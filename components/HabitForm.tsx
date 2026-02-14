@@ -1,9 +1,9 @@
 
-import React, { useState, useEffect } from 'react';
-import { Habit, Category, TimeOfDay } from '../types';
+import React, { useState, useMemo } from 'react';
+import { Habit, Category, TimeOfDay, GoalFormat, StepType } from '../types';
 import { ICONS, getIconById } from '../constants';
-import { ChevronLeft, Check, Save, Star } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ChevronLeft, Check, Save, Star, Layers, Zap, DollarSign, ChevronDown } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
   habits: Habit[];
@@ -18,8 +18,12 @@ const HabitForm: React.FC<Props> = ({ habits, categories, onSave, onCancel, init
   const [description, setDescription] = useState(initialHabit?.description || '');
   const [categoryId, setCategoryId] = useState(initialHabit?.categoryId || categories[0]?.id || '');
   const [icon, setIcon] = useState(initialHabit?.icon || ICONS[0].id);
+  const [showIcons, setShowIcons] = useState(false);
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(initialHabit?.timeOfDay || 'anytime');
+  const [stepType, setStepType] = useState<StepType>(initialHabit?.stepType || 'single');
+  const [goalFormat, setGoalFormat] = useState<GoalFormat>(initialHabit?.goalFormat || 'min');
   const [goal, setGoal] = useState<number | ''>(initialHabit?.goal || '');
+  const [stepValue, setStepValue] = useState<number | ''>(initialHabit?.stepValue || '');
   const [oneTimeValue, setOneTimeValue] = useState<number | ''>(initialHabit?.oneTimeValue || '');
   const [rewardValue, setRewardValue] = useState<number>(initialHabit?.rewardValue || 1);
   const [isMain, setIsMain] = useState<boolean>(initialHabit?.isMain || false);
@@ -27,162 +31,227 @@ const HabitForm: React.FC<Props> = ({ habits, categories, onSave, onCancel, init
   const mainHabitsCount = habits.filter(h => h.isMain && h.id !== initialHabit?.id).length;
   const isMainDisabled = mainHabitsCount >= 2;
 
+  const stepsCount = useMemo(() => {
+    if (stepType !== 'multiple' || !goal || !stepValue) return 0;
+    return Math.floor(Number(goal) / Number(stepValue));
+  }, [stepType, goal, stepValue]);
+
+  const goalFormatLabel = (format: GoalFormat) => {
+    switch (format) { case 'min': return 'min'; case 'times': return 'times'; case '$': return '$'; }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name) return;
-
+    const isMoneyGoal = goalFormat === '$';
     const habitData: Habit = {
       id: initialHabit?.id || Math.random().toString(36).substr(2, 9),
-      name,
-      description,
-      categoryId,
-      icon,
-      repetition: 'daily',
-      timeOfDay,
+      name, description, categoryId, icon,
+      repetition: 'daily', timeOfDay, stepType, goalFormat,
       goal: goal === '' ? undefined : Number(goal),
+      stepValue: stepValue !== '' ? Number(stepValue) : undefined,
       oneTimeValue: oneTimeValue === '' ? undefined : Number(oneTimeValue),
-      rewardValue: Number(rewardValue),
+      rewardValue: isMoneyGoal ? 0 : Number(rewardValue),
       isMain,
       createdAt: initialHabit?.createdAt || Date.now(),
     };
-
     onSave(habitData);
   };
 
   const isEditing = !!initialHabit;
 
+  const pill = (label: string, active: boolean, onClick: () => void, iconEl?: React.ReactNode) => (
+    <button type="button" onClick={onClick}
+      className={`flex items-center gap-1 px-3 py-2 rounded-block text-xs font-black transition-all border-2 ${active
+        ? 'bg-indigo-500 text-white border-indigo-600 shadow-sm'
+        : 'bg-white text-slate-400 border-slate-100'}`}
+    >{iconEl}{label}</button>
+  );
+
+  const sectionClass = "bg-white rounded-block p-4 shadow-sm border-2 border-indigo-50/30 space-y-3";
+  const labelClass = "text-[10px] font-black text-cozy-text/40 uppercase tracking-widest";
+  const inputClass = "w-full bg-slate-50/50 px-4 py-3 rounded-block border-2 border-slate-100 outline-none focus:border-cozy-indigo/30 transition-all font-bold text-cozy-text";
+
   return (
-    <div className="space-y-6 pb-20">
-      <div className="flex items-center gap-4">
-        <button onClick={onCancel} type="button" className="p-3 bg-white rounded-bubble shadow-sm active:scale-90 transition-transform border-4 border-indigo-50/50">
-          <ChevronLeft size={24} className="text-cozy-text" />
+    <div className="space-y-4 pb-20">
+      {/* Header */}
+      <div className="flex items-center gap-3">
+        <button onClick={onCancel} type="button" className="p-2 bg-white rounded-block shadow-sm active:scale-90 transition-transform border-2 border-indigo-50/50">
+          <ChevronLeft size={20} className="text-cozy-text" />
         </button>
-        <h2 className="text-2xl font-black text-cozy-text tracking-tight">{isEditing ? 'Edit Habit' : 'New Habit'}</h2>
+        <h2 className="text-xl font-black text-cozy-text tracking-tight">{isEditing ? 'Edit Habit' : 'New Habit'}</h2>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-2">
-          <label className="text-xs font-black text-cozy-text/50 uppercase tracking-widest px-2">Habit Name</label>
-          <input
-            type="text"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            placeholder="e.g. Daily Meditation"
-            className="w-full bg-white p-5 rounded-bubble shadow-md shadow-indigo-50/30 border-4 border-indigo-50/20 outline-none focus:border-cozy-indigo/30 transition-all font-black text-lg text-cozy-text"
-            required
-          />
-        </div>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {/* ═══ BLOCK 1: Main Info ═══ */}
+        <div className={sectionClass}>
+          <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Main Info</p>
 
-        <div className="space-y-2">
-          <label className="text-xs font-black text-cozy-text/50 uppercase tracking-widest px-2">Category</label>
-          <div className="flex flex-wrap gap-2">
-            {categories.map(cat => (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() => setCategoryId(cat.id)}
-                className={`px-5 py-3 rounded-bubble text-sm font-black transition-all border-4 ${categoryId === cat.id
-                  ? 'shadow-lg translate-y-[-1px]'
-                  : 'bg-white text-slate-400 border-indigo-50/30 shadow-none'}`}
-                style={categoryId === cat.id ? { backgroundColor: `${cat.color}30`, borderColor: cat.color, color: '#1E293B' } : {}}
-              >
-                {cat.name}
-              </button>
-            ))}
+          {/* Name */}
+          <div>
+            <label className={labelClass}>Name</label>
+            <input type="text" value={name} onChange={e => setName(e.target.value)}
+              placeholder="e.g. Daily Meditation" className={`${inputClass} text-base font-black`} required />
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <label className="text-xs font-black text-cozy-text/50 uppercase tracking-widest px-2">Icon</label>
-          <div className="grid grid-cols-5 gap-3 bg-white p-5 rounded-cozy shadow-md shadow-indigo-50/30 border-4 border-indigo-50/20 max-h-[280px] overflow-y-auto">
-            {ICONS.map(i => (
-              <button
-                key={i.id}
-                type="button"
-                onClick={() => setIcon(i.id)}
-                className={`p-3.5 rounded-bubble flex items-center justify-center transition-all ${icon === i.id
-                  ? 'bg-indigo-100 text-cozy-indigo shadow-inner'
-                  : 'bg-white text-slate-300 hover:bg-indigo-50/50'}`}
-              >
-                {React.cloneElement(i.component as React.ReactElement, { size: 24 })}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label className="text-xs font-black text-cozy-text/50 uppercase tracking-widest px-2">Time of Day</label>
-            <div className="relative">
-              <select
-                value={timeOfDay}
-                onChange={e => setTimeOfDay(e.target.value as TimeOfDay)}
-                className="w-full bg-white p-5 rounded-bubble shadow-md shadow-indigo-50/30 border-4 border-indigo-50/20 outline-none font-black capitalize text-cozy-text appearance-none"
-              >
-                <option value="anytime">Anytime</option>
-                <option value="morning">Morning</option>
-                <option value="afternoon">Afternoon</option>
-                <option value="evening">Evening</option>
-              </select>
+          {/* Category */}
+          <div>
+            <label className={labelClass}>Category</label>
+            <div className="flex flex-wrap gap-1.5 mt-1">
+              {categories.map(cat => (
+                <button key={cat.id} type="button" onClick={() => setCategoryId(cat.id)}
+                  className={`px-3 py-1.5 rounded-block text-[11px] font-black transition-all border-2 ${categoryId === cat.id
+                    ? 'shadow-sm translate-y-[-1px]' : 'bg-white text-slate-400 border-slate-100'}`}
+                  style={categoryId === cat.id ? { backgroundColor: `${cat.color}30`, borderColor: cat.color, color: '#1E293B' } : {}}
+                >{cat.name}</button>
+              ))}
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-black text-cozy-text/50 uppercase tracking-widest px-2">Goal (min)</label>
-            <input
-              type="number"
-              value={goal}
-              onChange={e => setGoal(e.target.value === '' ? '' : Number(e.target.value))}
-              placeholder="Optional"
-              className="w-full bg-white p-5 rounded-bubble shadow-md shadow-indigo-50/30 border-4 border-indigo-50/20 outline-none font-black text-cozy-text"
-            />
+          {/* Time of Day */}
+          <div>
+            <label className={labelClass}>Time of Day</label>
+            <select value={timeOfDay} onChange={e => setTimeOfDay(e.target.value as TimeOfDay)}
+              className={`${inputClass} py-2.5 capitalize appearance-none`}>
+              <option value="anytime">Anytime</option>
+              <option value="morning">Morning</option>
+              <option value="afternoon">Afternoon</option>
+              <option value="evening">Evening</option>
+            </select>
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <label className="text-xs font-black text-cozy-text/50 uppercase tracking-widest px-2">Frag Value</label>
-          <input
-            type="number"
-            value={rewardValue === 0 ? '' : rewardValue}
-            onChange={e => setRewardValue(e.target.value === '' ? 0 : Math.max(1, Number(e.target.value)))}
-            placeholder="Default 1"
-            className="w-full bg-white p-5 rounded-bubble shadow-md shadow-indigo-50/30 border-4 border-indigo-50/20 outline-none font-black text-cozy-text"
-            min="1"
-          />
-        </div>
+          {/* Icon — collapsible */}
+          <div>
+            <button type="button" onClick={() => setShowIcons(!showIcons)}
+              className="flex items-center justify-between w-full py-2"
+            >
+              <div className="flex items-center gap-2">
+                <span className={labelClass}>Icon</span>
+                <div className="w-8 h-8 rounded-block bg-indigo-50 flex items-center justify-center text-indigo-400">
+                  {React.cloneElement(getIconById(icon) as React.ReactElement, { size: 18 })}
+                </div>
+              </div>
+              <motion.div animate={{ rotate: showIcons ? 180 : 0 }}>
+                <ChevronDown size={16} className="text-slate-300" />
+              </motion.div>
+            </button>
+            <AnimatePresence>
+              {showIcons && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="grid grid-cols-6 gap-2 pt-2 max-h-[180px] overflow-y-auto">
+                    {ICONS.map(i => (
+                      <button key={i.id} type="button"
+                        onClick={() => { setIcon(i.id); setShowIcons(false); }}
+                        className={`p-2.5 rounded-block flex items-center justify-center transition-all ${icon === i.id
+                          ? 'bg-indigo-100 text-cozy-indigo shadow-inner'
+                          : 'bg-slate-50 text-slate-300 hover:bg-indigo-50/50'}`}
+                      >
+                        {React.cloneElement(i.component as React.ReactElement, { size: 20 })}
+                      </button>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
-        <div className="space-y-2">
-          <label className="text-xs font-black text-cozy-text/50 uppercase tracking-widest px-2 flex justify-between">
-            Priority Selection
-            {isMainDisabled && !isMain && <span className="text-[10px] text-rose-400 normal-case">Max 2 main habits reached</span>}
-          </label>
-          <button
-            type="button"
-            disabled={isMainDisabled && !isMain}
-            onClick={() => setIsMain(!isMain)}
-            className={`w-full p-5 rounded-bubble shadow-md border-4 transition-all flex items-center justify-between font-black ${isMain
-              ? 'bg-indigo-500 text-white border-indigo-600 shadow-indigo-100'
-              : isMainDisabled ? 'bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed grayscale' : 'bg-white text-slate-400 border-indigo-50/20 shadow-indigo-50/30'}`}
+          {/* Main Habit Toggle */}
+          <button type="button" disabled={isMainDisabled && !isMain} onClick={() => setIsMain(!isMain)}
+            className={`w-full px-4 py-2.5 rounded-block border-2 transition-all flex items-center justify-between font-black text-sm ${isMain
+              ? 'bg-indigo-500 text-white border-indigo-600'
+              : isMainDisabled ? 'bg-slate-50 text-slate-300 border-slate-100 cursor-not-allowed' : 'bg-white text-slate-400 border-slate-100'}`}
           >
-            <div className="flex items-center gap-3">
-              <Star size={20} fill={isMain ? "currentColor" : "none"} className={isMain ? "text-white" : "text-slate-300"} />
+            <div className="flex items-center gap-2">
+              <Star size={16} fill={isMain ? "currentColor" : "none"} />
               <span>Make Main</span>
+              {isMainDisabled && !isMain && <span className="text-[9px] text-rose-400 normal-case ml-1">max 2</span>}
             </div>
-            <div className={`w-10 h-6 rounded-full relative transition-colors ${isMain ? 'bg-white/30' : 'bg-slate-100'}`}>
-              <motion.div
-                animate={{ x: isMain ? 18 : 2 }}
-                className={`absolute top-1 w-4 h-4 rounded-full ${isMain ? 'bg-white' : 'bg-slate-300'}`}
-              />
+            <div className={`w-8 h-5 rounded-full relative transition-colors ${isMain ? 'bg-white/30' : 'bg-slate-100'}`}>
+              <motion.div animate={{ x: isMain ? 14 : 2 }}
+                className={`absolute top-0.5 w-4 h-4 rounded-full ${isMain ? 'bg-white' : 'bg-slate-300'}`} />
             </div>
           </button>
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-emerald-500 text-white p-6 rounded-bubble text-2xl font-black shadow-xl shadow-emerald-100 border-b-8 border-emerald-600 flex items-center justify-center gap-3 active:border-b-0 active:translate-y-1 transition-all"
+        {/* ═══ BLOCK 2: Goal Details ═══ */}
+        <div className={sectionClass}>
+          <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Goal Details</p>
+
+          {/* Goal Format */}
+          <div>
+            <label className={labelClass}>Goal Format</label>
+            <div className="flex gap-1.5 mt-1">
+              {pill('Minutes', goalFormat === 'min', () => setGoalFormat('min'))}
+              {pill('Times', goalFormat === 'times', () => setGoalFormat('times'))}
+              {pill('$', goalFormat === '$', () => setGoalFormat('$'), <DollarSign size={12} />)}
+            </div>
+          </div>
+
+          {/* Frag Value (only for non-$ goals) */}
+          {goalFormat !== '$' && (
+            <div>
+              <label className={labelClass}>Frag Value</label>
+              <input type="number" value={rewardValue === 0 ? '' : rewardValue}
+                onChange={e => setRewardValue(e.target.value === '' ? 0 : Math.max(1, Number(e.target.value)))}
+                placeholder="1" className={inputClass} min="1" />
+            </div>
+          )}
+
+          {/* Step Type */}
+          <div>
+            <label className={labelClass}>Steps</label>
+            <div className="flex gap-1.5 mt-1">
+              {pill('Single', stepType === 'single', () => setStepType('single'), <Zap size={12} />)}
+              {pill('Multiple', stepType === 'multiple', () => setStepType('multiple'), <Layers size={12} />)}
+            </div>
+          </div>
+
+          {/* Goal */}
+          <div>
+            <label className={labelClass}>Goal ({goalFormatLabel(goalFormat)})</label>
+            <input type="number" value={goal}
+              onChange={e => setGoal(e.target.value === '' ? '' : Number(e.target.value))}
+              placeholder="Optional" className={inputClass} />
+          </div>
+
+          {/* Step Value + Steps Count (only for multiple) */}
+          {stepType === 'multiple' && (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className={labelClass}>Step Value ({goalFormatLabel(goalFormat)})</label>
+                <input type="number" value={stepValue}
+                  onChange={e => setStepValue(e.target.value === '' ? '' : Number(e.target.value))}
+                  placeholder="Per step" className={inputClass} min="1" />
+              </div>
+              <div>
+                <label className={labelClass}>Steps Count</label>
+                <div className="bg-indigo-50/50 px-4 py-3 rounded-block border-2 border-indigo-100/30 font-black text-cozy-text flex items-center justify-center gap-1.5">
+                  {stepsCount > 0 ? (
+                    <>
+                      <Layers size={14} className="text-indigo-400" />
+                      <span className="text-lg tabular-nums">{stepsCount}</span>
+                      <span className="text-[10px] text-cozy-text/40">steps</span>
+                    </>
+                  ) : (
+                    <span className="text-[11px] text-cozy-text/30">—</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Submit */}
+        <button type="submit"
+          className="w-full bg-emerald-500 text-white p-4 rounded-block text-xl font-black shadow-lg shadow-emerald-100 border-b-6 border-emerald-600 flex items-center justify-center gap-2 active:border-b-0 active:translate-y-1 transition-all"
         >
-          {isEditing ? <Save size={32} /> : <Check size={32} />}
-          {isEditing ? 'Save Changes' : 'Create Habit'}
+          {isEditing ? <Save size={24} /> : <Check size={24} />}
+          {isEditing ? 'Save' : 'Create'}
         </button>
       </form>
     </div>

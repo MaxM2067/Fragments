@@ -7,6 +7,9 @@ export interface Category {
   color: string;
 }
 
+export type GoalFormat = 'min' | 'times' | '$';
+export type StepType = 'single' | 'multiple';
+
 export interface Habit {
   id: string;
   name: string;
@@ -16,8 +19,11 @@ export interface Habit {
   repetition: 'daily' | 'weekly' | 'custom';
   timeOfDay: TimeOfDay;
   oneTimeValue?: number; // In minutes
-  goal?: number; // In minutes
-  rewardValue?: number; // Fragments earned per completion
+  goal?: number; // Goal value in goalFormat units
+  rewardValue?: number; // Fragments earned per completion (for min/times)
+  stepType?: StepType; // 'single' (default) or 'multiple'
+  goalFormat?: GoalFormat; // 'min' (default), 'times', or '$'
+  stepValue?: number; // Value per step in goalFormat units (also $ per step for '$' goals)
   isMain?: boolean;
   createdAt: number;
 }
@@ -25,8 +31,10 @@ export interface Habit {
 export interface DailyProgress {
   habitId: string;
   completed: boolean;
-  completions: number; // Added to track multiple completions/points
+  completions: number; // Fragment completions (for min/times habits)
   elapsedTime: number; // In seconds
+  stepsCompleted: number; // Steps done today (for multi-step habits)
+  moneyEarned: number; // $ earned today (for $ habits)
 }
 
 export interface DailyLog {

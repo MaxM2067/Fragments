@@ -57,7 +57,7 @@ const App: React.FC = () => {
 
       for (const [id, timer] of Object.entries(timers)) {
         const elapsed = computeElapsedTime(timer);
-        const p = newProgress[id] || { habitId: id, completed: false, completions: 0, elapsedTime: 0 };
+        const p = newProgress[id] || { habitId: id, completed: false, completions: 0, elapsedTime: 0, stepsCompleted: 0, moneyEarned: 0 };
         newProgress[id] = { ...p, elapsedTime: elapsed };
       }
 
@@ -75,7 +75,7 @@ const App: React.FC = () => {
       setLogs(logsPrev => {
         const todayStr = new Date().toISOString().split('T')[0];
         const existingLog = logsPrev[todayStr] || { date: todayStr, mood: 0, progress: {} };
-        const p = existingLog.progress[habitId] || { habitId, completed: false, completions: 0, elapsedTime: 0 };
+        const p = existingLog.progress[habitId] || { habitId, completed: false, completions: 0, elapsedTime: 0, stepsCompleted: 0, moneyEarned: 0 };
         return {
           ...logsPrev,
           [todayStr]: {
@@ -195,7 +195,7 @@ const App: React.FC = () => {
         const elapsed = computeElapsedTime(timer);
         setLogs(logsPrev => {
           const existingLog = logsPrev[today] || { date: today, mood: 0, progress: {} };
-          const p = existingLog.progress[habitId] || { habitId, completed: false, completions: 0, elapsedTime: 0 };
+          const p = existingLog.progress[habitId] || { habitId, completed: false, completions: 0, elapsedTime: 0, stepsCompleted: 0, moneyEarned: 0 };
           return {
             ...logsPrev,
             [today]: {
@@ -224,7 +224,7 @@ const App: React.FC = () => {
   const updateHabitProgress = (habitId: string, update: Partial<DailyProgress>) => {
     setLogs(prev => {
       const existingLog = prev[today] || { date: today, mood: 0, progress: {} };
-      const existingProgress = existingLog.progress[habitId] || { habitId, completed: false, completions: 0, elapsedTime: 0 };
+      const existingProgress = existingLog.progress[habitId] || { habitId, completed: false, completions: 0, elapsedTime: 0, stepsCompleted: 0, moneyEarned: 0 };
 
       return {
         ...prev,
@@ -243,33 +243,97 @@ const App: React.FC = () => {
     const habit = habits.find(h => h.id === habitId);
     if (!habit) return;
 
-    const incrementMins = habit.goal || habit.oneTimeValue || 0;
-    const reward = habit.rewardValue || 1;
-    const existingProgress = currentLog.progress[habitId] || { habitId, completed: false, completions: 0, elapsedTime: 0 };
+    const isMoneyGoal = habit.goalFormat === '$';
+    const isMultiStep = habit.stepType === 'multiple';
+    const existingProgress = currentLog.progress[habitId] || { habitId, completed: false, completions: 0, elapsedTime: 0, stepsCompleted: 0, moneyEarned: 0 };
 
-    updateHabitProgress(habitId, {
-      completions: (existingProgress.completions || 0) + reward,
-      completed: true,
-      elapsedTime: existingProgress.elapsedTime + (incrementMins * 60)
-    });
+    if (isMultiStep) {
+      const stepsCount = habit.goal && habit.stepValue ? Math.floor(habit.goal / habit.stepValue) : 0;
+      const newSteps = (existingProgress.stepsCompleted || 0) + 1;
+      const cyclesCompleted = stepsCount > 0 ? Math.floor(newSteps / stepsCount) : 0;
+      const hasCompletedFirstCycle = stepsCount > 0 && newSteps >= stepsCount;
+
+      if (isMoneyGoal) {
+        updateHabitProgress(habitId, {
+          stepsCompleted: newSteps,
+          moneyEarned: (existingProgress.moneyEarned || 0) + (habit.stepValue || 0),
+          completed: hasCompletedFirstCycle,
+        });
+      } else {
+        const reward = habit.rewardValue || 1;
+        updateHabitProgress(habitId, {
+          stepsCompleted: newSteps,
+          completions: cyclesCompleted * reward,
+          completed: hasCompletedFirstCycle,
+        });
+      }
+    } else {
+      // Single step
+      if (isMoneyGoal) {
+        updateHabitProgress(habitId, {
+          moneyEarned: (existingProgress.moneyEarned || 0) + (habit.stepValue || 0),
+          completed: true,
+        });
+      } else {
+        const incrementMins = habit.goal || habit.oneTimeValue || 0;
+        const reward = habit.rewardValue || 1;
+        updateHabitProgress(habitId, {
+          completions: (existingProgress.completions || 0) + reward,
+          completed: true,
+          elapsedTime: existingProgress.elapsedTime + (incrementMins * 60)
+        });
+      }
+    }
   };
 
   const handleDecrementCompletion = (habitId: string) => {
     const habit = habits.find(h => h.id === habitId);
     if (!habit) return;
 
-    const reward = habit.rewardValue || 1;
+    const isMoneyGoal = habit.goalFormat === '$';
+    const isMultiStep = habit.stepType === 'multiple';
     const existingProgress = currentLog.progress[habitId];
-    if (!existingProgress || (existingProgress.completions || 0) <= 0) return;
+    if (!existingProgress) return;
 
-    const incrementMins = habit.goal || habit.oneTimeValue || 0;
-    const newCompletions = Math.max(0, (existingProgress.completions || 0) - reward);
+    if (isMultiStep) {
+      if ((existingProgress.stepsCompleted || 0) <= 0) return;
+      const stepsCount = habit.goal && habit.stepValue ? Math.floor(habit.goal / habit.stepValue) : 0;
+      const newSteps = Math.max(0, (existingProgress.stepsCompleted || 0) - 1);
+      const cyclesCompleted = stepsCount > 0 ? Math.floor(newSteps / stepsCount) : 0;
 
-    updateHabitProgress(habitId, {
-      completions: newCompletions,
-      completed: newCompletions > 0,
-      elapsedTime: Math.max(0, existingProgress.elapsedTime - (incrementMins * 60))
-    });
+      if (isMoneyGoal) {
+        updateHabitProgress(habitId, {
+          stepsCompleted: newSteps,
+          moneyEarned: Math.max(0, (existingProgress.moneyEarned || 0) - (habit.stepValue || 0)),
+          completed: stepsCount > 0 && newSteps >= stepsCount,
+        });
+      } else {
+        const reward = habit.rewardValue || 1;
+        updateHabitProgress(habitId, {
+          stepsCompleted: newSteps,
+          completions: cyclesCompleted * reward,
+          completed: stepsCount > 0 && newSteps >= stepsCount,
+        });
+      }
+    } else {
+      // Single step
+      if (isMoneyGoal) {
+        updateHabitProgress(habitId, {
+          moneyEarned: Math.max(0, (existingProgress.moneyEarned || 0) - (habit.stepValue || 0)),
+          completed: (existingProgress.moneyEarned || 0) - (habit.stepValue || 0) > 0,
+        });
+      } else {
+        if ((existingProgress.completions || 0) <= 0) return;
+        const reward = habit.rewardValue || 1;
+        const incrementMins = habit.goal || habit.oneTimeValue || 0;
+        const newCompletions = Math.max(0, (existingProgress.completions || 0) - reward);
+        updateHabitProgress(habitId, {
+          completions: newCompletions,
+          completed: newCompletions > 0,
+          elapsedTime: Math.max(0, existingProgress.elapsedTime - (incrementMins * 60))
+        });
+      }
+    }
   };
 
   const saveHabit = (habit: Habit) => {
@@ -322,7 +386,7 @@ const App: React.FC = () => {
             <MoodBar mood={currentLog.mood} onMoodChange={updateMood} isLarge />
             <button
               onClick={() => setView('habits')}
-              className="px-10 py-4 bg-indigo-500 text-white font-black rounded-bubble shadow-xl shadow-indigo-100 border-b-8 border-indigo-600 active:border-b-0 active:translate-y-1 transition-all"
+              className="px-10 py-4 bg-indigo-500 text-white font-black rounded-block shadow-xl shadow-indigo-100 border-b-8 border-indigo-600 active:border-b-0 active:translate-y-1 transition-all"
             >
               Done for now
             </button>
@@ -356,10 +420,10 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen text-cozy-text pb-20 select-none">
-      <header className="p-6 pb-2 flex items-center justify-between">
-        <h1 className="text-2xl font-black text-indigo-500 flex items-center gap-2 tracking-tight">
-          My Fragments <span className="text-[10px] font-black bg-slate-100 text-slate-500 px-3 py-1 rounded-bubble uppercase tracking-widest border border-slate-200/50">V3</span>
+    <div className="flex flex-col min-h-screen text-cozy-text pb-20 select-none" style={{ background: 'linear-gradient(135deg, #5DC6F3, #5AAA62)' }}>
+      <header className="p-5 pb-2 flex items-center justify-between">
+        <h1 className="text-2xl font-black text-white flex items-center gap-2 tracking-tight">
+          My Fragments <span className="text-[10px] font-black bg-white/15 text-white/60 px-3 py-1 rounded-block uppercase tracking-widest border border-white/20">V3</span>
         </h1>
       </header>
 

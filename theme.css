@@ -1,0 +1,58 @@
+/* ============================================
+   Fragments Theme — CSS Custom Properties
+   ============================================
+   Change these variables to restyle the whole app.
+*/
+
+:root {
+    /* ── Background gradient ── */
+    --bg-gradient: linear-gradient(135deg, #1CA2DC, #5AAA62);
+
+    /* ── Fragments (blue) ── */
+    --color-fragment: #3B82F6;
+    --color-fragment-light: #93C5FD;
+
+    /* ── Brand / primary ── */
+    --color-primary: #5AAA62;
+    /* green */
+    --color-primary-dark: #3d8a47;
+
+    /* ── Accent (orange) ── */
+    --color-accent: #F59E0B;
+    /* amber-500 */
+    --color-accent-light: #FCD34D;
+    /* amber-300 */
+    --color-accent-dark: #D97706;
+    /* amber-600 */
+
+    /* ── Success (check buttons) ── */
+    --color-success: #10B981;
+    /* emerald-500 */
+    --color-success-dark: #059669;
+    /* emerald-600 */
+
+    /* ── Text ── */
+    --color-text: #1E293B;
+    --color-text-muted: rgba(30, 41, 59, 0.5);
+
+    /* ── Surfaces ── */
+    --color-card: rgba(255, 255, 255, 0.95);
+    --color-glass: rgba(255, 255, 255, 0.2);
+
+    /* ── Bottom nav ── */
+    --nav-bg: linear-gradient(135deg, #3d8a47, #2d7a3a);
+
+    /* ── Border radius tokens ── */
+    --radius-block: 1.7rem;
+    /* rounded-2xl (16px) */
+    --radius-button: 1rem;
+    --radius-icon: 9999px;
+    /* fully round */
+
+    /* ── Progress ring ── */
+    --progress-stroke: 5;
+
+    /* ── Shadows ── */
+    --shadow-block: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-header: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}

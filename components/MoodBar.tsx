@@ -23,7 +23,7 @@ const MoodBar: React.FC<Props> = ({ mood, onMoodChange, isLarge }) => {
 
   if (isLarge) {
     return (
-      <div className="w-full max-w-sm mx-auto p-8 rounded-cozy bg-white shadow-xl shadow-indigo-100/50 border-4 border-indigo-50/50 flex flex-col items-center gap-8">
+      <div className="w-full max-w-sm mx-auto p-8 rounded-block bg-white shadow-xl shadow-indigo-100/50 border-4 border-indigo-50/50 flex flex-col items-center gap-8">
         <motion.div
           key={mood}
           initial={{ scale: 0.5, rotate: -20 }}
@@ -49,7 +49,7 @@ const MoodBar: React.FC<Props> = ({ mood, onMoodChange, isLarge }) => {
                   {mood === step && (
                     <motion.div
                       layoutId="active-mood-large"
-                      className="absolute inset-0 bg-indigo-50 rounded-bubble -z-10"
+                      className="absolute inset-0 bg-indigo-50 rounded-block -z-10"
                     />
                   )}
                 </button>
@@ -67,7 +67,7 @@ const MoodBar: React.FC<Props> = ({ mood, onMoodChange, isLarge }) => {
 
   // Fallback for smaller rendering if needed elsewhere
   return (
-    <div className="mx-5 mb-2 bg-white/80 backdrop-blur-md p-3 rounded-bubble shadow-lg shadow-indigo-100/20 border-2 border-indigo-50/50 flex flex-col gap-2">
+    <div className="mx-5 mb-2 bg-white/80 backdrop-blur-md p-3 rounded-block shadow-lg shadow-indigo-100/20 border-2 border-indigo-50/50 flex flex-col gap-2">
       <div className="flex justify-between items-center px-2">
         <span className="text-[10px] font-black text-cozy-text/40 uppercase tracking-widest">How's it going?</span>
         <span className="text-xl drop-shadow-sm">{moodEmojis[mood]}</span>

@@ -1,8 +1,8 @@
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Habit, Category, DailyProgress } from '../types';
 import { getIconById } from '../constants';
-import { Play, Pause, Plus, Minus, Star, Gem, Diamond } from 'lucide-react';
+import { Play, Pause, Check, Minus, Star, Gem, Diamond } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
@@ -25,6 +25,76 @@ interface Particle {
   size: number;
 }
 
+// SVG circular progress ring component
+const CircularProgress: React.FC<{
+  percent: number;
+  size: number;
+  stroke?: number;
+  segments?: number;
+  filledSegments?: number;
+  color?: string;
+}> = ({ percent, size, stroke: strokeProp, segments, filledSegments, color = '#34D399' }) => {
+  const stroke = strokeProp ?? (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--progress-stroke')) || 3.5);
+  const r = (size - stroke) / 2;
+  const circ = 2 * Math.PI * r;
+
+  if (segments && segments > 0) {
+    // Segmented ring for multi-step habits
+    const gap = 4; // gap in degrees between segments
+    const totalGap = gap * segments;
+    const totalArc = 360 - totalGap;
+    const segArc = totalArc / segments;
+
+    return (
+      <svg width={size} height={size} className="absolute inset-0 -rotate-90">
+        {Array.from({ length: segments }).map((_, i) => {
+          const startAngle = i * (segArc + gap) + gap / 2;
+          const endAngle = startAngle + segArc;
+          const startRad = (startAngle * Math.PI) / 180;
+          const endRad = (endAngle * Math.PI) / 180;
+          const cx = size / 2;
+          const cy = size / 2;
+
+          const x1 = cx + r * Math.cos(startRad);
+          const y1 = cy + r * Math.sin(startRad);
+          const x2 = cx + r * Math.cos(endRad);
+          const y2 = cy + r * Math.sin(endRad);
+          const largeArc = segArc > 180 ? 1 : 0;
+
+          const filled = filledSegments !== undefined ? i < filledSegments : false;
+
+          return (
+            <path
+              key={i}
+              d={`M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`}
+              fill="none"
+              stroke={filled ? color : 'rgba(0,0,0,0.06)'}
+              strokeWidth={stroke}
+              strokeLinecap="round"
+            />
+          );
+        })}
+      </svg>
+    );
+  }
+
+  // Continuous ring for timer-based progress
+  return (
+    <svg width={size} height={size} className="absolute inset-0 -rotate-90">
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth={stroke} />
+      <circle
+        cx={size / 2} cy={size / 2} r={r} fill="none"
+        stroke={color}
+        strokeWidth={stroke}
+        strokeLinecap="round"
+        strokeDasharray={circ}
+        strokeDashoffset={circ - (circ * percent) / 100}
+        style={{ transition: 'stroke-dashoffset 0.5s ease' }}
+      />
+    </svg>
+  );
+};
+
 const HabitCard: React.FC<Props> = ({
   habit,
   category,
@@ -37,7 +107,17 @@ const HabitCard: React.FC<Props> = ({
   const [particles, setParticles] = useState<Particle[]>([]);
   const elapsedTime = progress?.elapsedTime || 0;
   const completions = progress?.completions || 0;
-  const isActuallyCompleted = completions > 0;
+  const stepsCompleted = progress?.stepsCompleted || 0;
+  const isMultiStep = habit.stepType === 'multiple';
+
+  const stepsCount = useMemo(() => {
+    if (!isMultiStep || !habit.goal || !habit.stepValue) return 0;
+    return Math.floor(habit.goal / habit.stepValue);
+  }, [isMultiStep, habit.goal, habit.stepValue]);
+
+  const isActuallyCompleted = isMultiStep
+    ? (stepsCount > 0 && stepsCompleted >= stepsCount)
+    : completions > 0;
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -50,7 +130,7 @@ const HabitCard: React.FC<Props> = ({
       id: Date.now() + i,
       x: (Math.random() - 0.5) * 80,
       y: (Math.random() - 0.5) * 80,
-      color: ['#6366F1', '#38BDF8', '#818CF8', '#A5B4FC', '#6366F1'][Math.floor(Math.random() * 5)],
+      color: ['#3B82F6', '#60A5FA', '#93C5FD', '#2563EB', '#1D4ED8'][Math.floor(Math.random() * 5)],
       shape: Math.random() > 0.4 ? 'gem' : 'diamond',
       size: 12 + Math.floor(Math.random() * 12)
     }));
@@ -66,61 +146,107 @@ const HabitCard: React.FC<Props> = ({
     onIncrementCompletion(habit.id);
   };
 
-  const goalSeconds = habit.goal ? habit.goal * 60 : 0;
-  const isGoalHabit = goalSeconds > 0;
+  const goalSeconds = habit.goal && habit.goalFormat === 'min' ? habit.goal * 60 : 0;
+  const isGoalHabit = goalSeconds > 0 && !isMultiStep;
+  const hasTimer = (isGoalHabit || habit.oneTimeValue) && !isMultiStep;
   const progressPercent = isGoalHabit ? Math.min(100, (elapsedTime / goalSeconds) * 100) : (isActuallyCompleted ? 100 : 0);
+
+  const displayCount = isMultiStep ? stepsCompleted : completions;
+
+  // Circular progress config
+  const iconWrapSize = 52;
+  const ringSize = iconWrapSize + 10;
+  const showRing = isMultiStep ? stepsCount > 0 : isGoalHabit;
 
   return (
     <motion.div
       layout
-      className={`relative bg-white rounded-cozy p-4 border-2 transition-all duration-500 
+      className={`relative bg-white/95 backdrop-blur-sm rounded-block px-3 py-2.5 border transition-all duration-500 
         ${isActuallyCompleted
-          ? 'border-emerald-100 bg-emerald-50/20 shadow-sm'
+          ? 'border-emerald-200/60 bg-emerald-50/40 shadow-block'
           : habit.isMain
-            ? 'border-indigo-200 shadow-xl shadow-indigo-100/50 scale-[1.02] z-10'
-            : 'border-transparent shadow-indigo-50/30 shadow-md'}`}
-      initial={{ scale: 0.95, opacity: 0 }}
+            ? 'border-white/50 shadow-block scale-[1.01] z-10'
+            : 'border-white/30 shadow-block'}`}
+      initial={{ scale: 0.97, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
     >
       {habit.isMain && (
-        <div className="absolute -top-2 -left-2 bg-indigo-500 text-white p-1 rounded-full shadow-lg z-20 animate-bounce-subtle">
-          <Star size={14} fill="currentColor" />
+        <div className="absolute -top-1.5 -left-1.5 bg-amber-500 text-white p-0.5 rounded-full shadow-md z-20">
+          <Star size={12} fill="currentColor" />
         </div>
       )}
 
-      <div className="flex items-start gap-4">
-        {/* Icon */}
-        <div
-          className={`w-14 h-14 rounded-bubble flex items-center justify-center text-white shrink-0 shadow-lg shadow-black/5 transition-transform ${habit.isMain ? 'ring-4 ring-indigo-50' : ''}`}
-          style={{ backgroundColor: category?.color || '#cbd5e1' }}
-        >
-          {React.cloneElement(getIconById(habit.icon) as React.ReactElement, { size: 32 })}
-        </div>
-
-        {/* Info */}
-        <div className="flex-1 min-w-0 pt-1">
-          <div className={`${isActuallyCompleted ? 'text-emerald-900' : 'text-cozy-text'}`}>
-            <span className="font-black text-lg leading-tight transition-colors line-clamp-2">
-              {habit.name}
-            </span>
+      <div className="flex items-center gap-3">
+        {/* Icon with circular progress ring */}
+        <div className="relative shrink-0 flex items-center justify-center" style={{ width: ringSize, height: ringSize }}>
+          {showRing && (
+            <CircularProgress
+              percent={isMultiStep ? 0 : progressPercent}
+              size={ringSize}
+              segments={isMultiStep ? stepsCount : undefined}
+              filledSegments={isMultiStep ? Math.min(stepsCompleted, stepsCount) : undefined}
+              color="var(--color-accent, #F59E0B)"
+            />
+          )}
+          <div
+            className={`w-[${iconWrapSize}px] h-[${iconWrapSize}px] rounded-full flex items-center justify-center text-white shadow-md`}
+            style={{
+              backgroundColor: category?.color || '#cbd5e1',
+              width: iconWrapSize,
+              height: iconWrapSize,
+            }}
+          >
+            {React.cloneElement(getIconById(habit.icon) as React.ReactElement, { size: 26 })}
           </div>
-          <p className={`text-[11px] font-bold truncate capitalize mt-1 ${habit.isMain ? 'text-indigo-400' : 'text-slate-400'}`}>
-            {category?.name} • {habit.timeOfDay} {habit.isMain && '• Main'}
-          </p>
         </div>
 
-        {/* Increment Plus Button with Bubble Counter */}
-        <div className="flex items-center gap-2 shrink-0">
+        {/* Info + Timer inline */}
+        <div className="flex-1 min-w-0 overflow-hidden">
+          <span className={`font-black text-[15px] leading-tight line-clamp-1 ${isActuallyCompleted ? 'text-emerald-800' : 'text-cozy-text'}`}>
+            {habit.name}
+          </span>
+          <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
+            <span className={`text-[10px] font-bold truncate capitalize ${habit.isMain ? 'text-amber-500' : 'text-slate-400'}`}>
+              {category?.name} • {habit.timeOfDay} {habit.isMain && '• Main'}
+            </span>
+            {/* Inline timer */}
+            {hasTimer && (
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={(e) => { e.stopPropagation(); onToggleTimer(habit.id); }}
+                  className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${isRunning
+                    ? 'bg-amber-500 text-white shadow-sm'
+                    : 'bg-amber-50 text-amber-500'}`}
+                >
+                  {isRunning ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
+                </button>
+                <span className={`text-sm font-black tabular-nums ${isRunning ? 'text-amber-500' : 'text-slate-400'}`}>
+                  {formatTime(elapsedTime)}
+                  {isGoalHabit && <span className="text-slate-300">/{habit.goal}m</span>}
+                </span>
+              </div>
+            )}
+            {/* Inline multi-step counter */}
+            {isMultiStep && stepsCount > 0 && (
+              <span className="text-[11px] font-black tabular-nums text-amber-500 shrink-0">
+                {stepsCompleted}/{stepsCount}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Check / Decrement buttons */}
+        <div className="flex items-center gap-1.5 shrink-0">
           <AnimatePresence>
-            {completions > 0 && (
+            {displayCount > 0 && (
               <motion.button
-                initial={{ opacity: 0, x: 20, scale: 0.5 }}
+                initial={{ opacity: 0, x: 10, scale: 0.5 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: 20, scale: 0.5 }}
+                exit={{ opacity: 0, x: 10, scale: 0.5 }}
                 onClick={(e) => { e.stopPropagation(); onDecrementCompletion(habit.id); }}
-                className="w-10 h-10 bg-slate-50 text-slate-300 rounded-bubble flex items-center justify-center hover:bg-slate-100 transition-colors active:scale-90"
+                className="w-8 h-8 bg-slate-50 text-slate-300 rounded-block flex items-center justify-center active:scale-90"
               >
-                <Minus size={20} strokeWidth={3} />
+                <Minus size={16} strokeWidth={3} />
               </motion.button>
             )}
           </AnimatePresence>
@@ -128,26 +254,26 @@ const HabitCard: React.FC<Props> = ({
           <div className="relative">
             <button
               onClick={handleIncrement}
-              className={`w-14 h-14 rounded-bubble flex items-center justify-center transition-all duration-500 active:scale-90 relative z-10 ${completions > 0
-                ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-100'
-                : 'bg-white text-slate-300 border-4 border-emerald-50/20 shadow-sm'
+              className={`w-11 h-11 rounded-block flex items-center justify-center transition-all duration-500 active:scale-90 relative z-10 shadow-xl border-b-4 ${isActuallyCompleted
+                ? 'bg-emerald-500 text-white border-emerald-600'
+                : 'bg-white text-emerald-500 border-emerald-100'
                 }`}
             >
-              {habit.rewardValue && habit.rewardValue > 1 ? (
-                <span className="text-xl font-black">+{habit.rewardValue}</span>
+              {!isMultiStep && habit.rewardValue && habit.rewardValue > 1 ? (
+                <span className="text-base font-black">+{habit.rewardValue}</span>
               ) : (
-                <Plus size={36} strokeWidth={4} />
+                <Check size={24} strokeWidth={4} />
               )}
             </button>
 
             <AnimatePresence>
-              {completions > 0 && (
+              {displayCount > 0 && (
                 <motion.span
                   initial={{ scale: 0, rotate: -20 }}
                   animate={{ scale: 1, rotate: 0 }}
-                  className="absolute -top-1 -right-1 bg-emerald-500 text-white text-[11px] font-black w-7 h-7 rounded-full flex items-center justify-center shadow-md border-2 border-white z-20"
+                  className="absolute -top-1 -right-1 bg-emerald-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-sm border-2 border-white z-20"
                 >
-                  {completions}
+                  {displayCount}
                 </motion.span>
               )}
             </AnimatePresence>
@@ -179,42 +305,11 @@ const HabitCard: React.FC<Props> = ({
         </div>
       </div>
 
-      {/* Timer Row */}
-      {(isGoalHabit || habit.oneTimeValue) && (
-        <div className="mt-4 flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-emerald-50/30 px-3 py-2 rounded-cozy border border-emerald-50/50 shrink-0">
-            <span className={`text-sm font-black tabular-nums ${isRunning ? 'text-emerald-500 animate-pulse' : 'text-slate-500'}`}>
-              {formatTime(elapsedTime)}
-            </span>
-            {isGoalHabit && <span className="text-[10px] text-slate-300 font-bold">/ {habit.goal}m</span>}
-          </div>
-
-          <button
-            onClick={(e) => { e.stopPropagation(); onToggleTimer(habit.id); }}
-            className={`w-10 h-10 rounded-bubble flex items-center justify-center transition-all ${isRunning ? 'bg-emerald-400 text-white shadow-md' : 'bg-emerald-50 text-emerald-400 hover:bg-emerald-100'}`}
-          >
-            {isRunning ? <Pause size={18} fill="currentColor" /> : <Play size={18} fill="currentColor" className="ml-1" />}
-          </button>
-
-          {/* Progress Bar Container - Rounder */}
-          {isGoalHabit && (
-            <div className="flex-1 bg-slate-100/30 h-3 rounded-full overflow-hidden p-0.5 border border-emerald-50/10">
-              <motion.div
-                className="h-full bg-emerald-400 rounded-full"
-                initial={{ width: 0 }}
-                animate={{ width: `${progressPercent}%` }}
-                transition={{ type: "spring", stiffness: 50 }}
-              />
-            </div>
-          )}
-        </div>
-      )}
-
       {isActuallyCompleted && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="absolute inset-0 bg-indigo-500/5 pointer-events-none rounded-cozy"
+          className="absolute inset-0 bg-emerald-500/5 pointer-events-none rounded-block"
         />
       )}
     </motion.div>
