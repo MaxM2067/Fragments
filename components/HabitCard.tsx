@@ -161,7 +161,7 @@ const HabitCard: React.FC<Props> = ({
   return (
     <motion.div
       layout
-      className={`relative bg-white/95 backdrop-blur-sm rounded-block px-3 py-2.5 border transition-all duration-500 
+      className={`relative w-full overflow-hidden bg-white/95 backdrop-blur-sm rounded-block px-3 py-2.5 border transition-all duration-500 
         ${isActuallyCompleted
           ? 'border-emerald-200/60 bg-emerald-50/40 shadow-block'
           : habit.isMain
@@ -176,7 +176,7 @@ const HabitCard: React.FC<Props> = ({
         </div>
       )}
 
-      <div className="flex items-center gap-3">
+      <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 w-full">
         {/* Icon with circular progress ring */}
         <div className="relative shrink-0 flex items-center justify-center" style={{ width: ringSize, height: ringSize }}>
           {showRing && (
@@ -189,7 +189,7 @@ const HabitCard: React.FC<Props> = ({
             />
           )}
           <div
-            className={`w-[${iconWrapSize}px] h-[${iconWrapSize}px] rounded-full flex items-center justify-center text-white shadow-md`}
+            className={`w-[${iconWrapSize}px] h-[${iconWrapSize}px] rounded-full flex items-center justify-center text-white shadow-md shadow-black/5`}
             style={{
               backgroundColor: category?.color || '#cbd5e1',
               width: iconWrapSize,
@@ -201,26 +201,29 @@ const HabitCard: React.FC<Props> = ({
         </div>
 
         {/* Info + Timer inline */}
-        <div className="flex-1 min-w-0 overflow-hidden">
-          <span className={`font-black text-[15px] leading-tight line-clamp-1 ${isActuallyCompleted ? 'text-emerald-800' : 'text-cozy-text'}`}>
+        <div className="min-w-0 flex flex-col justify-center">
+          <div
+            className={`font-black leading-tight line-clamp-2 ${isActuallyCompleted ? 'text-emerald-800' : 'text-cozy-text'}`}
+            style={{ fontSize: 'var(--font-size-habit-name, 1.1rem)' }}
+          >
             {habit.name}
-          </span>
+          </div>
           <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
-            <span className={`text-[10px] font-bold truncate capitalize ${habit.isMain ? 'text-amber-500' : 'text-slate-400'}`}>
+            <span className={`text-[10px] font-bold truncate capitalize shrink-0 ${habit.isMain ? 'text-amber-500' : 'text-slate-400'}`}>
               {category?.name} • {habit.timeOfDay} {habit.isMain && '• Main'}
             </span>
             {/* Inline timer */}
             {hasTimer && (
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 min-w-0">
                 <button
                   onClick={(e) => { e.stopPropagation(); onToggleTimer(habit.id); }}
-                  className={`w-9 h-9 rounded-full flex items-center justify-center transition-all ${isRunning
+                  className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${isRunning
                     ? 'bg-amber-500 text-white shadow-sm'
                     : 'bg-amber-50 text-amber-500'}`}
                 >
                   {isRunning ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
                 </button>
-                <span className={`text-sm font-black tabular-nums ${isRunning ? 'text-amber-500' : 'text-slate-400'}`}>
+                <span className={`text-sm font-black tabular-nums truncate ${isRunning ? 'text-amber-500' : 'text-slate-400'}`}>
                   {formatTime(elapsedTime)}
                   {isGoalHabit && <span className="text-slate-300">/{habit.goal}m</span>}
                 </span>
@@ -236,7 +239,7 @@ const HabitCard: React.FC<Props> = ({
         </div>
 
         {/* Check / Decrement buttons */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0 justify-end">
           <AnimatePresence>
             {displayCount > 0 && (
               <motion.button
@@ -244,7 +247,7 @@ const HabitCard: React.FC<Props> = ({
                 animate={{ opacity: 1, x: 0, scale: 1 }}
                 exit={{ opacity: 0, x: 10, scale: 0.5 }}
                 onClick={(e) => { e.stopPropagation(); onDecrementCompletion(habit.id); }}
-                className="w-8 h-8 bg-slate-50 text-slate-300 rounded-block flex items-center justify-center active:scale-90"
+                className="w-8 h-8 bg-slate-50 text-slate-300 rounded-block flex items-center justify-center active:scale-90 shrink-0"
               >
                 <Minus size={16} strokeWidth={3} />
               </motion.button>

@@ -127,7 +127,7 @@ const HabitList: React.FC<Props> = ({
       </div>
 
       {/* Habit List */}
-      <div className="grid gap-1.5">
+      <div className="grid" style={{ gap: 'var(--spacing-list-gap, 0.5rem)' }}>
         {processedHabits.length > 0 ? (
           processedHabits.map(habit => (
             <HabitCard
