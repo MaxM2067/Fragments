@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Habit, Category, DailyProgress } from '../types';
 import HabitCard from './HabitCard';
-import { LayoutGrid, Clock, Filter, Trophy } from 'lucide-react';
+import { LayoutGrid, Clock, Filter, Gem } from 'lucide-react';
 
 interface Props {
   habits: Habit[];
@@ -79,7 +79,7 @@ const HabitList: React.FC<Props> = ({
           <p className="text-xs text-cozy-text/60 mt-2 font-bold italic">Давай, шевели жопкой</p>
         </div>
         <div className="w-20 h-20 bg-white rounded-bubble flex items-center justify-center shadow-inner shadow-indigo-100/50 border-4 border-indigo-50/50">
-          <Trophy size={40} className="text-indigo-400 drop-shadow-md" />
+          <Gem size={40} className="text-indigo-400 drop-shadow-md" />
         </div>
       </div>
 

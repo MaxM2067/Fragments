@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Habit, Category, DailyProgress } from '../types';
 import { getIconById } from '../constants';
-import { Play, Pause, Plus, Minus, Star } from 'lucide-react';
+import { Play, Pause, Plus, Minus, Star, Gem, Diamond } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
@@ -21,6 +21,8 @@ interface Particle {
   x: number;
   y: number;
   color: string;
+  shape: 'gem' | 'diamond';
+  size: number;
 }
 
 const HabitCard: React.FC<Props> = ({
@@ -44,16 +46,18 @@ const HabitCard: React.FC<Props> = ({
   };
 
   const spawnParticles = () => {
-    const newParticles: Particle[] = Array.from({ length: 6 }).map((_, i) => ({
+    const newParticles: Particle[] = Array.from({ length: 8 }).map((_, i) => ({
       id: Date.now() + i,
-      x: (Math.random() - 0.5) * 60,
-      y: (Math.random() - 0.5) * 60,
-      color: ['#6366F1', '#38BDF8', '#818CF8', '#A5B4FC'][Math.floor(Math.random() * 4)]
+      x: (Math.random() - 0.5) * 80,
+      y: (Math.random() - 0.5) * 80,
+      color: ['#6366F1', '#38BDF8', '#818CF8', '#A5B4FC', '#6366F1'][Math.floor(Math.random() * 5)],
+      shape: Math.random() > 0.4 ? 'gem' : 'diamond',
+      size: 12 + Math.floor(Math.random() * 12)
     }));
     setParticles(prev => [...prev, ...newParticles]);
     setTimeout(() => {
       setParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)));
-    }, 1000);
+    }, 1200);
   };
 
   const handleIncrement = (e: React.MouseEvent) => {
@@ -78,7 +82,7 @@ const HabitCard: React.FC<Props> = ({
       initial={{ scale: 0.95, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
     >
-      {habit.isMain && !isActuallyCompleted && (
+      {habit.isMain && (
         <div className="absolute -top-2 -left-2 bg-indigo-500 text-white p-1 rounded-full shadow-lg z-20 animate-bounce-subtle">
           <Star size={14} fill="currentColor" />
         </div>
@@ -95,11 +99,10 @@ const HabitCard: React.FC<Props> = ({
 
         {/* Info */}
         <div className="flex-1 min-w-0 pt-1">
-          <div className={`flex items-start gap-2 ${isActuallyCompleted ? 'text-emerald-900' : 'text-cozy-text'}`}>
-            <span className="font-black text-lg leading-tight transition-colors line-clamp-2 min-w-0">
+          <div className={`${isActuallyCompleted ? 'text-emerald-900' : 'text-cozy-text'}`}>
+            <span className="font-black text-lg leading-tight transition-colors line-clamp-2">
               {habit.name}
             </span>
-            {habit.isMain && isActuallyCompleted && <Star size={16} fill="currentColor" className="text-indigo-400 shrink-0 mt-1" />}
           </div>
           <p className={`text-[11px] font-bold truncate capitalize mt-1 ${habit.isMain ? 'text-indigo-400' : 'text-slate-400'}`}>
             {category?.name} • {habit.timeOfDay} {habit.isMain && '• Main'}
@@ -149,7 +152,7 @@ const HabitCard: React.FC<Props> = ({
               )}
             </AnimatePresence>
 
-            {/* Particle Celebration */}
+            {/* Crystal Particle Celebration */}
             <AnimatePresence>
               {particles.map(p => (
                 <motion.div
@@ -157,15 +160,18 @@ const HabitCard: React.FC<Props> = ({
                   initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
                   animate={{
                     x: p.x * 2.5,
-                    y: -120 + p.y,
-                    scale: [0, 1.8, 0],
-                    rotate: [0, 180, 360],
-                    opacity: 0
+                    y: -140 + p.y,
+                    scale: [0, 1.6, 0.8, 0],
+                    rotate: [0, 120 + Math.random() * 240, 360],
+                    opacity: [1, 1, 0.6, 0]
                   }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                  className="absolute left-1/2 top-1/2 -ml-2 -mt-2 pointer-events-none z-0"
+                  transition={{ duration: 1.2, ease: "easeOut" }}
+                  className="absolute left-1/2 top-1/2 -ml-2 -mt-2 pointer-events-none z-50"
                 >
-                  <Star size={20} fill={p.color} className="text-transparent" />
+                  {p.shape === 'gem'
+                    ? <Gem size={p.size} fill={p.color} className="text-transparent drop-shadow-sm" />
+                    : <Diamond size={p.size} fill={p.color} className="text-transparent drop-shadow-sm" />
+                  }
                 </motion.div>
               ))}
             </AnimatePresence>

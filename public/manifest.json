@@ -1,0 +1,17 @@
+{
+    "name": "Fragments",
+    "short_name": "Fragments",
+    "description": "A cozy habit tracker for building better routines",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#FBFCFE",
+    "theme_color": "#6366F1",
+    "icons": [
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
+}
