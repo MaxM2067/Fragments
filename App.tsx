@@ -213,6 +213,7 @@ const App: React.FC = () => {
       case 'add-habit':
         return (
           <HabitForm
+            habits={habits}
             categories={categories}
             onSave={saveHabit}
             onCancel={() => { setEditingHabitId(null); setView('habits'); }}

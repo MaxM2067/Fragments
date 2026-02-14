@@ -65,6 +65,38 @@
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
+
+        @keyframes bounce-subtle {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+
+        .animate-bounce-subtle {
+            animation: bounce-subtle 2s infinite ease-in-out;
+        }
+
+        @keyframes glow {
+
+            0%,
+            100% {
+                box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 30px rgba(99, 102, 241, 0.4);
+            }
+        }
+
+        .animate-glow {
+            animation: glow 3s infinite ease-in-out;
+        }
     </style>
     <script type="importmap">
 {

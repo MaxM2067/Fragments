@@ -37,17 +37,20 @@ const HabitList: React.FC<Props> = ({
       result = result.filter(h => h.categoryId === filterCategoryId);
     }
 
-    // 2. Sort: Completed to bottom, then by selected criteria
+    // 2. Sort: Main habits first, then incomplete habits, then by selected criteria
     return [...result].sort((a, b) => {
+      // 1. Main habits always first
+      if (a.isMain !== b.isMain) return a.isMain ? -1 : 1;
+
+      // 2. Completed habits go to bottom (within their group - main or regular)
       const progressA = todayProgress[a.id]?.completions || 0;
       const progressB = todayProgress[b.id]?.completions || 0;
       const isDoneA = progressA > 0;
       const isDoneB = progressB > 0;
 
-      // Completed habits go to bottom
       if (isDoneA !== isDoneB) return isDoneA ? 1 : -1;
 
-      // Secondary sorting criteria
+      // 3. Secondary sorting criteria (Time or Category)
       if (sortBy === 'time') {
         const order = { morning: 1, afternoon: 2, evening: 3, anytime: 4 };
         return order[a.timeOfDay] - order[b.timeOfDay];

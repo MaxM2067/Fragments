@@ -18,6 +18,7 @@ export interface Habit {
   oneTimeValue?: number; // In minutes
   goal?: number; // In minutes
   rewardValue?: number; // Fragments earned per completion
+  isMain?: boolean;
   createdAt: number;
 }
 

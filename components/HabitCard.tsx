@@ -69,14 +69,25 @@ const HabitCard: React.FC<Props> = ({
   return (
     <motion.div
       layout
-      className={`relative bg-white rounded-cozy p-4 shadow-sm border-2 transition-all duration-500 ${isActuallyCompleted ? 'border-emerald-100 bg-emerald-50/20' : 'border-transparent shadow-indigo-50/30 shadow-md'}`}
+      className={`relative bg-white rounded-cozy p-4 border-2 transition-all duration-500 
+        ${isActuallyCompleted
+          ? 'border-emerald-100 bg-emerald-50/20 shadow-sm'
+          : habit.isMain
+            ? 'border-indigo-200 shadow-xl shadow-indigo-100/50 scale-[1.02] z-10'
+            : 'border-transparent shadow-indigo-50/30 shadow-md'}`}
       initial={{ scale: 0.95, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
     >
+      {habit.isMain && !isActuallyCompleted && (
+        <div className="absolute -top-2 -left-2 bg-indigo-500 text-white p-1 rounded-full shadow-lg z-20 animate-bounce-subtle">
+          <Star size={14} fill="currentColor" />
+        </div>
+      )}
+
       <div className="flex items-start gap-4">
         {/* Icon */}
         <div
-          className="w-14 h-14 rounded-bubble flex items-center justify-center text-white shrink-0 shadow-lg shadow-black/5"
+          className={`w-14 h-14 rounded-bubble flex items-center justify-center text-white shrink-0 shadow-lg shadow-black/5 transition-transform ${habit.isMain ? 'ring-4 ring-indigo-50' : ''}`}
           style={{ backgroundColor: category?.color || '#cbd5e1' }}
         >
           {React.cloneElement(getIconById(habit.icon) as React.ReactElement, { size: 32 })}
@@ -84,11 +95,12 @@ const HabitCard: React.FC<Props> = ({
 
         {/* Info */}
         <div className="flex-1 min-w-0 pt-1">
-          <h3 className={`font-black text-lg leading-tight transition-colors line-clamp-2 overflow-hidden ${isActuallyCompleted ? 'text-emerald-900' : 'text-cozy-text'}`}>
+          <h3 className={`font-black text-lg leading-tight transition-colors line-clamp-2 overflow-hidden flex items-center gap-2 ${isActuallyCompleted ? 'text-emerald-900' : 'text-cozy-text'}`}>
             {habit.name}
+            {habit.isMain && isActuallyCompleted && <Star size={16} fill="currentColor" className="text-indigo-400 shrink-0" />}
           </h3>
-          <p className="text-slate-400 text-[11px] font-bold truncate capitalize mt-1">
-            {category?.name} • {habit.timeOfDay}
+          <p className={`text-[11px] font-bold truncate capitalize mt-1 ${habit.isMain ? 'text-indigo-400' : 'text-slate-400'}`}>
+            {category?.name} • {habit.timeOfDay} {habit.isMain && '• Main'}
           </p>
         </div>
 
