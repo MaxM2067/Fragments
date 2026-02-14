@@ -95,10 +95,12 @@ const HabitCard: React.FC<Props> = ({
 
         {/* Info */}
         <div className="flex-1 min-w-0 pt-1">
-          <h3 className={`font-black text-lg leading-tight transition-colors line-clamp-2 overflow-hidden flex items-center gap-2 ${isActuallyCompleted ? 'text-emerald-900' : 'text-cozy-text'}`}>
-            {habit.name}
-            {habit.isMain && isActuallyCompleted && <Star size={16} fill="currentColor" className="text-indigo-400 shrink-0" />}
-          </h3>
+          <div className={`flex items-start gap-2 ${isActuallyCompleted ? 'text-emerald-900' : 'text-cozy-text'}`}>
+            <span className="font-black text-lg leading-tight transition-colors line-clamp-2 min-w-0">
+              {habit.name}
+            </span>
+            {habit.isMain && isActuallyCompleted && <Star size={16} fill="currentColor" className="text-indigo-400 shrink-0 mt-1" />}
+          </div>
           <p className={`text-[11px] font-bold truncate capitalize mt-1 ${habit.isMain ? 'text-indigo-400' : 'text-slate-400'}`}>
             {category?.name} • {habit.timeOfDay} {habit.isMain && '• Main'}
           </p>

@@ -83,3 +83,6 @@ export const ICONS = [
 export const getIconById = (id: string) => {
   return ICONS.find(icon => icon.id === id)?.component || <Sparkles />;
 };
+
+/** Maximum timer duration in seconds (2 hours). Timer auto-stops after this. */
+export const TIMER_MAX_DURATION_SECONDS = 12 * 60 * 60; // 7200s

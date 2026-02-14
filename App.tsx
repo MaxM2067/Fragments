@@ -1,7 +1,7 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { ViewState, Habit, Category, DailyLog, DailyProgress } from './types';
-import { DEFAULT_CATEGORIES } from './constants';
+import { DEFAULT_CATEGORIES, TIMER_MAX_DURATION_SECONDS } from './constants';
 import HabitList from './components/HabitList';
 import Statistics from './components/Statistics';
 import Settings from './components/Settings';
@@ -12,55 +12,162 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const App: React.FC = () => {
   const [view, setView] = useState<ViewState>('habits');
-  const [habits, setHabits] = useState<Habit[]>([]);
+  const [habits, setHabits] = useState<Habit[]>(() => {
+    try { const s = localStorage.getItem('habitly_habits'); return s ? JSON.parse(s) : []; } catch { return []; }
+  });
   const [editingHabitId, setEditingHabitId] = useState<string | null>(null);
-  const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
-  const [logs, setLogs] = useState<Record<string, DailyLog>>({});
+  const [categories, setCategories] = useState<Category[]>(() => {
+    try { const s = localStorage.getItem('habitly_categories'); return s ? JSON.parse(s) : DEFAULT_CATEGORIES; } catch { return DEFAULT_CATEGORIES; }
+  });
+  const [logs, setLogs] = useState<Record<string, DailyLog>>(() => {
+    try { const s = localStorage.getItem('habitly_logs'); return s ? JSON.parse(s) : {}; } catch { return {}; }
+  });
   const [today, setToday] = useState(new Date().toISOString().split('T')[0]);
-  const [activeHabitIds, setActiveHabitIds] = useState<Set<string>>(new Set());
 
-  // Load data
+  // Timestamp-based active timers: { habitId: { startedAt: ms, accumulatedTime: seconds } }
+  type TimerEntry = { startedAt: number; accumulatedTime: number };
+  const [activeTimers, setActiveTimers] = useState<Record<string, TimerEntry>>({});
+  const activeTimersRef = useRef(activeTimers);
+  activeTimersRef.current = activeTimers;
+
+  // Derive activeHabitIds set for child components
+  const activeHabitIds = useMemo(() => new Set(Object.keys(activeTimers)), [activeTimers]);
+
+  // Compute real elapsed time for a timer from timestamps
+  const computeElapsedTime = useCallback((timer: TimerEntry): number => {
+    const sessionSeconds = (Date.now() - timer.startedAt) / 1000;
+    return Math.min(
+      Math.floor(timer.accumulatedTime + sessionSeconds),
+      TIMER_MAX_DURATION_SECONDS
+    );
+  }, []);
+
+  // Persist active timers to localStorage
+  const saveActiveTimers = useCallback((timers: Record<string, TimerEntry>) => {
+    localStorage.setItem('habitly_active_timers', JSON.stringify(timers));
+  }, []);
+
+  // Sync elapsed time from active timers into logs
+  const syncTimersToLogs = useCallback((timers: Record<string, TimerEntry>) => {
+    if (Object.keys(timers).length === 0) return;
+    setLogs(prev => {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const existingLog = prev[todayStr] || { date: todayStr, mood: 0, progress: {} };
+      const newProgress = { ...existingLog.progress };
+
+      for (const [id, timer] of Object.entries(timers)) {
+        const elapsed = computeElapsedTime(timer);
+        const p = newProgress[id] || { habitId: id, completed: false, completions: 0, elapsedTime: 0 };
+        newProgress[id] = { ...p, elapsedTime: elapsed };
+      }
+
+      return { ...prev, [todayStr]: { ...existingLog, progress: newProgress } };
+    });
+  }, [computeElapsedTime]);
+
+  // Stop a timer and finalize its elapsed time in logs
+  const stopTimer = useCallback((habitId: string) => {
+    setActiveTimers(prev => {
+      const timer = prev[habitId];
+      if (!timer) return prev;
+      // Finalize elapsed time in logs
+      const elapsed = computeElapsedTime(timer);
+      setLogs(logsPrev => {
+        const todayStr = new Date().toISOString().split('T')[0];
+        const existingLog = logsPrev[todayStr] || { date: todayStr, mood: 0, progress: {} };
+        const p = existingLog.progress[habitId] || { habitId, completed: false, completions: 0, elapsedTime: 0 };
+        return {
+          ...logsPrev,
+          [todayStr]: {
+            ...existingLog,
+            progress: { ...existingLog.progress, [habitId]: { ...p, elapsedTime: elapsed } }
+          }
+        };
+      });
+      const { [habitId]: _, ...rest } = prev;
+      saveActiveTimers(rest);
+      return rest;
+    });
+  }, [computeElapsedTime, saveActiveTimers]);
+
+  // Restore active timers on mount
   useEffect(() => {
-    const savedHabits = localStorage.getItem('habitly_habits');
-    const savedCats = localStorage.getItem('habitly_categories');
-    const savedLogs = localStorage.getItem('habitly_logs');
+    const savedTimers = localStorage.getItem('habitly_active_timers');
+    if (savedTimers) {
+      try {
+        const parsed: Record<string, TimerEntry> = JSON.parse(savedTimers);
+        // Auto-stop any that exceeded the limit while page was closed
+        const stillActive: Record<string, TimerEntry> = {};
+        for (const [id, timer] of Object.entries(parsed)) {
+          const elapsed = Math.floor(timer.accumulatedTime + (Date.now() - timer.startedAt) / 1000);
+          if (elapsed < TIMER_MAX_DURATION_SECONDS) {
+            stillActive[id] = timer;
+          }
+        }
+        setActiveTimers(stillActive);
+        saveActiveTimers(stillActive);
+        syncTimersToLogs(stillActive);
+      } catch { /* corrupted data, ignore */ }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-    if (savedHabits) setHabits(JSON.parse(savedHabits));
-    if (savedCats) setCategories(JSON.parse(savedCats));
-    if (savedLogs) setLogs(JSON.parse(savedLogs));
-
+  // Day rollover check
+  useEffect(() => {
     const timer = setInterval(() => {
       const current = new Date().toISOString().split('T')[0];
       if (current !== today) {
+        // Sync final times before resetting
+        syncTimersToLogs(activeTimersRef.current);
         setToday(current);
-        setActiveHabitIds(new Set()); // Reset timers on new day
+        setActiveTimers({});
+        saveActiveTimers({});
       }
     }, 60000);
     return () => clearInterval(timer);
-  }, [today]);
+  }, [today, saveActiveTimers, syncTimersToLogs]);
 
-  // Global Timer Interval
+  // UI refresh interval — only for display, not for time accumulation
   useEffect(() => {
-    if (activeHabitIds.size === 0) return;
+    if (Object.keys(activeTimers).length === 0) return;
 
     const interval = setInterval(() => {
-      setLogs(prev => {
-        const newLogs = { ...prev };
-        const existingLog = newLogs[today] || { date: today, mood: 0, progress: {} };
-        const newProgress = { ...existingLog.progress };
-
-        activeHabitIds.forEach(id => {
-          const p = newProgress[id] || { habitId: id, completed: false, completions: 0, elapsedTime: 0 };
-          newProgress[id] = { ...p, elapsedTime: p.elapsedTime + 1 };
-        });
-
-        newLogs[today] = { ...existingLog, progress: newProgress };
-        return newLogs;
-      });
+      // Check for auto-stop (2h limit)
+      const timersRef = activeTimersRef.current;
+      for (const [id, timer] of Object.entries(timersRef)) {
+        const elapsed = computeElapsedTime(timer);
+        if (elapsed >= TIMER_MAX_DURATION_SECONDS) {
+          stopTimer(id);
+        }
+      }
+      // Sync current elapsed times into logs for display
+      syncTimersToLogs(activeTimersRef.current);
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [activeHabitIds, today]);
+  }, [activeTimers, computeElapsedTime, stopTimer, syncTimersToLogs]);
+
+  // Visibility change — recalculate elapsed when tab becomes visible again
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        const timers = activeTimersRef.current;
+        if (Object.keys(timers).length === 0) return;
+
+        // Check for 2h auto-stop
+        for (const [id, timer] of Object.entries(timers)) {
+          const elapsed = computeElapsedTime(timer);
+          if (elapsed >= TIMER_MAX_DURATION_SECONDS) {
+            stopTimer(id);
+          }
+        }
+        // Sync all remaining active timers
+        syncTimersToLogs(activeTimersRef.current);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [computeElapsedTime, stopTimer, syncTimersToLogs]);
 
   // Save data
   useEffect(() => {
@@ -81,14 +188,36 @@ const App: React.FC = () => {
   };
 
   const toggleTimer = (habitId: string) => {
-    setActiveHabitIds(prev => {
-      const next = new Set(prev);
-      if (next.has(habitId)) {
-        next.delete(habitId);
+    setActiveTimers(prev => {
+      if (prev[habitId]) {
+        // Stopping: finalize elapsed time
+        const timer = prev[habitId];
+        const elapsed = computeElapsedTime(timer);
+        setLogs(logsPrev => {
+          const existingLog = logsPrev[today] || { date: today, mood: 0, progress: {} };
+          const p = existingLog.progress[habitId] || { habitId, completed: false, completions: 0, elapsedTime: 0 };
+          return {
+            ...logsPrev,
+            [today]: {
+              ...existingLog,
+              progress: { ...existingLog.progress, [habitId]: { ...p, elapsedTime: elapsed } }
+            }
+          };
+        });
+        const { [habitId]: _, ...rest } = prev;
+        saveActiveTimers(rest);
+        return rest;
       } else {
-        next.add(habitId);
+        // Starting: record current timestamp and current accumulated time
+        const currentLog = logs[today] || { date: today, mood: 0, progress: {} };
+        const currentElapsed = currentLog.progress[habitId]?.elapsedTime || 0;
+        const newTimers = {
+          ...prev,
+          [habitId]: { startedAt: Date.now(), accumulatedTime: currentElapsed }
+        };
+        saveActiveTimers(newTimers);
+        return newTimers;
       }
-      return next;
     });
   };
 
@@ -162,10 +291,11 @@ const App: React.FC = () => {
 
   const deleteHabit = (id: string) => {
     setHabits(prev => prev.filter(h => h.id !== id));
-    setActiveHabitIds(prev => {
-      const next = new Set(prev);
-      next.delete(id);
-      return next;
+    setActiveTimers(prev => {
+      if (!prev[id]) return prev;
+      const { [id]: _, ...rest } = prev;
+      saveActiveTimers(rest);
+      return rest;
     });
   };
 
