@@ -62,4 +62,6 @@
     /* ~18px, was text-[15px] */
     /* ── Spacing ── */
     --spacing-list-gap: 0.60rem;
+    --spacing-card-py: 0.5rem;
+    --spacing-card-px: 0.75rem;
 }

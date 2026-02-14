@@ -435,7 +435,7 @@ const App: React.FC = () => {
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.98 }}
             transition={{ duration: 0.2 }}
-            className="px-5 py-2"
+            className="px-3 py-2"
           >
             {renderContent()}
           </motion.div>

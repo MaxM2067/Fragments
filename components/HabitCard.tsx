@@ -105,10 +105,19 @@ const HabitCard: React.FC<Props> = ({
   onDecrementCompletion
 }) => {
   const [particles, setParticles] = useState<Particle[]>([]);
+  const [showMinus, setShowMinus] = useState(false);
   const elapsedTime = progress?.elapsedTime || 0;
   const completions = progress?.completions || 0;
   const stepsCompleted = progress?.stepsCompleted || 0;
   const isMultiStep = habit.stepType === 'multiple';
+
+  // Timer for minus button
+  React.useEffect(() => {
+    if (showMinus) {
+      const timer = setTimeout(() => setShowMinus(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showMinus]);
 
   const stepsCount = useMemo(() => {
     if (!isMultiStep || !habit.goal || !habit.stepValue) return 0;
@@ -143,6 +152,7 @@ const HabitCard: React.FC<Props> = ({
   const handleIncrement = (e: React.MouseEvent) => {
     e.stopPropagation();
     spawnParticles();
+    setShowMinus(true);
     onIncrementCompletion(habit.id);
   };
 
@@ -161,18 +171,25 @@ const HabitCard: React.FC<Props> = ({
   return (
     <motion.div
       layout
-      className={`relative w-full overflow-hidden bg-white/95 backdrop-blur-sm rounded-block px-3 py-2.5 border transition-all duration-500 
+      className={`relative w-full bg-white/95 backdrop-blur-sm rounded-block border transition-all duration-500 
+        ${particles.length > 0 ? 'z-50' : 'z-auto'}
         ${isActuallyCompleted
           ? 'border-emerald-200/60 bg-emerald-50/40 shadow-block'
           : habit.isMain
             ? 'border-white/50 shadow-block scale-[1.01] z-10'
             : 'border-white/30 shadow-block'}`}
+      style={{
+        paddingTop: 'var(--spacing-card-py)',
+        paddingBottom: 'var(--spacing-card-py)',
+        paddingLeft: 'var(--spacing-card-px)',
+        paddingRight: 'var(--spacing-card-px)',
+      }}
       initial={{ scale: 0.97, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
     >
       {habit.isMain && (
-        <div className="absolute -top-1.5 -left-1.5 bg-amber-500 text-white p-0.5 rounded-full shadow-md z-20">
-          <Star size={12} fill="currentColor" />
+        <div className="absolute -top-2 -left-2 bg-amber-500 text-white p-0.5 rounded-full shadow-md z-30 border-2 border-white">
+          <Star size={10} fill="currentColor" />
         </div>
       )}
 
@@ -209,9 +226,6 @@ const HabitCard: React.FC<Props> = ({
             {habit.name}
           </div>
           <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
-            <span className={`text-[10px] font-bold truncate capitalize shrink-0 ${habit.isMain ? 'text-amber-500' : 'text-slate-400'}`}>
-              {category?.name} • {habit.timeOfDay} {habit.isMain && '• Main'}
-            </span>
             {/* Inline timer */}
             {hasTimer && (
               <div className="flex items-center gap-1.5 min-w-0">
@@ -239,15 +253,15 @@ const HabitCard: React.FC<Props> = ({
         </div>
 
         {/* Check / Decrement buttons */}
-        <div className="flex items-center gap-1.5 shrink-0 justify-end">
+        <div className="flex items-center gap-1 shrink-0 justify-end">
           <AnimatePresence>
-            {displayCount > 0 && (
+            {showMinus && displayCount > 0 && (
               <motion.button
-                initial={{ opacity: 0, x: 10, scale: 0.5 }}
+                initial={{ opacity: 0, x: 5, scale: 0.8 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: 10, scale: 0.5 }}
-                onClick={(e) => { e.stopPropagation(); onDecrementCompletion(habit.id); }}
-                className="w-8 h-8 bg-slate-50 text-slate-300 rounded-block flex items-center justify-center active:scale-90 shrink-0"
+                exit={{ opacity: 0, x: 5, scale: 0.8 }}
+                onClick={(e) => { e.stopPropagation(); onDecrementCompletion(habit.id); setShowMinus(false); }}
+                className="w-8 h-8 bg-slate-200/60 text-slate-500 rounded-block flex items-center justify-center active:scale-90 shrink-0 mr-1.5 shadow-inner border border-slate-300/30"
               >
                 <Minus size={16} strokeWidth={3} />
               </motion.button>
@@ -270,7 +284,7 @@ const HabitCard: React.FC<Props> = ({
             </button>
 
             <AnimatePresence>
-              {displayCount > 0 && (
+              {((isMultiStep && displayCount > 0) || (!isMultiStep && displayCount >= 2)) && (
                 <motion.span
                   initial={{ scale: 0, rotate: -20 }}
                   animate={{ scale: 1, rotate: 0 }}
