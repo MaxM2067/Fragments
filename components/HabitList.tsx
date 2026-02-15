@@ -32,11 +32,39 @@ const HabitList: React.FC<Props> = ({
   onSkipHabit,
   onEditHabit
 }) => {
-  const [sortBy, setSortBy] = useState<'time' | 'category'>('time');
-  const [filterCategoryId, setFilterCategoryId] = useState<string | 'all' | 'daily-minimum'>('all');
+  const [sortBy, setSortBy] = useState<'time' | 'category'>(() => {
+    return (localStorage.getItem('habitly_sort_by') as 'time' | 'category') || 'time';
+  });
+  const [filterCategoryId, setFilterCategoryId] = useState<string | 'all' | 'daily-minimum'>(() => {
+    return localStorage.getItem('habitly_filter_category') || 'all';
+  });
   const [swipedHabitId, setSwipedHabitId] = useState<string | null>(null);
   const [recentlyCompleted, setRecentlyCompleted] = useState<Set<string>>(new Set());
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem('habitly_collapsed_groups');
+    if (saved) return new Set(JSON.parse(saved));
+    return new Set(['Done Today']); // Done Today collapsed by default
+  });
   const prevProgressRef = React.useRef(todayProgress);
+
+  // Persist settings
+  React.useEffect(() => {
+    localStorage.setItem('habitly_sort_by', sortBy);
+    localStorage.setItem('habitly_filter_category', filterCategoryId);
+  }, [sortBy, filterCategoryId]);
+
+  React.useEffect(() => {
+    localStorage.setItem('habitly_collapsed_groups', JSON.stringify(Array.from(collapsedGroups)));
+  }, [collapsedGroups]);
+
+  const toggleGroupCollapse = (title: string) => {
+    setCollapsedGroups(prev => {
+      const next = new Set(prev);
+      if (next.has(title)) next.delete(title);
+      else next.add(title);
+      return next;
+    });
+  };
 
   // Track completions to trigger the 3s delay
   React.useEffect(() => {
@@ -314,6 +342,8 @@ const HabitList: React.FC<Props> = ({
                 onEditHabit={onEditHabit}
                 swipedHabitId={swipedHabitId}
                 setSwipedHabitId={setSwipedHabitId}
+                isCollapsed={collapsedGroups.has(group.title)}
+                onToggleCollapse={() => toggleGroupCollapse(group.title)}
               />
             </motion.div>
           ))

@@ -29,6 +29,8 @@
 - **Daily Minimum:** Mandatory habits marked with gold crystals. Completion contributes to a dedicated "Daily Min" progress bar in the header. Once met, the header crystal icon fills with gold/orange.
 - **Micro-Progress:** Every habit icon is wrapped in a SVG circular ring that fills in real-time (for timers) or by segments (for steps).
 - **Habit Grouping:** Habits are grouped by Time of Day or Category. Groups are collapsible (spoilers) if they contain more than one habit.
+- **Done Today Group:** Completed habits move to a separate "Done Today" group at the bottom unless they are marked to stay in place.
+- **Keep in List:** Users can toggle "Keep in list when done" for any habit. This keeps the habit in its original group/position even after completion, allowing for over-completion without moving the card.
 
 ## Project Structure
 - `theme.css`: **The source of truth for styling.** Defines colors, shadows, and default progress ring stroke thickness.
@@ -48,6 +50,7 @@
 - **Standardized Rounding:** Almost all containers use `rounded-block` which reads from the CSS variable `--radius-block` in `theme.css`.
 - **Intelligent Grouping:** Groups with only **one** item automatically hide their collapse toggle and "stacked" visual to maintain a clean UI.
 - **Descending Stacking:** Habit groups use a descending `z-index` so that shadows from previous cards always fall correctly over subsequent group headers.
+- **Completion Delay:** When a habit is completed (and "Keep in list" is OFF), it remains in its original position for **3 seconds** before animating smoothly to the "Done Today" group. This gives the user time to celebrate or continue interacting before reorganization.
 
 ## Guidelines for AI / Developers
 1. **Styling Integrity:** **NEVER** use hardcoded hex codes for primary colors or shadows. Always check `theme.css` variables.

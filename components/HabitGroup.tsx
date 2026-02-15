@@ -21,6 +21,8 @@ interface HabitGroupProps {
     onEditHabit: (id: string) => void;
     swipedHabitId: string | null;
     setSwipedHabitId: (id: string | null) => void;
+    isCollapsed: boolean;
+    onToggleCollapse: () => void;
 }
 
 const HabitGroup: React.FC<HabitGroupProps> = ({
@@ -38,11 +40,12 @@ const HabitGroup: React.FC<HabitGroupProps> = ({
     onEditHabit,
     swipedHabitId,
     setSwipedHabitId,
+    isCollapsed,
+    onToggleCollapse,
 }) => {
-    const isCollapsible = habits.length > 1;
-    const [isExpanded, setIsExpanded] = useState(true);
+    const isCollapsible = habits.length > 1 || title === 'Done Today';
 
-    const effectivelyExpanded = !isCollapsible || isExpanded;
+    const effectivelyExpanded = !isCollapsible || !isCollapsed;
 
     const firstHabit = habits[0];
     const firstCategory = categories.find(c => c.id === firstHabit.categoryId);
@@ -59,10 +62,10 @@ const HabitGroup: React.FC<HabitGroupProps> = ({
                 <div className="habit-group-line" />
                 {isCollapsible && (
                     <button
-                        onClick={() => setIsExpanded(!isExpanded)}
+                        onClick={onToggleCollapse}
                         className="habit-group-toggle"
                     >
-                        {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                        {!isCollapsed ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                     </button>
                 )}
             </div>
@@ -109,7 +112,7 @@ const HabitGroup: React.FC<HabitGroupProps> = ({
                         animate={{ opacity: 1, scale: 1 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         className="habit-stack-container"
-                        onClick={() => setIsExpanded(true)}
+                        onClick={onToggleCollapse}
                     >
                         <div className="habit-stack-bg-2" />
                         <div className="habit-stack-bg" />
