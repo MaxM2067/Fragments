@@ -14,6 +14,7 @@ interface Props {
   onToggleTimer: (habitId: string) => void;
   onIncrementCompletion: (habitId: string) => void;
   onDecrementCompletion: (habitId: string) => void;
+  onSkipHabit: (habitId: string) => void;
   onAddClick: () => void;
   onEditHabit: (id: string) => void;
 }
@@ -27,10 +28,12 @@ const HabitList: React.FC<Props> = ({
   onToggleTimer,
   onIncrementCompletion,
   onDecrementCompletion,
+  onSkipHabit,
   onEditHabit
 }) => {
   const [sortBy, setSortBy] = useState<'time' | 'category'>('time');
   const [filterCategoryId, setFilterCategoryId] = useState<string | 'all' | 'daily-minimum'>('all');
+  const [swipedHabitId, setSwipedHabitId] = useState<string | null>(null);
 
   const processedHabits = useMemo(() => {
     let result = habits;
@@ -39,6 +42,9 @@ const HabitList: React.FC<Props> = ({
     } else if (filterCategoryId !== 'all') {
       result = result.filter(h => h.categoryId === filterCategoryId);
     }
+    // Filter out skipped habits for today
+    result = result.filter(h => !todayProgress[h.id]?.skipped);
+
     return [...result].sort((a, b) => {
       if (a.isMain !== b.isMain) return a.isMain ? -1 : 1;
       const isDoneA = (todayProgress[a.id]?.completions || 0) > 0 || todayProgress[a.id]?.completed;
@@ -195,7 +201,10 @@ const HabitList: React.FC<Props> = ({
               onToggleTimer={onToggleTimer}
               onIncrementCompletion={onIncrementCompletion}
               onDecrementCompletion={onDecrementCompletion}
+              onSkip={onSkipHabit}
               onEdit={onEditHabit}
+              isSwiped={swipedHabitId === habit.id}
+              onSwipe={(id) => setSwipedHabitId(id)}
             />
           ))
         ) : (

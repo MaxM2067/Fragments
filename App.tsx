@@ -336,6 +336,11 @@ const App: React.FC = () => {
     }
   };
 
+  const handleSkipHabit = (habitId: string) => {
+    const existingProgress = currentLog.progress[habitId];
+    updateHabitProgress(habitId, { skipped: !existingProgress?.skipped });
+  };
+
   const saveHabit = (habit: Habit) => {
     setHabits(prev => {
       const exists = prev.some(h => h.id === habit.id);
@@ -376,6 +381,7 @@ const App: React.FC = () => {
             onToggleTimer={toggleTimer}
             onIncrementCompletion={handleIncrementCompletion}
             onDecrementCompletion={handleDecrementCompletion}
+            onSkipHabit={handleSkipHabit}
             onAddClick={() => { setEditingHabitId(null); setView('add-habit'); }}
             onEditHabit={startEditing}
           />
@@ -413,6 +419,8 @@ const App: React.FC = () => {
             onSave={saveHabit}
             onCancel={() => { setEditingHabitId(null); setView('habits'); }}
             initialHabit={habits.find(h => h.id === editingHabitId)}
+            isSkipped={editingHabitId ? !!currentLog.progress[editingHabitId]?.skipped : false}
+            onToggleSkip={handleSkipHabit}
           />
         );
       default:

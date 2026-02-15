@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Habit, Category, TimeOfDay, GoalFormat, StepType } from '../types';
 import { ICONS, getIconById } from '../constants';
-import { ChevronLeft, Check, Save, Star, Layers, Zap, DollarSign, ChevronDown, Gem } from 'lucide-react';
+import { ChevronLeft, Check, Save, Star, Layers, Zap, DollarSign, ChevronDown, Gem, Minus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
@@ -11,9 +11,19 @@ interface Props {
   onSave: (habit: Habit) => void;
   onCancel: () => void;
   initialHabit?: Habit;
+  isSkipped?: boolean;
+  onToggleSkip?: (habitId: string) => void;
 }
 
-const HabitForm: React.FC<Props> = ({ habits, categories, onSave, onCancel, initialHabit }) => {
+const HabitForm: React.FC<Props> = ({
+  habits,
+  categories,
+  onSave,
+  onCancel,
+  initialHabit,
+  isSkipped,
+  onToggleSkip
+}) => {
   const [name, setName] = useState(initialHabit?.name || '');
   const [description, setDescription] = useState(initialHabit?.description || '');
   const [categoryId, setCategoryId] = useState(initialHabit?.categoryId || categories[0]?.id || '');
@@ -84,17 +94,31 @@ const HabitForm: React.FC<Props> = ({ habits, categories, onSave, onCancel, init
           </button>
           <h2 className="text-lg font-black text-cozy-text tracking-tight">{isEditing ? 'Edit Habit' : 'New Habit'}</h2>
         </div>
-        <button
-          onClick={() => {
-            const form = document.getElementById('habit-form') as HTMLFormElement;
-            if (form) form.requestSubmit();
-          }}
-          type="button"
-          className="bg-indigo-600 text-white px-6 py-2.5 rounded-block text-sm font-black shadow-lg shadow-indigo-100 border-b-4 border-indigo-800 flex items-center gap-2 active:border-b-0 active:translate-y-1 transition-all"
-        >
-          {isEditing ? <Save size={18} /> : <Check size={18} />}
-          {isEditing ? 'Save' : 'Create'}
-        </button>
+        <div className="flex items-center gap-2">
+          {isEditing && onToggleSkip && (
+            <button
+              type="button"
+              onClick={() => onToggleSkip(initialHabit.id)}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-block text-[10px] font-black uppercase tracking-widest transition-all border-2 ${isSkipped
+                ? 'bg-slate-900 text-white border-slate-900'
+                : 'bg-white text-slate-400 border-slate-100 hover:border-slate-200'}`}
+            >
+              <Minus size={14} className={isSkipped ? 'text-white' : 'text-slate-300'} />
+              {isSkipped ? 'Skipped' : 'Skip Day'}
+            </button>
+          )}
+          <button
+            onClick={() => {
+              const form = document.getElementById('habit-form') as HTMLFormElement;
+              if (form) form.requestSubmit();
+            }}
+            type="button"
+            className="bg-indigo-600 text-white px-6 py-2.5 rounded-block text-sm font-black shadow-lg shadow-indigo-100 border-b-4 border-indigo-800 flex items-center gap-2 active:border-b-0 active:translate-y-1 transition-all"
+          >
+            {isEditing ? <Save size={18} /> : <Check size={18} />}
+            {isEditing ? 'Save' : 'Create'}
+          </button>
+        </div>
       </div>
 
       <form id="habit-form" onSubmit={handleSubmit} className="space-y-6 pb-20">

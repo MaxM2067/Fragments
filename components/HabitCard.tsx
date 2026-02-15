@@ -14,6 +14,9 @@ interface Props {
   onToggleTimer: (habitId: string) => void;
   onIncrementCompletion: (habitId: string) => void;
   onDecrementCompletion: (habitId: string) => void;
+  onSkip: (habitId: string) => void;
+  isSwiped: boolean;
+  onSwipe: (id: string | null) => void;
   onEdit: (id: string) => void;
 }
 
@@ -104,6 +107,9 @@ const HabitCard: React.FC<Props> = ({
   onToggleTimer,
   onIncrementCompletion,
   onDecrementCompletion,
+  onSkip,
+  isSwiped,
+  onSwipe,
   onEdit
 }) => {
   const [particles, setParticles] = useState<Particle[]>([]);
@@ -113,6 +119,16 @@ const HabitCard: React.FC<Props> = ({
   const completions = progress?.completions || 0;
   const stepsCompleted = progress?.stepsCompleted || 0;
   const isMultiStep = habit.stepType === 'multiple';
+
+  // 7-second auto-return timer
+  React.useEffect(() => {
+    if (isSwiped) {
+      const timer = setTimeout(() => {
+        onSwipe(null);
+      }, 7000);
+      return () => clearTimeout(timer);
+    }
+  }, [isSwiped, onSwipe]);
 
   // Timer for minus button
   React.useEffect(() => {
@@ -173,182 +189,207 @@ const HabitCard: React.FC<Props> = ({
   const showRing = isMultiStep ? stepsCount > 0 : isGoalHabit;
 
   return (
-    <motion.div
-      layout
-      className={`relative w-full bg-white/95 backdrop-blur-sm rounded-block border transition-all duration-500 
-        ${particles.length > 0 ? 'z-50' : 'z-auto'}
-        cursor-pointer hover:bg-white/100 active:scale-[0.99] transition-all
-        ${isActuallyCompleted
-          ? 'border-emerald-200/60 bg-emerald-50/40 shadow-block'
-          : habit.dailyMinimum
-            ? 'border-amber-200/50 shadow-block bg-white'
-            : habit.isMain
-              ? 'border-white/50 shadow-block scale-[1.01] z-10'
-              : 'border-white/30 shadow-block'}`}
-      style={{
-        paddingTop: 'var(--spacing-card-py)',
-        paddingBottom: 'var(--spacing-card-py)',
-        paddingLeft: 'var(--spacing-card-px)',
-        paddingRight: 'var(--spacing-card-px)',
-      }}
-      initial={{ scale: 0.97, opacity: 0 }}
-      animate={{ scale: 1, opacity: 1 }}
-      onClick={() => onEdit(habit.id)}
-    >
-      {habit.dailyMinimum && (
-        <div className="daily-minimum-bg">
-          <span className="crystal-1">💎</span>
-          <span className="crystal-2">💎</span>
-          <span className="crystal-3">💎</span>
-          <div className="glint glint-1" />
-          <div className="glint glint-2" />
-          <div className="glint glint-3" />
-        </div>
-      )}
-      {habit.dailyMinimum && <div className="absolute inset-0 bg-amber-50/20 pointer-events-none rounded-block" />}
-      {habit.isMain && (
-        <div className="absolute -top-2 -left-2 bg-amber-500 text-white p-0.5 rounded-full shadow-md z-30 border-2 border-white">
-          <Star size={10} fill="currentColor" />
-        </div>
-      )}
-
-      <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 w-full">
-        {/* Icon with circular progress ring */}
-        <div className="relative shrink-0 flex items-center justify-center" style={{ width: ringSize, height: ringSize }}>
-          {showRing && (
-            <CircularProgress
-              percent={isMultiStep ? 0 : progressPercent}
-              size={ringSize}
-              segments={isMultiStep ? stepsCount : undefined}
-              filledSegments={isMultiStep ? Math.min(stepsCompleted, stepsCount) : undefined}
-              color="var(--color-accent, #F59E0B)"
-            />
-          )}
-          <div
-            className={`w-[${iconWrapSize}px] h-[${iconWrapSize}px] rounded-full flex items-center justify-center text-white shadow-md shadow-black/5`}
-            style={{
-              backgroundColor: category?.color || '#cbd5e1',
-              width: iconWrapSize,
-              height: iconWrapSize,
-            }}
-          >
-            {React.cloneElement(getIconById(habit.icon) as React.ReactElement, { size: 26 })}
-          </div>
-        </div>
-
-        {/* Info + Timer inline */}
-        <div className="min-w-0 flex flex-col justify-center">
-          <div
-            className={`font-bold leading-tight line-clamp-2 ${isActuallyCompleted ? 'text-emerald-500' : 'text-cozy-text'}`}
-            style={{ fontSize: 'var(--font-size-habit-name, 1.1rem)' }}
-          >
-            {habit.name}
-          </div>
-          <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
-            {/* Inline timer */}
-            {hasTimer && (
-              <div className="flex items-center gap-1.5 min-w-0">
-                <button
-                  onClick={(e) => { e.stopPropagation(); onToggleTimer(habit.id); }}
-                  className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 border transition-all ${isRunning
-                    ? 'bg-amber-500 text-white shadow-sm border-amber-600/20'
-                    : 'bg-slate-50 text-amber-500 border-amber-200/50'}`}
-                >
-                  {isRunning ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
-                </button>
-                <span className={`text-sm font-black tabular-nums truncate ${isRunning ? 'text-amber-500' : 'text-slate-400'}`}>
-                  {formatTime(elapsedTime)}
-                  {isGoalHabit && <span className="text-slate-300">/{habit.goal}m</span>}
-                </span>
-              </div>
-            )}
-            {/* Inline multi-step counter */}
-            {isMultiStep && stepsCount > 0 && (
-              <span className="text-[11px] font-black tabular-nums text-amber-500 shrink-0">
-                {stepsCompleted}/{stepsCount}
-              </span>
-            )}
-          </div>
-        </div>
-
-        {/* Check / Decrement buttons */}
-        <div className="flex items-center gap-1 shrink-0 justify-end" onClick={(e) => e.stopPropagation()}>
-          <AnimatePresence>
-            {showMinus && displayCount > 0 && (
-              <motion.button
-                initial={{ opacity: 0, x: 5, scale: 0.8 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: 5, scale: 0.8 }}
-                onClick={(e) => { e.stopPropagation(); onDecrementCompletion(habit.id); setMinusTimerKey(prev => prev + 1); }}
-                className="w-8 h-8 bg-slate-200/60 text-slate-500 rounded-block flex items-center justify-center active:scale-90 shrink-0 mr-1.5 shadow-inner border border-slate-300/30"
-              >
-                <Minus size={16} strokeWidth={3} />
-              </motion.button>
-            )}
-          </AnimatePresence>
-
-          <div className="relative">
-            <button
-              onClick={handleIncrement}
-              className={`w-11 h-11 rounded-block flex items-center justify-center transition-all duration-500 active:scale-90 relative z-10 shadow-xl border-b-4 ${isActuallyCompleted
-                ? 'bg-emerald-500 text-white border-emerald-600'
-                : 'bg-white text-emerald-500 border-emerald-100'
-                }`}
-            >
-              {!isMultiStep && habit.rewardValue && habit.rewardValue > 1 ? (
-                <span className="text-base font-black">+{habit.rewardValue}</span>
-              ) : (
-                <Check size={24} strokeWidth={4} />
-              )}
-            </button>
-
-            <AnimatePresence>
-              {((isMultiStep && displayCount > 0) || (!isMultiStep && displayCount >= 2)) && (
-                <motion.span
-                  initial={{ scale: 0, rotate: -20 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  className="absolute -top-1 -right-1 bg-emerald-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-sm border-2 border-white z-20"
-                >
-                  {displayCount}
-                </motion.span>
-              )}
-            </AnimatePresence>
-
-            {/* Crystal Particle Celebration */}
-            <AnimatePresence>
-              {particles.map(p => (
-                <motion.div
-                  key={p.id}
-                  initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
-                  animate={{
-                    x: p.x * 2.5,
-                    y: -140 + p.y,
-                    scale: [0, 1.6, 0.8, 0],
-                    rotate: [0, 120 + Math.random() * 240, 360],
-                    opacity: [1, 1, 0.6, 0]
-                  }}
-                  transition={{ duration: 1.2, ease: "easeOut" }}
-                  className="absolute left-1/2 top-1/2 -ml-2 -mt-2 pointer-events-none z-50"
-                >
-                  {p.shape === 'gem'
-                    ? <Gem size={p.size} fill={p.color} className="text-transparent drop-shadow-sm" />
-                    : <Diamond size={p.size} fill={p.color} className="text-transparent drop-shadow-sm" />
-                  }
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        </div>
+    <div className="relative group rounded-block">
+      {/* Background Action: Skip today */}
+      <div className="absolute inset-0 z-10 flex items-center justify-end bg-slate-900 pr-6 rounded-block">
+        <button
+          onClick={(e) => { e.stopPropagation(); onSkip(habit.id); }}
+          className="text-white font-black text-[10px] uppercase tracking-[0.2em] flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
+        >
+          <span className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
+            <Minus size={18} strokeWidth={4} />
+          </span>
+          Skip Today
+        </button>
       </div>
 
-      {isActuallyCompleted && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="absolute inset-0 bg-emerald-500/5 pointer-events-none rounded-block"
-        />
-      )}
-    </motion.div>
+      <motion.div
+        layout
+        drag="x"
+        dragConstraints={{ left: -110, right: 0 }}
+        dragElastic={0.1}
+        dragSnapToOrigin={false}
+        onDragStart={() => onSwipe(habit.id)}
+        animate={{
+          x: isSwiped ? -110 : 0,
+          opacity: 1,
+          scale: 1
+        }}
+        transition={{ type: 'spring', stiffness: 100, damping: 45, mass: 2.2 }}
+        className={`relative z-20 w-full bg-white/95 backdrop-blur-sm rounded-block border 
+          ${particles.length > 0 ? '!z-50' : ''}
+          cursor-pointer hover:bg-white/100 active:scale-[0.99]
+          ${isActuallyCompleted
+            ? 'border-emerald-200/60 bg-emerald-50/40 shadow-block'
+            : habit.dailyMinimum
+              ? 'border-amber-200/50 shadow-block bg-white'
+              : habit.isMain
+                ? 'border-white/50 shadow-block scale-[1.01] z-10'
+                : 'border-white/30 shadow-block'}`}
+        style={{
+          paddingTop: 'var(--spacing-card-py)',
+          paddingBottom: 'var(--spacing-card-py)',
+          paddingLeft: 'var(--spacing-card-px)',
+          paddingRight: 'var(--spacing-card-px)',
+        }}
+        initial={{ scale: 0.97, opacity: 0 }}
+        onClick={() => onEdit(habit.id)}
+      >
+        {habit.dailyMinimum && (
+          <div className="daily-minimum-bg">
+            <span className="crystal-1">💎</span>
+            <span className="crystal-2">💎</span>
+            <span className="crystal-3">💎</span>
+            <div className="glint glint-1" />
+            <div className="glint glint-2" />
+            <div className="glint glint-3" />
+          </div>
+        )}
+        {habit.dailyMinimum && <div className="absolute inset-0 bg-amber-50/20 pointer-events-none rounded-block" />}
+        {habit.isMain && (
+          <div className="absolute -top-2 -left-2 bg-amber-500 text-white p-0.5 rounded-full shadow-md z-30 border-2 border-white">
+            <Star size={10} fill="currentColor" />
+          </div>
+        )}
+
+        <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 w-full">
+          {/* Icon with circular progress ring */}
+          <div className="relative shrink-0 flex items-center justify-center" style={{ width: ringSize, height: ringSize }}>
+            {showRing && (
+              <CircularProgress
+                percent={isMultiStep ? 0 : progressPercent}
+                size={ringSize}
+                segments={isMultiStep ? stepsCount : undefined}
+                filledSegments={isMultiStep ? Math.min(stepsCompleted, stepsCount) : undefined}
+                color="var(--color-accent, #F59E0B)"
+              />
+            )}
+            <div
+              className={`w-[${iconWrapSize}px] h-[${iconWrapSize}px] rounded-full flex items-center justify-center text-white shadow-md shadow-black/5`}
+              style={{
+                backgroundColor: category?.color || '#cbd5e1',
+                width: iconWrapSize,
+                height: iconWrapSize,
+              }}
+            >
+              {React.cloneElement(getIconById(habit.icon) as React.ReactElement, { size: 26 })}
+            </div>
+          </div>
+
+          {/* Info + Timer inline */}
+          <div className="min-w-0 flex flex-col justify-center">
+            <div
+              className={`font-bold leading-tight line-clamp-2 ${isActuallyCompleted ? 'text-emerald-500' : 'text-cozy-text'}`}
+              style={{ fontSize: 'var(--font-size-habit-name, 1.1rem)' }}
+            >
+              {habit.name}
+            </div>
+            <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
+              {/* Inline timer */}
+              {hasTimer && (
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <button
+                    onClick={(e) => { e.stopPropagation(); onToggleTimer(habit.id); }}
+                    className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 border transition-all ${isRunning
+                      ? 'bg-amber-500 text-white shadow-sm border-amber-600/20'
+                      : 'bg-slate-50 text-amber-500 border-amber-200/50'}`}
+                  >
+                    {isRunning ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
+                  </button>
+                  <span className={`text-sm font-black tabular-nums truncate ${isRunning ? 'text-amber-500' : 'text-slate-400'}`}>
+                    {formatTime(elapsedTime)}
+                    {isGoalHabit && <span className="text-slate-300">/{habit.goal}m</span>}
+                  </span>
+                </div>
+              )}
+              {/* Inline multi-step counter */}
+              {isMultiStep && stepsCount > 0 && (
+                <span className="text-[11px] font-black tabular-nums text-amber-500 shrink-0">
+                  {stepsCompleted}/{stepsCount}
+                </span>
+              )}
+            </div>
+          </div>
+
+          {/* Check / Decrement buttons */}
+          <div className="flex items-center gap-1 shrink-0 justify-end" onClick={(e) => e.stopPropagation()}>
+            <AnimatePresence>
+              {showMinus && displayCount > 0 && (
+                <motion.button
+                  initial={{ opacity: 0, x: 5, scale: 0.8 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: 5, scale: 0.8 }}
+                  onClick={(e) => { e.stopPropagation(); onDecrementCompletion(habit.id); setMinusTimerKey(prev => prev + 1); }}
+                  className="w-8 h-8 bg-slate-200/60 text-slate-500 rounded-block flex items-center justify-center active:scale-90 shrink-0 mr-1.5 shadow-inner border border-slate-300/30"
+                >
+                  <Minus size={16} strokeWidth={3} />
+                </motion.button>
+              )}
+            </AnimatePresence>
+
+            <div className="relative">
+              <button
+                onClick={handleIncrement}
+                className={`w-11 h-11 rounded-block flex items-center justify-center transition-all duration-500 active:scale-90 relative z-10 shadow-xl border-b-4 ${isActuallyCompleted
+                  ? 'bg-emerald-500 text-white border-emerald-600'
+                  : 'bg-white text-emerald-500 border-emerald-100'
+                  }`}
+              >
+                {!isMultiStep && habit.rewardValue && habit.rewardValue > 1 ? (
+                  <span className="text-base font-black">+{habit.rewardValue}</span>
+                ) : (
+                  <Check size={24} strokeWidth={4} />
+                )}
+              </button>
+
+              <AnimatePresence>
+                {((isMultiStep && displayCount > 0) || (!isMultiStep && displayCount >= 2)) && (
+                  <motion.span
+                    initial={{ scale: 0, rotate: -20 }}
+                    animate={{ scale: 1, rotate: 0 }}
+                    className="absolute -top-1 -right-1 bg-emerald-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-sm border-2 border-white z-20"
+                  >
+                    {displayCount}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+
+              {/* Crystal Particle Celebration */}
+              <AnimatePresence>
+                {particles.map(p => (
+                  <motion.div
+                    key={p.id}
+                    initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
+                    animate={{
+                      x: p.x * 2.5,
+                      y: -140 + p.y,
+                      scale: [0, 1.6, 0.8, 0],
+                      rotate: [0, 120 + Math.random() * 240, 360],
+                      opacity: [1, 1, 0.6, 0]
+                    }}
+                    transition={{ duration: 1.2, ease: "easeOut" }}
+                    className="absolute left-1/2 top-1/2 -ml-2 -mt-2 pointer-events-none z-50"
+                  >
+                    {p.shape === 'gem'
+                      ? <Gem size={p.size} fill={p.color} className="text-transparent drop-shadow-sm" />
+                      : <Diamond size={p.size} fill={p.color} className="text-transparent drop-shadow-sm" />
+                    }
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </div>
+          </div>
+        </div>
+
+        {isActuallyCompleted && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="absolute inset-0 bg-emerald-500/5 pointer-events-none rounded-block"
+          />
+        )}
+      </motion.div>
+    </div>
   );
 };
 

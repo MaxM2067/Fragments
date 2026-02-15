@@ -36,6 +36,7 @@ export interface DailyProgress {
   elapsedTime: number; // In seconds
   stepsCompleted: number; // Steps done today (for multi-step habits)
   moneyEarned: number; // $ earned today (for $ habits)
+  skipped?: boolean;
 }
 
 export interface DailyLog {

@@ -19,12 +19,14 @@
   - **Orange (`--color-accent` / Amber):** Used for "Doing" progress — circular rings, step counters, timers, and the default "Play" button.
   - **Blue (`--color-fragment`):** Used for "Rewards" — fragment gems, celebration particles, and statistics.
   - **Green (`--color-success` / Emerald):** Used for "Completion" — filled check buttons and success indicators.
-- **Structure:** Neutral shadows (`shadow-block`), high border-radius (`rounded-block` @ 1.7rem), and glassmorphism (white/15-20% opacity) for headers and filters.
+  - **Gold (`--color-gold` / Amber Gradient):** Used for **"Daily Minimum"** — mandatory habits. Features floating 3D crystals with sparkles and a dedicated header progress bar.
+- **Structure:** Neutral shadows (`shadow-block`), high border-radius (`rounded-block` @ 1.7rem), and glassmorphism (white/15-60% opacity) for sticky headers and filters.
 
 ## Core Concepts
 - **Fragments (Frags):** The reward unit. Logic distinguishes between completing a habit and earning fragments.
 - **Multi-Step Logic:** For habits with sub-steps (e.g., 25 pushups), fragments are awarded only upon completing a full "cycle" (defined by `goal` / `stepValue`).
 - **Main Habits:** Users can pin up to 2 habits. They are highlighted with an amber Star badge and stay at the top of the list.
+- **Daily Minimum:** Mandatory habits marked with gold crystals. Completion contributes to a dedicated "Daily Min" progress bar in the header. Once met, the header crystal icon fills with gold/orange.
 - **Micro-Progress:** Every habit icon is wrapped in a SVG circular ring that fills in real-time (for timers) or by segments (for steps).
 
 ## Project Structure
@@ -32,8 +34,9 @@
 - `App.tsx`: Central state management, persistence, and routing. Handles cycle-based fragment logic.
 - `types.ts`: Interface definitions for `Habit`, `Category`, `DailyLog`, and `DailyProgress`.
 - `components/`:
-  - `HabitCard.tsx`: Compact design with circular SVG rings. Manages particle bursts on completion.
-  - `HabitList.tsx`: Transparent filter/sort bar with white-on-green labels.
+  - `HabitForm.tsx`: Features a **sticky compact header** with a persistent "Save/Create" button and glassmorphism effect.
+  - `HabitCard.tsx`: Interactive and **clickable** (click anywhere to edit, excluding controls). Manages particle bursts and gold crystal visuals for "Daily Min".
+  - `HabitList.tsx`: Features a gold gradient "Daily Min" goal tracker and categorized filtering.
   - `Statistics.tsx`: Blue-accented fragments dashboard and charts.
   - `BottomNav.tsx`: Dark-green, high-contrast navigation bar.
 
