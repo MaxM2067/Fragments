@@ -37,10 +37,12 @@ const CircularProgress: React.FC<{
   segments?: number;
   filledSegments?: number;
   color?: string;
-}> = ({ percent, size, stroke: strokeProp, segments, filledSegments, color = '#34D399' }) => {
+  id: string;
+}> = ({ percent, size, stroke: strokeProp, segments, filledSegments, color = '#34D399', id }) => {
   const stroke = strokeProp ?? (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--progress-stroke')) || 3.5);
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
+  const gradId = `habit-grad-${id}`;
 
   if (segments && segments > 0) {
     // Segmented ring for multi-step habits
@@ -51,6 +53,13 @@ const CircularProgress: React.FC<{
 
     return (
       <svg width={size} height={size} className="absolute inset-0 -rotate-90">
+        <defs>
+          <linearGradient id={gradId} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2={size} y2={size}>
+            <stop offset="0%" stopColor="var(--color-progress-start)" />
+            <stop offset="50%" stopColor="var(--color-progress-mid)" />
+            <stop offset="100%" stopColor="var(--color-progress-end)" />
+          </linearGradient>
+        </defs>
         {Array.from({ length: segments }).map((_, i) => {
           const startAngle = i * (segArc + gap) + gap / 2;
           const endAngle = startAngle + segArc;
@@ -72,7 +81,7 @@ const CircularProgress: React.FC<{
               key={i}
               d={`M ${x1} ${y1} A ${r} ${r} 0 ${largeArc} 1 ${x2} ${y2}`}
               fill="none"
-              stroke={filled ? color : 'rgba(0,0,0,0.06)'}
+              stroke={filled ? `url(#${gradId})` : 'rgba(0,0,0,0.06)'}
               strokeWidth={stroke}
               strokeLinecap="round"
             />
@@ -85,10 +94,17 @@ const CircularProgress: React.FC<{
   // Continuous ring for timer-based progress
   return (
     <svg width={size} height={size} className="absolute inset-0 -rotate-90">
+      <defs>
+        <linearGradient id={gradId} gradientUnits="userSpaceOnUse" x1="0" y1="0" x2={size} y2={size}>
+          <stop offset="0%" stopColor="var(--color-progress-start)" />
+          <stop offset="50%" stopColor="var(--color-progress-mid)" />
+          <stop offset="100%" stopColor="var(--color-progress-end)" />
+        </linearGradient>
+      </defs>
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth={stroke} />
       <circle
         cx={size / 2} cy={size / 2} r={r} fill="none"
-        stroke={color}
+        stroke={`url(#${gradId})`}
         strokeWidth={stroke}
         strokeLinecap="round"
         strokeDasharray={circ}
@@ -211,16 +227,24 @@ const HabitCard: React.FC<Props> = ({
       <motion.div
         layout
         drag="x"
+        dragDirectionLock={true}
         dragConstraints={{ left: -110, right: 0 }}
-        dragElastic={0.1}
+        dragElastic={0.15}
         dragSnapToOrigin={false}
         onDragStart={() => onSwipe(habit.id)}
+        onDragEnd={(_, info) => {
+          if (info.offset.x < -50) {
+            onSwipe(habit.id);
+          } else {
+            onSwipe(null);
+          }
+        }}
         animate={{
           x: isSwiped ? -110 : 0,
           opacity: 1,
           scale: 1
         }}
-        transition={{ type: 'spring', stiffness: 100, damping: 45, mass: 2.2 }}
+        transition={{ type: 'spring', stiffness: 350, damping: 40, mass: 1 }}
         className={`relative z-20 w-full bg-white/95 backdrop-blur-sm rounded-block border 
           ${particles.length > 0 ? '!z-50' : ''}
           cursor-pointer hover:bg-white/100 active:scale-[0.99]
@@ -264,6 +288,7 @@ const HabitCard: React.FC<Props> = ({
               <CircularProgress
                 percent={isMultiStep ? 0 : progressPercent}
                 size={ringSize}
+                id={habit.id}
                 segments={isMultiStep ? stepsCount : undefined}
                 filledSegments={isMultiStep ? Math.min(stepsCompleted, stepsCount) : undefined}
                 color="var(--color-accent, #F59E0B)"

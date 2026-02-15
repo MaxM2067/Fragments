@@ -28,6 +28,7 @@
 - **Main Habits:** Users can pin up to 2 habits. They are highlighted with an amber Star badge and stay at the top of the list.
 - **Daily Minimum:** Mandatory habits marked with gold crystals. Completion contributes to a dedicated "Daily Min" progress bar in the header. Once met, the header crystal icon fills with gold/orange.
 - **Micro-Progress:** Every habit icon is wrapped in a SVG circular ring that fills in real-time (for timers) or by segments (for steps).
+- **Habit Grouping:** Habits are grouped by Time of Day or Category. Groups are collapsible (spoilers) if they contain more than one habit.
 
 ## Project Structure
 - `theme.css`: **The source of truth for styling.** Defines colors, shadows, and default progress ring stroke thickness.
@@ -36,7 +37,8 @@
 - `components/`:
   - `HabitForm.tsx`: Features a **sticky compact header** with a persistent "Save/Create" button and glassmorphism effect.
   - `HabitCard.tsx`: Interactive and **clickable** (click anywhere to edit, excluding controls). Manages particle bursts and gold crystal visuals for "Daily Min".
-  - `HabitList.tsx`: Features a gold gradient "Daily Min" goal tracker and categorized filtering.
+  - `HabitGroup.tsx`: Manages the **collapsible/expandable state** of habit clusters. Implements a "stacked" card UI when collapsed.
+  - `HabitList.tsx`: Handles the high-level grouping logic and renders `HabitGroup` components. Features a gold gradient "Daily Min" goal tracker.
   - `Statistics.tsx`: Blue-accented fragments dashboard and charts.
   - `BottomNav.tsx`: Dark-green, high-contrast navigation bar.
 
@@ -44,6 +46,8 @@
 - **Full-Cycle Fragments:** If a habit has 25 steps to 1 fragment, 50 steps earned gives 2 fragments. Logic recalculates based on `Math.floor(steps / stepsCount)`.
 - **Timer Persistence:** Timers are tracked globally in `App.tsx` and protected against tab inactivity or accidental refreshes.
 - **Standardized Rounding:** Almost all containers use `rounded-block` which reads from the CSS variable `--radius-block` in `theme.css`.
+- **Intelligent Grouping:** Groups with only **one** item automatically hide their collapse toggle and "stacked" visual to maintain a clean UI.
+- **Descending Stacking:** Habit groups use a descending `z-index` so that shadows from previous cards always fall correctly over subsequent group headers.
 
 ## Guidelines for AI / Developers
 1. **Styling Integrity:** **NEVER** use hardcoded hex codes for primary colors or shadows. Always check `theme.css` variables.

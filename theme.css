@@ -42,6 +42,14 @@
     --color-text-completed: #065f46;
     /* emerald-800 for dark green readability */
 
+    /* ── Progress Gradient Colors ── */
+    --color-progress-start: #f9d493;
+    /* Amber */
+    --color-progress-mid: #F97316;
+    /* Orange */
+    --color-progress-end: #a187ff;
+    /* Rose */
+
     /* ── Surfaces ── */
     --color-card: rgba(255, 255, 255, 0.95);
     --color-glass: rgba(255, 255, 255, 0.2);
@@ -135,21 +143,21 @@
 .daily-minimum-bg .crystal-1 {
     top: 10%;
     left: 0.4rem;
-    font-size: 1.5rem;
+    font-size: 0.6rem;
     animation-delay: 0s;
 }
 
 .daily-minimum-bg .crystal-2 {
     top: 38%;
     left: 0.1rem;
-    font-size: 2.2rem;
+    font-size: 1.5rem;
     animation-delay: -2s;
 }
 
 .daily-minimum-bg .crystal-3 {
     top: 68%;
     left: 0.5rem;
-    font-size: 1.2rem;
+    font-size: 0.5rem;
     animation-delay: -4s;
 }
 
