@@ -38,6 +38,7 @@ const HabitForm: React.FC<Props> = ({
   const [rewardValue, setRewardValue] = useState<number>(initialHabit?.rewardValue || 1);
   const [isMain, setIsMain] = useState<boolean>(initialHabit?.isMain || false);
   const [dailyMinimum, setDailyMinimum] = useState<boolean>(initialHabit?.dailyMinimum || false);
+  const [keepInListWhenDone, setKeepInListWhenDone] = useState<boolean>(initialHabit?.keepInListWhenDone || false);
 
   const mainHabitsCount = habits.filter(h => h.isMain && h.id !== initialHabit?.id).length;
   const isMainDisabled = mainHabitsCount >= 2;
@@ -65,6 +66,7 @@ const HabitForm: React.FC<Props> = ({
       rewardValue: isMoneyGoal ? 0 : Number(rewardValue),
       isMain,
       dailyMinimum,
+      keepInListWhenDone,
       createdAt: initialHabit?.createdAt || Date.now(),
     };
     onSave(habitData);
@@ -229,6 +231,22 @@ const HabitForm: React.FC<Props> = ({
             <div className={`w-8 h-5 rounded-full relative transition-colors ${dailyMinimum ? 'bg-white/30' : 'bg-slate-100'}`}>
               <motion.div animate={{ x: dailyMinimum ? 14 : 2 }}
                 className={`absolute top-0.5 w-4 h-4 rounded-full ${dailyMinimum ? 'bg-white' : 'bg-slate-300'}`} />
+            </div>
+          </button>
+
+          {/* Keep in List Toggle */}
+          <button type="button" onClick={() => setKeepInListWhenDone(!keepInListWhenDone)}
+            className={`w-full px-4 py-2.5 rounded-block border-2 transition-all flex items-center justify-between font-black text-sm ${keepInListWhenDone
+              ? 'bg-emerald-500 text-white border-emerald-600 shadow-sm'
+              : 'bg-white text-slate-400 border-slate-100'}`}
+          >
+            <div className="flex items-center gap-2">
+              <Layers size={16} />
+              <span>Keep in list when done</span>
+            </div>
+            <div className={`w-8 h-5 rounded-full relative transition-colors ${keepInListWhenDone ? 'bg-white/30' : 'bg-slate-100'}`}>
+              <motion.div animate={{ x: keepInListWhenDone ? 14 : 2 }}
+                className={`absolute top-0.5 w-4 h-4 rounded-full ${keepInListWhenDone ? 'bg-white' : 'bg-slate-300'}`} />
             </div>
           </button>
         </div>

@@ -35,6 +35,43 @@ const HabitList: React.FC<Props> = ({
   const [sortBy, setSortBy] = useState<'time' | 'category'>('time');
   const [filterCategoryId, setFilterCategoryId] = useState<string | 'all' | 'daily-minimum'>('all');
   const [swipedHabitId, setSwipedHabitId] = useState<string | null>(null);
+  const [recentlyCompleted, setRecentlyCompleted] = useState<Set<string>>(new Set());
+  const prevProgressRef = React.useRef(todayProgress);
+
+  // Track completions to trigger the 3s delay
+  React.useEffect(() => {
+    const newlyDone = habits.filter(h => {
+      if (h.keepInListWhenDone) return false;
+
+      const p = todayProgress[h.id];
+      const isDone = (p?.completions || 0) > 0 || p?.completed;
+
+      const prevP = prevProgressRef.current[h.id];
+      const wasDone = (prevP?.completions || 0) > 0 || prevP?.completed;
+
+      return isDone && !wasDone;
+    });
+
+    if (newlyDone.length > 0) {
+      newlyDone.forEach(h => {
+        setRecentlyCompleted(prev => {
+          const next = new Set(prev);
+          next.add(h.id);
+          return next;
+        });
+
+        setTimeout(() => {
+          setRecentlyCompleted(prev => {
+            const next = new Set(prev);
+            next.delete(h.id);
+            return next;
+          });
+        }, 3000);
+      });
+    }
+    prevProgressRef.current = todayProgress;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [todayProgress, habits]);
 
   const filteredHabits = useMemo(() => {
     let result = habits;
@@ -50,6 +87,22 @@ const HabitList: React.FC<Props> = ({
 
   const groupedHabits = useMemo(() => {
     const groups: { title: string; habits: Habit[] }[] = [];
+    const doneTodayHabits: Habit[] = [];
+
+    const getIsDone = (h: Habit) => (todayProgress[h.id]?.completions || 0) > 0 || todayProgress[h.id]?.completed;
+    const getWasDone = (h: Habit) => (prevProgressRef.current[h.id]?.completions || 0) > 0 || prevProgressRef.current[h.id]?.completed;
+
+    const filteredAndSplit = filteredHabits.filter(h => {
+      const isDone = getIsDone(h);
+      const wasDone = getWasDone(h);
+      const isJustDone = isDone && !wasDone;
+
+      if (isDone && !h.keepInListWhenDone && !recentlyCompleted.has(h.id) && !isJustDone) {
+        doneTodayHabits.push(h);
+        return false;
+      }
+      return true;
+    });
 
     if (sortBy === 'time') {
       const timeGroups: Record<string, Habit[]> = {
@@ -58,7 +111,7 @@ const HabitList: React.FC<Props> = ({
         'Evening': []
       };
 
-      filteredHabits.forEach(h => {
+      filteredAndSplit.forEach(h => {
         if (h.timeOfDay === 'morning') timeGroups['Morning'].push(h);
         else if (h.timeOfDay === 'evening') timeGroups['Evening'].push(h);
         else timeGroups['Day & Anytime'].push(h);
@@ -70,32 +123,44 @@ const HabitList: React.FC<Props> = ({
     } else {
       const categoryGroups: Record<string, Habit[]> = {};
 
-      filteredHabits.forEach(h => {
+      filteredAndSplit.forEach(h => {
         const cat = categories.find(c => c.id === h.categoryId);
         const catName = cat ? cat.name : 'Uncategorized';
         if (!categoryGroups[catName]) categoryGroups[catName] = [];
         categoryGroups[catName].push(h);
       });
 
-      // Sort categories alphabetically or keep original order? Alphabetic is safer.
       Object.keys(categoryGroups).sort().forEach(catName => {
         groups.push({ title: catName, habits: categoryGroups[catName] });
       });
     }
 
-    // Sort habits within each group: Main first, then completed last
+    // Sort habits within each group: Main first, then completed last (only if NOT "Keep in list")
     groups.forEach(group => {
       group.habits.sort((a, b) => {
         if (a.isMain !== b.isMain) return a.isMain ? -1 : 1;
-        const isDoneA = (todayProgress[a.id]?.completions || 0) > 0 || todayProgress[a.id]?.completed;
-        const isDoneB = (todayProgress[b.id]?.completions || 0) > 0 || todayProgress[b.id]?.completed;
-        if (isDoneA !== isDoneB) return isDoneA ? 1 : -1;
+
+        const isDoneA = getIsDone(a);
+        const isDoneB = getIsDone(b);
+        const isJustDoneA = isDoneA && !getWasDone(a);
+        const isJustDoneB = isDoneB && !getWasDone(b);
+
+        // If keeping in list or recently done, don't move to bottom
+        const effectivelyDoneA = isDoneA && !a.keepInListWhenDone && !recentlyCompleted.has(a.id) && !isJustDoneA;
+        const effectivelyDoneB = isDoneB && !b.keepInListWhenDone && !recentlyCompleted.has(b.id) && !isJustDoneB;
+
+        if (effectivelyDoneA !== effectivelyDoneB) return effectivelyDoneA ? 1 : -1;
         return 0;
       });
     });
 
+    // Add Done Today group at the end
+    if (doneTodayHabits.length > 0) {
+      groups.push({ title: 'Done Today', habits: doneTodayHabits });
+    }
+
     return groups;
-  }, [filteredHabits, sortBy, categories, todayProgress]);
+  }, [filteredHabits, sortBy, categories, todayProgress, recentlyCompleted]);
 
   const moneyHabitIds = useMemo(() => new Set(habits.filter(h => h.goalFormat === '$').map(h => h.id)), [habits]);
 
@@ -228,9 +293,11 @@ const HabitList: React.FC<Props> = ({
       <div className="pb-4 flex flex-col">
         {groupedHabits.length > 0 ? (
           groupedHabits.map((group, idx) => (
-            <div
-              key={group.title + idx}
+            <motion.div
+              layout
+              key={group.title}
               style={{ position: 'relative', zIndex: groupedHabits.length - idx }}
+              transition={{ type: 'spring', stiffness: 120, damping: 25 }}
             >
               <HabitGroup
                 title={group.title}
@@ -248,7 +315,7 @@ const HabitList: React.FC<Props> = ({
                 swipedHabitId={swipedHabitId}
                 setSwipedHabitId={setSwipedHabitId}
               />
-            </div>
+            </motion.div>
           ))
         ) : (
           <div className="text-center py-16 bg-white/20 backdrop-blur-sm rounded-block border border-white/20">

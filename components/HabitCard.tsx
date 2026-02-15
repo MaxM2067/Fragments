@@ -226,6 +226,7 @@ const HabitCard: React.FC<Props> = ({
 
       <motion.div
         layout
+        layoutId={`habit-${habit.id}`}
         drag="x"
         dragDirectionLock={true}
         dragConstraints={{ left: -110, right: 0 }}
@@ -244,7 +245,10 @@ const HabitCard: React.FC<Props> = ({
           opacity: 1,
           scale: 1
         }}
-        transition={{ type: 'spring', stiffness: 350, damping: 40, mass: 1 }}
+        transition={{
+          layout: { type: 'spring', stiffness: 120, damping: 25, mass: 1 },
+          default: { type: 'spring', stiffness: 350, damping: 40, mass: 1 }
+        }}
         className={`relative z-20 w-full bg-white/95 backdrop-blur-sm rounded-block border 
           ${particles.length > 0 ? '!z-50' : ''}
           cursor-pointer hover:bg-white/100 active:scale-[0.99]

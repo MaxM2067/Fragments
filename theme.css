@@ -43,11 +43,11 @@
     /* emerald-800 for dark green readability */
 
     /* ── Progress Gradient Colors ── */
-    --color-progress-start: #f9d493;
+    --color-progress-start: #ffeed0;
     /* Amber */
     --color-progress-mid: #F97316;
     /* Orange */
-    --color-progress-end: #a187ff;
+    --color-progress-end: #f97f22;
     /* Rose */
 
     /* ── Surfaces ── */
