@@ -377,6 +377,7 @@ const App: React.FC = () => {
             onIncrementCompletion={handleIncrementCompletion}
             onDecrementCompletion={handleDecrementCompletion}
             onAddClick={() => { setEditingHabitId(null); setView('add-habit'); }}
+            onEditHabit={startEditing}
           />
         );
       case 'mood':
@@ -420,14 +421,8 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen text-cozy-text pb-20 select-none" style={{ background: 'linear-gradient(135deg, #5DC6F3, #5AAA62)' }}>
-      <header className="p-5 pb-2 flex items-center justify-between">
-        <h1 className="text-2xl font-black text-white flex items-center gap-2 tracking-tight">
-          My Fragments <span className="text-[10px] font-black bg-white/15 text-white/60 px-3 py-1 rounded-block uppercase tracking-widest border border-white/20">V3</span>
-        </h1>
-      </header>
-
-      <main className="flex-1 overflow-x-hidden">
+    <div className="flex flex-col min-h-screen text-cozy-text pb-20 select-none shadow-inner" style={{ background: 'linear-gradient(135deg, #5DC6F3, #5AAA62)' }}>
+      <main className="flex-1">
         <AnimatePresence mode="wait">
           <motion.div
             key={view}

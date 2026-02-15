@@ -75,16 +75,29 @@ const HabitForm: React.FC<Props> = ({ habits, categories, onSave, onCancel, init
   const inputClass = "w-full bg-slate-50/50 px-4 py-3 rounded-block border-2 border-slate-100 outline-none focus:border-cozy-indigo/30 transition-all font-bold text-cozy-text";
 
   return (
-    <div className="space-y-4 pb-20">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <button onClick={onCancel} type="button" className="p-2 bg-white rounded-block shadow-sm active:scale-90 transition-transform border-2 border-indigo-50/50">
-          <ChevronLeft size={20} className="text-cozy-text" />
+    <div className="flex flex-col relative">
+      {/* Sticky Header — Fixed at the very top of the scroll container */}
+      <div className="sticky top-0 z-[60] -mx-3 -mt-2 mb-4 px-3 py-2 bg-white/60 backdrop-blur-md border-b border-white/20 flex items-center justify-between shadow-sm">
+        <div className="flex items-center gap-3">
+          <button onClick={onCancel} type="button" className="w-9 h-9 bg-white rounded-full shadow-sm active:scale-90 transition-transform border border-indigo-50 flex items-center justify-center">
+            <ChevronLeft size={18} className="text-cozy-text" />
+          </button>
+          <h2 className="text-lg font-black text-cozy-text tracking-tight">{isEditing ? 'Edit Habit' : 'New Habit'}</h2>
+        </div>
+        <button
+          onClick={() => {
+            const form = document.getElementById('habit-form') as HTMLFormElement;
+            if (form) form.requestSubmit();
+          }}
+          type="button"
+          className="bg-indigo-600 text-white px-6 py-2.5 rounded-block text-sm font-black shadow-lg shadow-indigo-100 border-b-4 border-indigo-800 flex items-center gap-2 active:border-b-0 active:translate-y-1 transition-all"
+        >
+          {isEditing ? <Save size={18} /> : <Check size={18} />}
+          {isEditing ? 'Save' : 'Create'}
         </button>
-        <h2 className="text-xl font-black text-cozy-text tracking-tight">{isEditing ? 'Edit Habit' : 'New Habit'}</h2>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form id="habit-form" onSubmit={handleSubmit} className="space-y-6 pb-20">
         {/* ═══ BLOCK 1: Main Info ═══ */}
         <div className={sectionClass}>
           <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Main Info</p>
@@ -263,14 +276,6 @@ const HabitForm: React.FC<Props> = ({ habits, categories, onSave, onCancel, init
             </div>
           )}
         </div>
-
-        {/* Submit */}
-        <button type="submit"
-          className="w-full bg-emerald-500 text-white p-4 rounded-block text-xl font-black shadow-lg shadow-emerald-100 border-b-6 border-emerald-600 flex items-center justify-center gap-2 active:border-b-0 active:translate-y-1 transition-all"
-        >
-          {isEditing ? <Save size={24} /> : <Check size={24} />}
-          {isEditing ? 'Save' : 'Create'}
-        </button>
       </form>
     </div>
   );

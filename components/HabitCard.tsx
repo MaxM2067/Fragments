@@ -14,6 +14,7 @@ interface Props {
   onToggleTimer: (habitId: string) => void;
   onIncrementCompletion: (habitId: string) => void;
   onDecrementCompletion: (habitId: string) => void;
+  onEdit: (id: string) => void;
 }
 
 interface Particle {
@@ -102,7 +103,8 @@ const HabitCard: React.FC<Props> = ({
   isRunning,
   onToggleTimer,
   onIncrementCompletion,
-  onDecrementCompletion
+  onDecrementCompletion,
+  onEdit
 }) => {
   const [particles, setParticles] = useState<Particle[]>([]);
   const [showMinus, setShowMinus] = useState(false);
@@ -175,6 +177,7 @@ const HabitCard: React.FC<Props> = ({
       layout
       className={`relative w-full bg-white/95 backdrop-blur-sm rounded-block border transition-all duration-500 
         ${particles.length > 0 ? 'z-50' : 'z-auto'}
+        cursor-pointer hover:bg-white/100 active:scale-[0.99] transition-all
         ${isActuallyCompleted
           ? 'border-emerald-200/60 bg-emerald-50/40 shadow-block'
           : habit.dailyMinimum
@@ -190,6 +193,7 @@ const HabitCard: React.FC<Props> = ({
       }}
       initial={{ scale: 0.97, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
+      onClick={() => onEdit(habit.id)}
     >
       {habit.dailyMinimum && (
         <div className="daily-minimum-bg">
@@ -268,7 +272,7 @@ const HabitCard: React.FC<Props> = ({
         </div>
 
         {/* Check / Decrement buttons */}
-        <div className="flex items-center gap-1 shrink-0 justify-end">
+        <div className="flex items-center gap-1 shrink-0 justify-end" onClick={(e) => e.stopPropagation()}>
           <AnimatePresence>
             {showMinus && displayCount > 0 && (
               <motion.button

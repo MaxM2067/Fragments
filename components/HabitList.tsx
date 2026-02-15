@@ -15,6 +15,7 @@ interface Props {
   onIncrementCompletion: (habitId: string) => void;
   onDecrementCompletion: (habitId: string) => void;
   onAddClick: () => void;
+  onEditHabit: (id: string) => void;
 }
 
 const HabitList: React.FC<Props> = ({
@@ -26,6 +27,7 @@ const HabitList: React.FC<Props> = ({
   onToggleTimer,
   onIncrementCompletion,
   onDecrementCompletion,
+  onEditHabit
 }) => {
   const [sortBy, setSortBy] = useState<'time' | 'category'>('time');
   const [filterCategoryId, setFilterCategoryId] = useState<string | 'all' | 'daily-minimum'>('all');
@@ -193,6 +195,7 @@ const HabitList: React.FC<Props> = ({
               onToggleTimer={onToggleTimer}
               onIncrementCompletion={onIncrementCompletion}
               onDecrementCompletion={onDecrementCompletion}
+              onEdit={onEditHabit}
             />
           ))
         ) : (
