@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Habit, Category, DailyProgress } from '../types';
 import HabitCard from './HabitCard';
+import HabitGroup from './HabitGroup';
 import { LayoutGrid, Clock, Filter, Gem, DollarSign } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -35,7 +36,7 @@ const HabitList: React.FC<Props> = ({
   const [filterCategoryId, setFilterCategoryId] = useState<string | 'all' | 'daily-minimum'>('all');
   const [swipedHabitId, setSwipedHabitId] = useState<string | null>(null);
 
-  const processedHabits = useMemo(() => {
+  const filteredHabits = useMemo(() => {
     let result = habits;
     if (filterCategoryId === 'daily-minimum') {
       result = result.filter(h => h.dailyMinimum);
@@ -44,21 +45,57 @@ const HabitList: React.FC<Props> = ({
     }
     // Filter out skipped habits for today
     result = result.filter(h => !todayProgress[h.id]?.skipped);
+    return result;
+  }, [habits, filterCategoryId, todayProgress]);
 
-    return [...result].sort((a, b) => {
-      if (a.isMain !== b.isMain) return a.isMain ? -1 : 1;
-      const isDoneA = (todayProgress[a.id]?.completions || 0) > 0 || todayProgress[a.id]?.completed;
-      const isDoneB = (todayProgress[b.id]?.completions || 0) > 0 || todayProgress[b.id]?.completed;
-      if (isDoneA !== isDoneB) return isDoneA ? 1 : -1;
-      if (sortBy === 'time') {
-        const order = { morning: 1, afternoon: 2, evening: 3, anytime: 4 };
-        return order[a.timeOfDay] - order[b.timeOfDay];
-      } else {
-        return (categories.find(c => c.id === a.categoryId)?.name || '').localeCompare(
-          categories.find(c => c.id === b.categoryId)?.name || '');
-      }
+  const groupedHabits = useMemo(() => {
+    const groups: { title: string; habits: Habit[] }[] = [];
+
+    if (sortBy === 'time') {
+      const timeGroups: Record<string, Habit[]> = {
+        'Morning': [],
+        'Day & Anytime': [],
+        'Evening': []
+      };
+
+      filteredHabits.forEach(h => {
+        if (h.timeOfDay === 'morning') timeGroups['Morning'].push(h);
+        else if (h.timeOfDay === 'evening') timeGroups['Evening'].push(h);
+        else timeGroups['Day & Anytime'].push(h);
+      });
+
+      if (timeGroups['Morning'].length > 0) groups.push({ title: 'Morning', habits: timeGroups['Morning'] });
+      if (timeGroups['Day & Anytime'].length > 0) groups.push({ title: 'Day & Anytime', habits: timeGroups['Day & Anytime'] });
+      if (timeGroups['Evening'].length > 0) groups.push({ title: 'Evening', habits: timeGroups['Evening'] });
+    } else {
+      const categoryGroups: Record<string, Habit[]> = {};
+
+      filteredHabits.forEach(h => {
+        const cat = categories.find(c => c.id === h.categoryId);
+        const catName = cat ? cat.name : 'Uncategorized';
+        if (!categoryGroups[catName]) categoryGroups[catName] = [];
+        categoryGroups[catName].push(h);
+      });
+
+      // Sort categories alphabetically or keep original order? Alphabetic is safer.
+      Object.keys(categoryGroups).sort().forEach(catName => {
+        groups.push({ title: catName, habits: categoryGroups[catName] });
+      });
+    }
+
+    // Sort habits within each group: Main first, then completed last
+    groups.forEach(group => {
+      group.habits.sort((a, b) => {
+        if (a.isMain !== b.isMain) return a.isMain ? -1 : 1;
+        const isDoneA = (todayProgress[a.id]?.completions || 0) > 0 || todayProgress[a.id]?.completed;
+        const isDoneB = (todayProgress[b.id]?.completions || 0) > 0 || todayProgress[b.id]?.completed;
+        if (isDoneA !== isDoneB) return isDoneA ? 1 : -1;
+        return 0;
+      });
     });
-  }, [habits, sortBy, filterCategoryId, todayProgress, categories]);
+
+    return groups;
+  }, [filteredHabits, sortBy, categories, todayProgress]);
 
   const moneyHabitIds = useMemo(() => new Set(habits.filter(h => h.goalFormat === '$').map(h => h.id)), [habits]);
 
@@ -97,7 +134,7 @@ const HabitList: React.FC<Props> = ({
   return (
     <div className="space-y-3 pb-10">
       {/* Score Header */}
-      <div className="bg-white/20 backdrop-blur-sm p-5 rounded-block text-white border border-white/20 space-y-4">
+      <div className="relative z-20 bg-white/20 backdrop-blur-sm p-5 rounded-block text-white border border-white/20 space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <p className="text-white/60 text-[10px] font-black mb-1 uppercase tracking-widest">Daily Progress</p>
@@ -144,7 +181,7 @@ const HabitList: React.FC<Props> = ({
       </div>
 
       {/* Filter & Sort Bar — transparent, no background plate */}
-      <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide py-1">
+      <div className="relative z-10 flex items-center gap-2 overflow-x-auto scrollbar-hide pt-2 pb-0">
         <button
           onClick={() => setSortBy(sortBy === 'time' ? 'category' : 'time')}
           className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-block text-[11px] font-bold border border-white/20 whitespace-nowrap active:scale-95 transition-transform text-white shadow-block"
@@ -187,25 +224,31 @@ const HabitList: React.FC<Props> = ({
         ))}
       </div>
 
-      {/* Habit List */}
-      <div className="grid" style={{ gap: 'var(--spacing-list-gap, 0.5rem)' }}>
-        {processedHabits.length > 0 ? (
-          processedHabits.map(habit => (
-            <HabitCard
-              key={habit.id}
-              habit={habit}
-              category={categories.find(c => c.id === habit.categoryId)}
-              progress={todayProgress[habit.id]}
-              isRunning={activeHabitIds.has(habit.id)}
-              onUpdate={onUpdateProgress}
-              onToggleTimer={onToggleTimer}
-              onIncrementCompletion={onIncrementCompletion}
-              onDecrementCompletion={onDecrementCompletion}
-              onSkip={onSkipHabit}
-              onEdit={onEditHabit}
-              isSwiped={swipedHabitId === habit.id}
-              onSwipe={(id) => setSwipedHabitId(id)}
-            />
+      {/* Habit List with Groups */}
+      <div className="pb-4 flex flex-col">
+        {groupedHabits.length > 0 ? (
+          groupedHabits.map((group, idx) => (
+            <div
+              key={group.title + idx}
+              style={{ position: 'relative', zIndex: groupedHabits.length - idx }}
+            >
+              <HabitGroup
+                title={group.title}
+                isFirst={idx === 0}
+                habits={group.habits}
+                categories={categories}
+                todayProgress={todayProgress}
+                activeHabitIds={activeHabitIds}
+                onUpdateProgress={onUpdateProgress}
+                onToggleTimer={onToggleTimer}
+                onIncrementCompletion={onIncrementCompletion}
+                onDecrementCompletion={onDecrementCompletion}
+                onSkipHabit={onSkipHabit}
+                onEditHabit={onEditHabit}
+                swipedHabitId={swipedHabitId}
+                setSwipedHabitId={setSwipedHabitId}
+              />
+            </div>
           ))
         ) : (
           <div className="text-center py-16 bg-white/20 backdrop-blur-sm rounded-block border border-white/20">
@@ -222,3 +265,4 @@ const HabitList: React.FC<Props> = ({
 };
 
 export default HabitList;
+

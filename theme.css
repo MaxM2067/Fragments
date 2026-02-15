@@ -39,6 +39,8 @@
     /* ── Text ── */
     --color-text: #1E293B;
     --color-text-muted: rgba(30, 41, 59, 0.5);
+    --color-text-completed: #065f46;
+    /* emerald-800 for dark green readability */
 
     /* ── Surfaces ── */
     --color-card: rgba(255, 255, 255, 0.95);
@@ -133,21 +135,21 @@
 .daily-minimum-bg .crystal-1 {
     top: 10%;
     left: 0.4rem;
-    font-size: 2.5rem;
+    font-size: 1.5rem;
     animation-delay: 0s;
 }
 
 .daily-minimum-bg .crystal-2 {
     top: 38%;
     left: 0.1rem;
-    font-size: 3.8rem;
+    font-size: 2.2rem;
     animation-delay: -2s;
 }
 
 .daily-minimum-bg .crystal-3 {
     top: 68%;
     left: 0.5rem;
-    font-size: 2.2rem;
+    font-size: 1.2rem;
     animation-delay: -4s;
 }
 
@@ -168,4 +170,123 @@
     top: 75%;
     left: 1.8rem;
     animation-delay: 0.5s;
+}
+
+/* Group Headers */
+.habit-group-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.45rem;
+    padding: 0 0.5rem;
+    position: relative;
+    z-index: 1;
+    /* Lower than HabitCard's z-20 to allow shadows to fall over it */
+}
+
+.habit-group-title {
+    font-size: 0.75rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+}
+
+.habit-group-line {
+    height: 1px;
+    background: linear-gradient(to right, rgba(255, 255, 255, 0.2), transparent);
+    flex-grow: 1;
+}
+
+.habit-group-toggle {
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 0.5rem;
+    padding: 0.25rem;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.habit-group-toggle:active {
+    scale: 0.9;
+}
+
+/* Stacked Card Effect */
+.habit-stack-container {
+    position: relative;
+    padding-bottom: 8px;
+    /* space for the visual stack */
+    cursor: pointer;
+}
+
+/* Background "cards" for the stack */
+.habit-stack-bg {
+    position: absolute;
+    inset: 0;
+    background: white;
+    opacity: 0.4;
+    border-radius: var(--radius-block);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    z-index: 1;
+    transform: translateY(4px) scale(0.97);
+}
+
+.habit-stack-bg-2 {
+    position: absolute;
+    inset: 0;
+    background: white;
+    opacity: 0.2;
+    border-radius: var(--radius-block);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    z-index: 0;
+    transform: translateY(8px) scale(0.94);
+}
+
+.habit-stack-main {
+    position: relative;
+    z-index: 2;
+    background: white;
+    border-radius: var(--radius-block);
+    border: 1px solid white;
+    box-shadow: var(--shadow-block);
+}
+
+.habit-stack-content {
+    padding: var(--spacing-card-py) var(--spacing-card-px);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 52px;
+}
+
+.habit-stack-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    flex-shrink: 0;
+}
+
+.habit-stack-info {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.habit-stack-group-name {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--color-text);
+}
+
+.habit-stack-summary {
+    font-size: 0.85rem;
+    color: var(--color-text-muted);
+    font-weight: 500;
 }

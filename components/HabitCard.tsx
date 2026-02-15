@@ -191,7 +191,12 @@ const HabitCard: React.FC<Props> = ({
   return (
     <div className="relative group rounded-block">
       {/* Background Action: Skip today */}
-      <div className="absolute inset-0 z-10 flex items-center justify-end bg-slate-900 pr-6 rounded-block">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isSwiped ? 1 : 0 }}
+        transition={{ duration: 0.2 }}
+        className="absolute inset-0 z-10 flex items-center justify-end bg-slate-900 pr-6 rounded-block"
+      >
         <button
           onClick={(e) => { e.stopPropagation(); onSkip(habit.id); }}
           className="text-white font-black text-[10px] uppercase tracking-[0.2em] flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
@@ -201,7 +206,7 @@ const HabitCard: React.FC<Props> = ({
           </span>
           Skip Today
         </button>
-      </div>
+      </motion.div>
 
       <motion.div
         layout
@@ -279,8 +284,11 @@ const HabitCard: React.FC<Props> = ({
           {/* Info + Timer inline */}
           <div className="min-w-0 flex flex-col justify-center">
             <div
-              className={`font-bold leading-tight line-clamp-2 ${isActuallyCompleted ? 'text-emerald-500' : 'text-cozy-text'}`}
-              style={{ fontSize: 'var(--font-size-habit-name, 1.1rem)' }}
+              className={`font-bold leading-tight line-clamp-2 ${isActuallyCompleted ? '' : 'text-cozy-text'}`}
+              style={{
+                fontSize: 'var(--font-size-habit-name, 1.1rem)',
+                color: isActuallyCompleted ? 'var(--color-text-completed)' : undefined
+              }}
             >
               {habit.name}
             </div>
