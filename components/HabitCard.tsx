@@ -106,6 +106,7 @@ const HabitCard: React.FC<Props> = ({
 }) => {
   const [particles, setParticles] = useState<Particle[]>([]);
   const [showMinus, setShowMinus] = useState(false);
+  const [minusTimerKey, setMinusTimerKey] = useState(0);
   const elapsedTime = progress?.elapsedTime || 0;
   const completions = progress?.completions || 0;
   const stepsCompleted = progress?.stepsCompleted || 0;
@@ -117,7 +118,7 @@ const HabitCard: React.FC<Props> = ({
       const timer = setTimeout(() => setShowMinus(false), 5000);
       return () => clearTimeout(timer);
     }
-  }, [showMinus]);
+  }, [showMinus, minusTimerKey]);
 
   const stepsCount = useMemo(() => {
     if (!isMultiStep || !habit.goal || !habit.stepValue) return 0;
@@ -153,6 +154,7 @@ const HabitCard: React.FC<Props> = ({
     e.stopPropagation();
     spawnParticles();
     setShowMinus(true);
+    setMinusTimerKey(prev => prev + 1);
     onIncrementCompletion(habit.id);
   };
 
@@ -175,9 +177,11 @@ const HabitCard: React.FC<Props> = ({
         ${particles.length > 0 ? 'z-50' : 'z-auto'}
         ${isActuallyCompleted
           ? 'border-emerald-200/60 bg-emerald-50/40 shadow-block'
-          : habit.isMain
-            ? 'border-white/50 shadow-block scale-[1.01] z-10'
-            : 'border-white/30 shadow-block'}`}
+          : habit.dailyMinimum
+            ? 'border-amber-200/50 shadow-block bg-white'
+            : habit.isMain
+              ? 'border-white/50 shadow-block scale-[1.01] z-10'
+              : 'border-white/30 shadow-block'}`}
       style={{
         paddingTop: 'var(--spacing-card-py)',
         paddingBottom: 'var(--spacing-card-py)',
@@ -187,6 +191,17 @@ const HabitCard: React.FC<Props> = ({
       initial={{ scale: 0.97, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
     >
+      {habit.dailyMinimum && (
+        <div className="daily-minimum-bg">
+          <span className="crystal-1">💎</span>
+          <span className="crystal-2">💎</span>
+          <span className="crystal-3">💎</span>
+          <div className="glint glint-1" />
+          <div className="glint glint-2" />
+          <div className="glint glint-3" />
+        </div>
+      )}
+      {habit.dailyMinimum && <div className="absolute inset-0 bg-amber-50/20 pointer-events-none rounded-block" />}
       {habit.isMain && (
         <div className="absolute -top-2 -left-2 bg-amber-500 text-white p-0.5 rounded-full shadow-md z-30 border-2 border-white">
           <Star size={10} fill="currentColor" />
@@ -220,7 +235,7 @@ const HabitCard: React.FC<Props> = ({
         {/* Info + Timer inline */}
         <div className="min-w-0 flex flex-col justify-center">
           <div
-            className={`font-black leading-tight line-clamp-2 ${isActuallyCompleted ? 'text-emerald-800' : 'text-cozy-text'}`}
+            className={`font-bold leading-tight line-clamp-2 ${isActuallyCompleted ? 'text-emerald-500' : 'text-cozy-text'}`}
             style={{ fontSize: 'var(--font-size-habit-name, 1.1rem)' }}
           >
             {habit.name}
@@ -231,9 +246,9 @@ const HabitCard: React.FC<Props> = ({
               <div className="flex items-center gap-1.5 min-w-0">
                 <button
                   onClick={(e) => { e.stopPropagation(); onToggleTimer(habit.id); }}
-                  className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all ${isRunning
-                    ? 'bg-amber-500 text-white shadow-sm'
-                    : 'bg-amber-50 text-amber-500'}`}
+                  className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 border transition-all ${isRunning
+                    ? 'bg-amber-500 text-white shadow-sm border-amber-600/20'
+                    : 'bg-slate-50 text-amber-500 border-amber-200/50'}`}
                 >
                   {isRunning ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
                 </button>
@@ -260,7 +275,7 @@ const HabitCard: React.FC<Props> = ({
                 initial={{ opacity: 0, x: 5, scale: 0.8 }}
                 animate={{ opacity: 1, x: 0, scale: 1 }}
                 exit={{ opacity: 0, x: 5, scale: 0.8 }}
-                onClick={(e) => { e.stopPropagation(); onDecrementCompletion(habit.id); setShowMinus(false); }}
+                onClick={(e) => { e.stopPropagation(); onDecrementCompletion(habit.id); setMinusTimerKey(prev => prev + 1); }}
                 className="w-8 h-8 bg-slate-200/60 text-slate-500 rounded-block flex items-center justify-center active:scale-90 shrink-0 mr-1.5 shadow-inner border border-slate-300/30"
               >
                 <Minus size={16} strokeWidth={3} />

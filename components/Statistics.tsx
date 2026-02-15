@@ -2,7 +2,8 @@
 import React, { useMemo } from 'react';
 import { Habit, DailyLog, Category, DailyProgress } from '../types';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, YAxis } from 'recharts';
-import { TrendingUp, Award, Calendar, Zap, DollarSign } from 'lucide-react';
+import { TrendingUp, Award, Calendar, Zap, DollarSign, Gem } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
   habits: Habit[];
@@ -12,6 +13,7 @@ interface Props {
 
 const Statistics: React.FC<Props> = ({ habits, logs }) => {
   const moneyHabitIds = useMemo(() => new Set(habits.filter(h => h.goalFormat === '$').map(h => h.id)), [habits]);
+  const dailyMinHabitIds = useMemo(() => new Set(habits.filter(h => h.dailyMinimum).map(h => h.id)), [habits]);
   const hasMoneyHabits = moneyHabitIds.size > 0;
 
   const chartData = useMemo(() => {
@@ -27,22 +29,41 @@ const Statistics: React.FC<Props> = ({ habits, logs }) => {
 
       let fragments = 0;
       let money = 0;
+      const dailyMinHabitsForDate = habits.filter(h => h.dailyMinimum);
+      let dailyMinCompletedCount = 0;
+
       for (const [id, p] of Object.entries(log.progress)) {
         if (moneyHabitIds.has(id)) {
           money += (p as DailyProgress).moneyEarned || 0;
         } else {
           fragments += (p as DailyProgress).completions || 0;
         }
+
+        if (dailyMinHabitIds.has(id)) {
+          const habit = habits.find(h => h.id === id);
+          if (habit) {
+            const progress = p as DailyProgress;
+            if (habit.stepType === 'multiple') {
+              const stepsCount = habit.goal && habit.stepValue ? Math.floor(habit.goal / habit.stepValue) : 0;
+              if (stepsCount > 0 && progress.stepsCompleted >= stepsCount) dailyMinCompletedCount++;
+            } else if (progress.completed || progress.completions > 0) {
+              dailyMinCompletedCount++;
+            }
+          }
+        }
       }
+
+      const dailyMinMet = dailyMinHabitsForDate.length > 0 && dailyMinCompletedCount === dailyMinHabitsForDate.length;
 
       return {
         name: date.split('-').slice(2).join('/'),
         fragments,
         money,
         mood: log.mood,
+        dailyMinMet
       };
     });
-  }, [logs, moneyHabitIds]);
+  }, [logs, moneyHabitIds, dailyMinHabitIds, habits]);
 
   const stats = useMemo(() => {
     const allLogs = Object.values(logs) as DailyLog[];
@@ -181,9 +202,30 @@ const Statistics: React.FC<Props> = ({ habits, logs }) => {
                 cursor={{ fill: 'rgba(59, 130, 246, 0.1)', radius: 16 }}
                 contentStyle={{ borderRadius: '2rem', border: '4px solid #FBFCFE', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.05)', backgroundColor: '#fff', fontWeight: 900 }}
               />
-              <Bar dataKey="fragments" fill="#3B82F6" radius={[12, 12, 12, 12]} barSize={24} />
+              <Bar dataKey="fragments" fill="#3B82F6" radius={[12, 12, 12, 12]} barSize={24}>
+                {chartData.map((entry, index) => (
+                  <cell key={`cell-${index}`} fill={entry.fragments > 0 ? '#3B82F6' : '#E2E8F0'} />
+                ))}
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
+
+          {/* Daily Minimum Status Icons overlaying the chart */}
+          <div className="absolute top-14 left-8 right-8 flex justify-between px-2 pointer-events-none">
+            {chartData.map((entry, i) => (
+              <div key={i} className="flex flex-col items-center flex-1">
+                {entry.dailyMinMet && (
+                  <motion.div
+                    initial={{ scale: 0, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="mb-1"
+                  >
+                    <Gem size={14} className="text-amber-400" fill="currentColor" />
+                  </motion.div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 

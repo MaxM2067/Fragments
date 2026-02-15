@@ -31,6 +31,11 @@
     --color-success-dark: #059669;
     /* emerald-600 */
 
+    /* ── Gold (Daily Minimum) ── */
+    --color-gold: #FFD700;
+    --color-gold-light: #FFF4B0;
+    --color-gold-dark: #B8860B;
+
     /* ── Text ── */
     --color-text: #1E293B;
     --color-text-muted: rgba(30, 41, 59, 0.5);
@@ -43,7 +48,7 @@
     --nav-bg: linear-gradient(135deg, #3d8a47, #2d7a3a);
 
     /* ── Border radius tokens ── */
-    --radius-block: 1.7rem;
+    --radius-block: 1.6rem;
     /* rounded-2xl (16px) */
     --radius-button: 1rem;
     --radius-icon: 9999px;
@@ -57,11 +62,110 @@
     --shadow-header: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 
     /* ── Typography ── */
-    --font-family-main: 'Nunito', sans-serif;
+    --font-family-main: 'Inter', sans-serif;
     --font-size-habit-name: 1.15rem;
     /* ~18px, was text-[15px] */
     /* ── Spacing ── */
     --spacing-list-gap: 0.60rem;
     --spacing-card-py: 0.5rem;
     --spacing-card-px: 0.75rem;
+}
+
+@keyframes float-crystal-gold {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.9;
+        filter: drop-shadow(0 0 10px rgba(200, 120, 0, 0.4)) sepia(1) saturate(3) hue-rotate(-12deg) contrast(1) brightness(0.9);
+    }
+
+    50% {
+        transform: translateY(-12px) rotate(15deg);
+        opacity: 1;
+        filter: drop-shadow(0 0 20px rgba(255, 140, 0, 0.8)) sepia(1) saturate(5) hue-rotate(-12deg) contrast(1.2) brightness(1);
+    }
+
+    100% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 0.9;
+        filter: drop-shadow(0 0 10px rgba(200, 120, 0, 0.4)) sepia(1) saturate(3) hue-rotate(-12deg) contrast(1) brightness(0.9);
+    }
+}
+
+@keyframes glint-shimmer {
+
+    0%,
+    100% {
+        transform: scale(0.5) rotate(0deg);
+        opacity: 0;
+    }
+
+    50% {
+        transform: scale(1.4) rotate(45deg);
+        opacity: 1;
+    }
+}
+
+.daily-minimum-bg {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+    border-radius: inherit;
+}
+
+.daily-minimum-bg span {
+    position: absolute;
+    animation: float-crystal-gold 6s infinite ease-in-out;
+}
+
+/* Sparkles / Glints */
+.daily-minimum-bg .glint {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 0 8px 2px white, 0 0 18px 4px #FFD700;
+    animation: glint-shimmer 4s infinite ease-in-out;
+}
+
+.daily-minimum-bg .crystal-1 {
+    top: 10%;
+    left: 0.4rem;
+    font-size: 2.5rem;
+    animation-delay: 0s;
+}
+
+.daily-minimum-bg .crystal-2 {
+    top: 38%;
+    left: 0.1rem;
+    font-size: 3.8rem;
+    animation-delay: -2s;
+}
+
+.daily-minimum-bg .crystal-3 {
+    top: 68%;
+    left: 0.5rem;
+    font-size: 2.2rem;
+    animation-delay: -4s;
+}
+
+/* Positioning sparkles on the crystals */
+.daily-minimum-bg .glint-1 {
+    top: 20%;
+    left: 1.5rem;
+    animation-delay: 1s;
+}
+
+.daily-minimum-bg .glint-2 {
+    top: 45%;
+    left: 2.8rem;
+    animation-delay: 2.5s;
+}
+
+.daily-minimum-bg .glint-3 {
+    top: 75%;
+    left: 1.8rem;
+    animation-delay: 0.5s;
 }

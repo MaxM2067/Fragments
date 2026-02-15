@@ -25,6 +25,7 @@ export interface Habit {
   goalFormat?: GoalFormat; // 'min' (default), 'times', or '$'
   stepValue?: number; // Value per step in goalFormat units (also $ per step for '$' goals)
   isMain?: boolean;
+  dailyMinimum?: boolean;
   createdAt: number;
 }
 

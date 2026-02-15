@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Habit, Category, TimeOfDay, GoalFormat, StepType } from '../types';
 import { ICONS, getIconById } from '../constants';
-import { ChevronLeft, Check, Save, Star, Layers, Zap, DollarSign, ChevronDown } from 'lucide-react';
+import { ChevronLeft, Check, Save, Star, Layers, Zap, DollarSign, ChevronDown, Gem } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
@@ -27,6 +27,7 @@ const HabitForm: React.FC<Props> = ({ habits, categories, onSave, onCancel, init
   const [oneTimeValue, setOneTimeValue] = useState<number | ''>(initialHabit?.oneTimeValue || '');
   const [rewardValue, setRewardValue] = useState<number>(initialHabit?.rewardValue || 1);
   const [isMain, setIsMain] = useState<boolean>(initialHabit?.isMain || false);
+  const [dailyMinimum, setDailyMinimum] = useState<boolean>(initialHabit?.dailyMinimum || false);
 
   const mainHabitsCount = habits.filter(h => h.isMain && h.id !== initialHabit?.id).length;
   const isMainDisabled = mainHabitsCount >= 2;
@@ -53,6 +54,7 @@ const HabitForm: React.FC<Props> = ({ habits, categories, onSave, onCancel, init
       oneTimeValue: oneTimeValue === '' ? undefined : Number(oneTimeValue),
       rewardValue: isMoneyGoal ? 0 : Number(rewardValue),
       isMain,
+      dailyMinimum,
       createdAt: initialHabit?.createdAt || Date.now(),
     };
     onSave(habitData);
@@ -168,12 +170,28 @@ const HabitForm: React.FC<Props> = ({ habits, categories, onSave, onCancel, init
           >
             <div className="flex items-center gap-2">
               <Star size={16} fill={isMain ? "currentColor" : "none"} />
-              <span>Make Main</span>
+              <span>Main Goal</span>
               {isMainDisabled && !isMain && <span className="text-[9px] text-rose-400 normal-case ml-1">max 2</span>}
             </div>
             <div className={`w-8 h-5 rounded-full relative transition-colors ${isMain ? 'bg-white/30' : 'bg-slate-100'}`}>
               <motion.div animate={{ x: isMain ? 14 : 2 }}
                 className={`absolute top-0.5 w-4 h-4 rounded-full ${isMain ? 'bg-white' : 'bg-slate-300'}`} />
+            </div>
+          </button>
+
+          {/* Daily Minimum Toggle */}
+          <button type="button" onClick={() => setDailyMinimum(!dailyMinimum)}
+            className={`w-full px-4 py-2.5 rounded-block border-2 transition-all flex items-center justify-between font-black text-sm ${dailyMinimum
+              ? 'bg-amber-400 text-white border-amber-500 shadow-sm'
+              : 'bg-white text-slate-400 border-slate-100'}`}
+          >
+            <div className="flex items-center gap-2">
+              <Gem size={16} fill={dailyMinimum ? "currentColor" : "none"} />
+              <span>Daily Minimum</span>
+            </div>
+            <div className={`w-8 h-5 rounded-full relative transition-colors ${dailyMinimum ? 'bg-white/30' : 'bg-slate-100'}`}>
+              <motion.div animate={{ x: dailyMinimum ? 14 : 2 }}
+                className={`absolute top-0.5 w-4 h-4 rounded-full ${dailyMinimum ? 'bg-white' : 'bg-slate-300'}`} />
             </div>
           </button>
         </div>
