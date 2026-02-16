@@ -9,6 +9,7 @@ import HabitForm from './components/HabitForm';
 import BottomNav from './components/BottomNav';
 import MoodBar from './components/MoodBar';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getTodayInTimezone } from './utils/dateUtils';
 
 const App: React.FC = () => {
   const [view, setView] = useState<ViewState>('habits');
@@ -19,10 +20,13 @@ const App: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>(() => {
     try { const s = localStorage.getItem('habitly_categories'); return s ? JSON.parse(s) : DEFAULT_CATEGORIES; } catch { return DEFAULT_CATEGORIES; }
   });
+  const [userTimezone, setUserTimezone] = useState<string>(() => {
+    return localStorage.getItem('habitly_timezone') || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  });
   const [logs, setLogs] = useState<Record<string, DailyLog>>(() => {
     try { const s = localStorage.getItem('habitly_logs'); return s ? JSON.parse(s) : {}; } catch { return {}; }
   });
-  const [today, setToday] = useState(new Date().toISOString().split('T')[0]);
+  const [today, setToday] = useState(() => getTodayInTimezone(localStorage.getItem('habitly_timezone') || undefined));
 
   // Timestamp-based active timers: { habitId: { startedAt: ms, accumulatedTime: seconds } }
   type TimerEntry = { startedAt: number; accumulatedTime: number };
@@ -51,7 +55,7 @@ const App: React.FC = () => {
   const syncTimersToLogs = useCallback((timers: Record<string, TimerEntry>) => {
     if (Object.keys(timers).length === 0) return;
     setLogs(prev => {
-      const todayStr = new Date().toISOString().split('T')[0];
+      const todayStr = getTodayInTimezone(userTimezone);
       const existingLog = prev[todayStr] || { date: todayStr, mood: 0, progress: {} };
       const newProgress = { ...existingLog.progress };
 
@@ -73,7 +77,7 @@ const App: React.FC = () => {
       // Finalize elapsed time in logs
       const elapsed = computeElapsedTime(timer);
       setLogs(logsPrev => {
-        const todayStr = new Date().toISOString().split('T')[0];
+        const todayStr = getTodayInTimezone(userTimezone);
         const existingLog = logsPrev[todayStr] || { date: todayStr, mood: 0, progress: {} };
         const p = existingLog.progress[habitId] || { habitId, completed: false, completions: 0, elapsedTime: 0, stepsCompleted: 0, moneyEarned: 0 };
         return {
@@ -115,7 +119,7 @@ const App: React.FC = () => {
   // Day rollover check
   useEffect(() => {
     const timer = setInterval(() => {
-      const current = new Date().toISOString().split('T')[0];
+      const current = getTodayInTimezone(userTimezone);
       if (current !== today) {
         // Sync final times before resetting
         syncTimersToLogs(activeTimersRef.current);
@@ -174,7 +178,8 @@ const App: React.FC = () => {
     localStorage.setItem('habitly_habits', JSON.stringify(habits));
     localStorage.setItem('habitly_categories', JSON.stringify(categories));
     localStorage.setItem('habitly_logs', JSON.stringify(logs));
-  }, [habits, categories, logs]);
+    localStorage.setItem('habitly_timezone', userTimezone);
+  }, [habits, categories, logs, userTimezone]);
 
   const currentLog = useMemo(() => {
     return logs[today] || { date: today, mood: 0, progress: {} };
@@ -400,7 +405,7 @@ const App: React.FC = () => {
           </div>
         );
       case 'statistics':
-        return <Statistics habits={habits} logs={logs} categories={categories} />;
+        return <Statistics habits={habits} logs={logs} categories={categories} userTimezone={userTimezone} />;
       case 'settings':
         return (
           <Settings
@@ -409,6 +414,8 @@ const App: React.FC = () => {
             habits={habits}
             onDeleteHabit={deleteHabit}
             onEditHabit={startEditing}
+            userTimezone={userTimezone}
+            setUserTimezone={setUserTimezone}
           />
         );
       case 'add-habit':

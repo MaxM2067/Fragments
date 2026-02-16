@@ -4,24 +4,22 @@ import { Habit, DailyLog, Category, DailyProgress } from '../types';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, YAxis } from 'recharts';
 import { TrendingUp, Award, Calendar, Zap, DollarSign, Gem } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getLastNDaysInTimezone, formatDateInTimezone } from '../utils/dateUtils';
 
 interface Props {
   habits: Habit[];
   logs: Record<string, DailyLog>;
   categories: Category[];
+  userTimezone: string;
 }
 
-const Statistics: React.FC<Props> = ({ habits, logs }) => {
+const Statistics: React.FC<Props> = ({ habits, logs, userTimezone }) => {
   const moneyHabitIds = useMemo(() => new Set(habits.filter(h => h.goalFormat === '$').map(h => h.id)), [habits]);
   const dailyMinHabitIds = useMemo(() => new Set(habits.filter(h => h.dailyMinimum).map(h => h.id)), [habits]);
   const hasMoneyHabits = moneyHabitIds.size > 0;
 
   const chartData = useMemo(() => {
-    const last7Days = Array.from({ length: 7 }, (_, i) => {
-      const d = new Date();
-      d.setDate(d.getDate() - (6 - i));
-      return d.toISOString().split('T')[0];
-    });
+    const last7Days = getLastNDaysInTimezone(7, userTimezone);
 
     return last7Days.map(date => {
       const log = logs[date];
@@ -68,6 +66,8 @@ const Statistics: React.FC<Props> = ({ habits, logs }) => {
   const stats = useMemo(() => {
     const allLogs = Object.values(logs) as DailyLog[];
     const now = new Date();
+    const todayStr = formatDateInTimezone(now, userTimezone);
+    const [todayYear, todayMonth] = todayStr.split('-').map(Number);
 
     // Total Fragments (excluding $ habits)
     const totalFragments = allLogs.reduce((sum, log) => {
@@ -89,8 +89,8 @@ const Statistics: React.FC<Props> = ({ habits, logs }) => {
     const currentMonth = now.getMonth();
     const currentYear = now.getFullYear();
     const monthLogs = allLogs.filter(log => {
-      const d = new Date(log.date);
-      return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+      const [y, m] = log.date.split('-').map(Number);
+      return m === todayMonth && y === todayYear;
     });
 
     const monthFragments = monthLogs.reduce((sum, log) =>
@@ -102,11 +102,8 @@ const Statistics: React.FC<Props> = ({ habits, logs }) => {
         !moneyHabitIds.has(id) ? ps : ps + ((p as DailyProgress).moneyEarned || 0), 0), 0);
 
     // Current Week
-    const startOfWeek = new Date(now);
-    startOfWeek.setDate(now.getDate() - now.getDay());
-    startOfWeek.setHours(0, 0, 0, 0);
-
-    const weekLogs = allLogs.filter(log => new Date(log.date) >= startOfWeek);
+    const last7Days = getLastNDaysInTimezone(7, userTimezone);
+    const weekLogs = allLogs.filter(log => last7Days.includes(log.date));
 
     const weekFragments = weekLogs.reduce((sum, log) =>
       sum + Object.entries(log.progress).reduce((ps, [id, p]) =>

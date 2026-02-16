@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Category, Habit } from '../types';
-import { Trash2, Plus, Palette, Edit2, Sparkles } from 'lucide-react';
+import { Trash2, Plus, Palette, Edit2, Sparkles, Globe, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getTimezoneLabel, getTimezoneOffset, getTimeInTimezone } from '../utils/dateUtils';
+import { useEffect } from 'react';
 
 interface Props {
   categories: Category[];
@@ -9,6 +11,8 @@ interface Props {
   habits: Habit[];
   onDeleteHabit: (id: string) => void;
   onEditHabit: (id: string) => void;
+  userTimezone: string;
+  setUserTimezone: (tz: string) => void;
 }
 
 const COZY_PALETTE = [
@@ -23,9 +27,17 @@ const COZY_PALETTE = [
   '#2DD4BF', // teal
 ];
 
-const Settings: React.FC<Props> = ({ categories, setCategories, habits, onDeleteHabit, onEditHabit }) => {
+const Settings: React.FC<Props> = ({ categories, setCategories, habits, onDeleteHabit, onEditHabit, userTimezone, setUserTimezone }) => {
   const [newCatName, setNewCatName] = useState('');
   const [editingColorId, setEditingColorId] = useState<string | null>(null);
+  const [currentTime, setCurrentTime] = useState(() => getTimeInTimezone(userTimezone));
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(getTimeInTimezone(userTimezone));
+    }, 10000); // Update every 10s to be reasonably accurate
+    return () => clearInterval(timer);
+  }, [userTimezone]);
 
   const addCategory = () => {
     if (!newCatName) return;
@@ -55,6 +67,7 @@ const Settings: React.FC<Props> = ({ categories, setCategories, habits, onDelete
   return (
     <div className="space-y-6 pb-24 text-cozy-text">
       <h2 className="text-2xl font-black tracking-tight">Settings</h2>
+
 
       <div className="space-y-3">
         <h3 className="text-[11px] font-black text-cozy-text/40 uppercase tracking-widest px-2">Categories</h3>
@@ -188,15 +201,57 @@ const Settings: React.FC<Props> = ({ categories, setCategories, habits, onDelete
         </div>
       </div>
 
-      <div className="bg-indigo-100 p-6 rounded-block border-4 border-white shadow-header flex items-start gap-4">
-        <div className="w-12 h-12 bg-white rounded-block flex items-center justify-center shrink-0 text-indigo-400 shadow-inner">
-          <Sparkles size={24} />
-        </div>
-        <div>
-          <h4 className="font-black text-cozy-text text-sm mb-1 uppercase tracking-tight">Cozy Tip</h4>
-          <p className="text-xs text-cozy-text leading-relaxed font-bold italic">
-            "Organizing habits by category helps your brain switch between different types of tasks more efficiently! ✨"
-          </p>
+
+      <div className="space-y-3">
+        <h3 className="text-[11px] font-black text-cozy-text/40 uppercase tracking-widest px-2">Timezone</h3>
+        <div className="bg-white rounded-block p-5 shadow-block border-4 border-indigo-50/20 space-y-4">
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-3 bg-indigo-50/30 p-3 rounded-block border-2 border-indigo-50/50">
+              <Globe size={20} className="text-cozy-indigo" />
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Timezone</p>
+                <div className="flex flex-col">
+                  <p className="font-black text-[11px] text-cozy-text/50 truncate max-w-[150px]">
+                    {getTimezoneLabel(userTimezone)}
+                  </p>
+                  <p className="font-black text-lg text-cozy-indigo leading-none mt-1">
+                    {currentTime}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setUserTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone)}
+                className="text-[10px] font-black bg-white px-3 py-1.5 rounded-block shadow-sm border border-indigo-100 hover:bg-indigo-50 transition-colors shrink-0"
+                title="Detect automatically"
+              >
+                Auto-Detect
+              </button>
+            </div>
+
+            <div className="relative">
+              <select
+                value={userTimezone}
+                onChange={(e) => setUserTimezone(e.target.value)}
+                className="w-full bg-white px-4 py-3 rounded-block text-sm outline-none border-4 border-indigo-50/10 focus:border-cozy-indigo/30 font-black appearance-none cursor-pointer pr-10"
+              >
+                <option value="UTC">(UTC) Coordinated Universal Time</option>
+                {Intl.supportedValuesOf('timeZone')
+                  .filter(tz => tz !== 'UTC')
+                  .map(tz => ({
+                    id: tz,
+                    label: getTimezoneLabel(tz),
+                    offset: getTimezoneOffset(tz)
+                  }))
+                  .sort((a, b) => a.offset.localeCompare(b.offset) || a.id.localeCompare(b.id))
+                  .map(tz => (
+                    <option key={tz.id} value={tz.id}>{tz.label}</option>
+                  ))}
+              </select>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-cozy-text/30">
+                <ChevronDown size={18} strokeWidth={3} />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

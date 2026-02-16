@@ -51,6 +51,8 @@
 - **Intelligent Grouping:** Groups with only **one** item automatically hide their collapse toggle and "stacked" visual to maintain a clean UI.
 - **Descending Stacking:** Habit groups use a descending `z-index` so that shadows from previous cards always fall correctly over subsequent group headers.
 - **Completion Delay:** When a habit is completed (and "Keep in list" is OFF), it remains in its original position for **3 seconds** before animating smoothly to the "Done Today" group. This gives the user time to celebrate or continue interacting before reorganization.
+- **UI State Persistence:** Sorting method (`sortBy`), active filter (`filterCategoryId`), and group expansion states (`collapsedGroups`) are persisted in `localStorage`. 
+    - The "Done Today" group is **collapsed by default** when it first appears to maintain a clean workspace.
 
 ## Guidelines for AI / Developers
 1. **Styling Integrity:** **NEVER** use hardcoded hex codes for primary colors or shadows. Always check `theme.css` variables.
