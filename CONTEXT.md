@@ -11,7 +11,7 @@
   - `theme.css`: Central hub for CSS variables (colors, shadows, border-radius, stroke thickness).
   - Framer Motion (for fluid list transitions, particle celebrations, and micro-animations).
 - **Icons:** Lucide React (Customized sizing/stroke for better visibility).
-- **Persistence:** LocalStorage (`habitly_habits`, `habitly_categories`, `habitly_logs`).
+- **Persistence:** LocalStorage (`habitly_habits`, `habitly_categories`, `habitly_logs`, `habitly_timezone`).
 
 ## Design Philosophy: "Tactile Fragments"
 - **Background:** High-contrast linear gradient (`#1CA2DC` to `#5AAA62`) that flows diagonally.
@@ -36,6 +36,8 @@
 - `theme.css`: **The source of truth for styling.** Defines colors, shadows, and default progress ring stroke thickness.
 - `App.tsx`: Central state management, persistence, and routing. Handles cycle-based fragment logic.
 - `types.ts`: Interface definitions for `Habit`, `Category`, `DailyLog`, and `DailyProgress`.
+- `utils/`:
+  - `dateUtils.ts`: Centralized logic for timezone-aware date formatting (`YYYY-MM-DD`) and current time calculations.
 - `components/`:
   - `HabitForm.tsx`: Features a **sticky compact header** with a persistent "Save/Create" button and glassmorphism effect.
   - `HabitCard.tsx`: Interactive and **clickable** (click anywhere to edit, excluding controls). Manages particle bursts and gold crystal visuals for "Daily Min".
@@ -53,6 +55,7 @@
 - **Completion Delay:** When a habit is completed (and "Keep in list" is OFF), it remains in its original position for **3 seconds** before animating smoothly to the "Done Today" group. This gives the user time to celebrate or continue interacting before reorganization.
 - **UI State Persistence:** Sorting method (`sortBy`), active filter (`filterCategoryId`), and group expansion states (`collapsedGroups`) are persisted in `localStorage`. 
     - The "Done Today" group is **collapsed by default** when it first appears to maintain a clean workspace.
+- **Timezone-Awareness:** All date generation and rollover logic is tied to the `userTimezone` (persisted). The app uses `Intl.DateTimeFormat` via `dateUtils.ts` to ensure that "Today" is calculated relative to the user's selected location, not UTC.
 
 ## Guidelines for AI / Developers
 1. **Styling Integrity:** **NEVER** use hardcoded hex codes for primary colors or shadows. Always check `theme.css` variables.
@@ -60,3 +63,4 @@
 3. **Animations:** Always use `motion` and `AnimatePresence`. The "premium" feel comes from smooth layouts and bouncy particles.
 4. **Mobile Polish:** Every button must have state (`active:scale-95`). Use `safe-bottom` for the navigation area.
 5. **Logic Guardrails:** When modifying completion counts, ensure you use the `Math.floor` cycle logic for multi-step fragments.
+6. **Timezone Integrity:** **NEVER** use `new Date().toISOString()` or direct `Date` string conversion for day tracking. Always use `getTodayInTimezone(userTimezone)` from `dateUtils.ts` to prevent day-offset bugs for international users.

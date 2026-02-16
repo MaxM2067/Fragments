@@ -379,9 +379,11 @@ const App: React.FC = () => {
         return (
           <HabitList
             habits={habits}
+            logs={logs}
             categories={categories}
             todayProgress={currentLog.progress}
             activeHabitIds={activeHabitIds}
+            userTimezone={userTimezone}
             onUpdateProgress={updateHabitProgress}
             onToggleTimer={toggleTimer}
             onIncrementCompletion={handleIncrementCompletion}
