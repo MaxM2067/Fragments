@@ -75,6 +75,11 @@ const HabitDetail: React.FC<Props> = ({
     });
     const notesRef = useRef<HTMLDivElement>(null);
 
+    // Scroll to top on mount
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     useEffect(() => {
         const timer = setTimeout(() => {
             localStorage.setItem(`habitly_notes_${habit.id}`, notes);
@@ -221,7 +226,7 @@ const HabitDetail: React.FC<Props> = ({
     };
 
     return (
-        <div className="flex flex-col min-h-screen select-none">
+        <div className="flex flex-col select-none pb-24">
             {/* Sticky Header — Matches HabitForm style */}
             <div className="sticky top-0 z-[60] -mx-3 -mt-2 mb-4 px-3 py-2 bg-white/60 backdrop-blur-md border-b border-white/20 flex items-center justify-between shadow-sm">
                 <div className="flex items-center gap-3">

@@ -11,7 +11,8 @@
   - `theme.css`: Central hub for CSS variables (colors, shadows, border-radius, stroke thickness).
   - Framer Motion (for fluid list transitions, particle celebrations, and micro-animations).
 - **Icons:** Lucide React (Customized sizing/stroke for better visibility).
-- **Persistence:** LocalStorage (`habitly_habits`, `habitly_categories`, `habitly_logs`, `habitly_timezone`).
+- **Persistence:** LocalStorage (`habitly_habits`, `habitly_categories`, `habitly_logs`, `habitly_timezone`, `habitly_detail_tab`, `habitly_show_full_month`, `habitly_notes_*`).
+- **Charts:** Recharts (Customized for high-contrast, bold visuals).
 
 ## Design Philosophy: "Tactile Fragments"
 - **Background:** High-contrast linear gradient (`#1CA2DC` to `#5AAA62`) that flows diagonally.
@@ -32,6 +33,9 @@
 - **Header Statistics:** A collapsible/expandable dashboard (`HeaderDashboard`) providing Today, Yesterday, Week, and Month fragment counts.
 - **Done Today Group:** Completed habits move to a separate "Done Today" group at the bottom unless they are marked to stay in place.
 - **Keep in List:** Users can toggle "Keep in list when done" for any habit. This keeps the habit in its original group/position even after completion, allowing for over-completion without moving the card.
+- **Habit Detail Screen:** Clicking a habit card opens a dedicated detail view with two persistent tabs:
+    - **Notes:** A rich-text editor for habit journals, auto-saved per-habit.
+    - **Stats:** Comprehensive activity tracking including a swipeable weekly bar chart and a full-month calendar grid.
 
 ## Project Structure
 - `theme.css`: **The source of truth for styling.** Defines colors, shadows, and default progress ring stroke thickness.
@@ -40,8 +44,9 @@
 - `utils/`:
   - `dateUtils.ts`: Centralized logic for timezone-aware date formatting (`YYYY-MM-DD`) and current time calculations.
 - `components/`:
-  - `HabitForm.tsx`: Features a **sticky compact header** with a persistent "Save/Create" button and glassmorphism effect.
-  - `HabitCard.tsx`: Interactive and **clickable** (click anywhere to edit, excluding controls). Manages particle bursts and gold crystal visuals for "Daily Min".
+  - `HabitDetail.tsx`: **The new primary interaction point.** Features a sticky header, persistent UI state (tab/view), and two functional tabs (Notes/Stats).
+  - `HabitForm.tsx`: Features a **sticky compact header** with a persistent "Save/Create" button. Default goal format is set to **"Times"**.
+  - `HabitCard.tsx`: Interactive and **clickable** (click anywhere to open **Habit Detail**). Manages particle bursts and gold crystal visuals for "Daily Min".
   - `HabitGroup.tsx`: Manages the **collapsible/expandable state** of habit clusters. Implements a "stacked" card UI when collapsed.
   - `HabitList.tsx`: Handles the high-level grouping logic and renders `HabitGroup` components.
   - `HeaderDashboard.tsx`: A **draggable collapsible header** that displays statistics and the "Daily Minimum" goal tracker. Features a thin "tab" ("ушко") for expansion when collapsed.
@@ -56,7 +61,12 @@
 - **Descending Stacking:** Habit groups use a descending `z-index` so that shadows from previous cards always fall correctly over subsequent group headers.
 - **Completion Delay:** When a habit is completed (and "Keep in list" is OFF), it remains in its original position for **3 seconds** before animating smoothly to the "Done Today" group. This gives the user time to celebrate or continue interacting before reorganization.
 - **UI State Persistence:** Sorting method (`sortBy`), active filter (`filterCategoryId`), and group expansion states (`collapsedGroups`) are persisted in `localStorage`. 
-    - The "Done Today" group is **collapsed by default** when it first appears to maintain a clean workspace.
+    - The "Done Today" group is **collapsed by default** when it first appears.
+    - Habit Detail's **active tab** (`habitly_detail_tab`) and **stat view** (`habitly_show_full_month`) are persisted globally.
+- **Enhanced Statistics:**
+    - **Dashboard-Style Summary:** Features a glassmorphic background with 6 metrics (This/Last Week, Month, Year).
+    - **Goal Indicators:** Weekly charts include a dashed goal line and "Gem" icons inside bars that meet/exceed the target.
+    - **Manual Completion Logic:** For "Minutes" habits completed without a timer, stats automatically count the goal value (or 1m) to ensure completion visibility.
 - **Timezone-Awareness:** All date generation and rollover logic is tied to the `userTimezone` (persisted). The app uses `Intl.DateTimeFormat` via `dateUtils.ts` to ensure that "Today" is calculated relative to the user's selected location, not UTC.
 
 ## Guidelines for AI / Developers
