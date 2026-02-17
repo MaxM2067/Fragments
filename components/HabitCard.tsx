@@ -17,7 +17,7 @@ interface Props {
   onSkip: (habitId: string) => void;
   isSwiped: boolean;
   onSwipe: (id: string | null) => void;
-  onEdit: (id: string) => void;
+  onViewDetail: (id: string) => void;
 }
 
 interface Particle {
@@ -126,7 +126,7 @@ const HabitCard: React.FC<Props> = ({
   onSkip,
   isSwiped,
   onSwipe,
-  onEdit
+  onViewDetail
 }) => {
   const [particles, setParticles] = useState<Particle[]>([]);
   const [showMinus, setShowMinus] = useState(false);
@@ -266,7 +266,7 @@ const HabitCard: React.FC<Props> = ({
           paddingRight: 'var(--spacing-card-px)',
         }}
         initial={{ scale: 0.97, opacity: 0 }}
-        onClick={() => onEdit(habit.id)}
+        onClick={() => onViewDetail(habit.id)}
       >
         {habit.dailyMinimum && (
           <div className="daily-minimum-bg">

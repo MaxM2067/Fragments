@@ -93,3 +93,107 @@ export const getTimeInTimezone = (timezone: string): string => {
         return '--:--';
     }
 };
+
+/**
+ * Returns an array of 7 YYYY-MM-DD date strings for a given week.
+ * weekOffset = 0 means current week, -1 = previous week, etc.
+ * Week starts on Monday.
+ */
+export const getWeekDaysInTimezone = (weekOffset: number = 0, timezone?: string): string[] => {
+    const tz = timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+    const now = new Date();
+
+    // Get today's date parts in the target timezone
+    const parts = new Intl.DateTimeFormat('en-CA', {
+        timeZone: tz,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+    }).formatToParts(now);
+
+    const year = parseInt(parts.find(p => p.type === 'year')!.value);
+    const month = parseInt(parts.find(p => p.type === 'month')!.value) - 1;
+    const day = parseInt(parts.find(p => p.type === 'day')!.value);
+
+    // Create a date object for "today" in local context
+    const today = new Date(year, month, day);
+    const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    const monday = new Date(today);
+    monday.setDate(today.getDate() + mondayOffset + weekOffset * 7);
+
+    const dates: string[] = [];
+    for (let i = 0; i < 7; i++) {
+        const d = new Date(monday);
+        d.setDate(monday.getDate() + i);
+        const yy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        dates.push(`${yy}-${mm}-${dd}`);
+    }
+    return dates;
+};
+
+export interface CalendarDay {
+    date: string; // YYYY-MM-DD
+    dayOfMonth: number;
+    isCurrentMonth: boolean;
+}
+
+/**
+ * Returns a full calendar grid (6-row max) for the given year/month.
+ * Each row has 7 days (Mon–Sun). Pads with prev/next month days.
+ */
+export const getMonthCalendarInTimezone = (year: number, month: number): CalendarDay[] => {
+    // month is 1-based (1=Jan, 12=Dec)
+    const firstOfMonth = new Date(year, month - 1, 1);
+    const lastOfMonth = new Date(year, month, 0);
+    const daysInMonth = lastOfMonth.getDate();
+
+    // Day of week: 0=Sun, we want Mon=0
+    let startDow = firstOfMonth.getDay(); // 0=Sun
+    startDow = startDow === 0 ? 6 : startDow - 1; // Convert to Mon=0
+
+    const days: CalendarDay[] = [];
+
+    // Pad start with previous month days
+    if (startDow > 0) {
+        const prevMonthLast = new Date(year, month - 1, 0);
+        const prevMonthDays = prevMonthLast.getDate();
+        for (let i = startDow - 1; i >= 0; i--) {
+            const d = prevMonthDays - i;
+            const prevMonth = month - 1 <= 0 ? 12 : month - 1;
+            const prevYear = month - 1 <= 0 ? year - 1 : year;
+            days.push({
+                date: `${prevYear}-${String(prevMonth).padStart(2, '0')}-${String(d).padStart(2, '0')}`,
+                dayOfMonth: d,
+                isCurrentMonth: false,
+            });
+        }
+    }
+
+    // Current month days
+    for (let d = 1; d <= daysInMonth; d++) {
+        days.push({
+            date: `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`,
+            dayOfMonth: d,
+            isCurrentMonth: true,
+        });
+    }
+
+    // Pad end to fill last row (up to 42 = 6 rows)
+    const totalSlots = Math.ceil(days.length / 7) * 7;
+    let nextDay = 1;
+    const nextMonth = month + 1 > 12 ? 1 : month + 1;
+    const nextYear = month + 1 > 12 ? year + 1 : year;
+    while (days.length < totalSlots) {
+        days.push({
+            date: `${nextYear}-${String(nextMonth).padStart(2, '0')}-${String(nextDay).padStart(2, '0')}`,
+            dayOfMonth: nextDay,
+            isCurrentMonth: false,
+        });
+        nextDay++;
+    }
+
+    return days;
+};

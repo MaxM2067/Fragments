@@ -20,7 +20,7 @@ interface Props {
   onDecrementCompletion: (habitId: string) => void;
   onSkipHabit: (habitId: string) => void;
   onAddClick: () => void;
-  onEditHabit: (id: string) => void;
+  onViewDetail: (id: string) => void;
 }
 
 const HabitList: React.FC<Props> = ({
@@ -35,7 +35,7 @@ const HabitList: React.FC<Props> = ({
   onIncrementCompletion,
   onDecrementCompletion,
   onSkipHabit,
-  onEditHabit
+  onViewDetail
 }) => {
   const [sortBy, setSortBy] = useState<'time' | 'category'>(() => {
     return (localStorage.getItem('habitly_sort_by') as 'time' | 'category') || 'time';
@@ -305,7 +305,7 @@ const HabitList: React.FC<Props> = ({
                 onIncrementCompletion={onIncrementCompletion}
                 onDecrementCompletion={onDecrementCompletion}
                 onSkipHabit={onSkipHabit}
-                onEditHabit={onEditHabit}
+                onViewDetail={onViewDetail}
                 swipedHabitId={swipedHabitId}
                 setSwipedHabitId={setSwipedHabitId}
                 isCollapsed={collapsedGroups.has(group.title)}

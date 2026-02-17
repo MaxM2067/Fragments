@@ -18,7 +18,7 @@ interface HabitGroupProps {
     onIncrementCompletion: (habitId: string) => void;
     onDecrementCompletion: (habitId: string) => void;
     onSkipHabit: (habitId: string) => void;
-    onEditHabit: (id: string) => void;
+    onViewDetail: (id: string) => void;
     swipedHabitId: string | null;
     setSwipedHabitId: (id: string | null) => void;
     isCollapsed: boolean;
@@ -37,7 +37,7 @@ const HabitGroup: React.FC<HabitGroupProps> = ({
     onIncrementCompletion,
     onDecrementCompletion,
     onSkipHabit,
-    onEditHabit,
+    onViewDetail,
     swipedHabitId,
     setSwipedHabitId,
     isCollapsed,
@@ -98,7 +98,7 @@ const HabitGroup: React.FC<HabitGroupProps> = ({
                                     onIncrementCompletion={onIncrementCompletion}
                                     onDecrementCompletion={onDecrementCompletion}
                                     onSkip={onSkipHabit}
-                                    onEdit={onEditHabit}
+                                    onViewDetail={onViewDetail}
                                     isSwiped={swipedHabitId === habit.id}
                                     onSwipe={(id) => setSwipedHabitId(id)}
                                 />

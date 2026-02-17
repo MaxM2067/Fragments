@@ -6,6 +6,7 @@ import HabitList from './components/HabitList';
 import Statistics from './components/Statistics';
 import Settings from './components/Settings';
 import HabitForm from './components/HabitForm';
+import HabitDetail from './components/HabitDetail';
 import BottomNav from './components/BottomNav';
 import MoodBar from './components/MoodBar';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,6 +18,7 @@ const App: React.FC = () => {
     try { const s = localStorage.getItem('habitly_habits'); return s ? JSON.parse(s) : []; } catch { return []; }
   });
   const [editingHabitId, setEditingHabitId] = useState<string | null>(null);
+  const [viewingHabitId, setViewingHabitId] = useState<string | null>(null);
   const [categories, setCategories] = useState<Category[]>(() => {
     try { const s = localStorage.getItem('habitly_categories'); return s ? JSON.parse(s) : DEFAULT_CATEGORIES; } catch { return DEFAULT_CATEGORIES; }
   });
@@ -363,6 +365,11 @@ const App: React.FC = () => {
     setView('add-habit');
   };
 
+  const handleViewDetail = (id: string) => {
+    setViewingHabitId(id);
+    setView('habit-detail');
+  };
+
   const deleteHabit = (id: string) => {
     setHabits(prev => prev.filter(h => h.id !== id));
     setActiveTimers(prev => {
@@ -390,7 +397,7 @@ const App: React.FC = () => {
             onDecrementCompletion={handleDecrementCompletion}
             onSkipHabit={handleSkipHabit}
             onAddClick={() => { setEditingHabitId(null); setView('add-habit'); }}
-            onEditHabit={startEditing}
+            onViewDetail={handleViewDetail}
           />
         );
       case 'mood':
@@ -430,6 +437,23 @@ const App: React.FC = () => {
             initialHabit={habits.find(h => h.id === editingHabitId)}
             isSkipped={editingHabitId ? !!currentLog.progress[editingHabitId]?.skipped : false}
             onToggleSkip={handleSkipHabit}
+          />
+        );
+      case 'habit-detail':
+        const habit = habits.find(h => h.id === viewingHabitId);
+        if (!habit) return null;
+        return (
+          <HabitDetail
+            key={habit.id}
+            habit={habit}
+            category={categories.find(c => c.id === habit.categoryId)}
+            logs={logs}
+            userTimezone={userTimezone}
+            onBack={() => setView('habits')}
+            onEdit={(id) => {
+              setEditingHabitId(id);
+              setView('add-habit');
+            }}
           />
         );
       default:

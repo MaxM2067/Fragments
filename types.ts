@@ -46,4 +46,4 @@ export interface DailyLog {
   progress: Record<string, DailyProgress>;
 }
 
-export type ViewState = 'habits' | 'mood' | 'statistics' | 'settings' | 'add-habit';
+export type ViewState = 'habits' | 'mood' | 'statistics' | 'settings' | 'add-habit' | 'habit-detail';

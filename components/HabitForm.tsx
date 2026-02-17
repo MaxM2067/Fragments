@@ -31,7 +31,7 @@ const HabitForm: React.FC<Props> = ({
   const [showIcons, setShowIcons] = useState(false);
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(initialHabit?.timeOfDay || 'anytime');
   const [stepType, setStepType] = useState<StepType>(initialHabit?.stepType || 'single');
-  const [goalFormat, setGoalFormat] = useState<GoalFormat>(initialHabit?.goalFormat || 'min');
+  const [goalFormat, setGoalFormat] = useState<GoalFormat>(initialHabit?.goalFormat || 'times');
   const [goal, setGoal] = useState<number | ''>(initialHabit?.goal || '');
   const [stepValue, setStepValue] = useState<number | ''>(initialHabit?.stepValue || '');
   const [oneTimeValue, setOneTimeValue] = useState<number | ''>(initialHabit?.oneTimeValue || '');
@@ -259,8 +259,8 @@ const HabitForm: React.FC<Props> = ({
           <div>
             <label className={labelClass}>Goal Format</label>
             <div className="flex gap-1.5 mt-1">
-              {pill('Minutes', goalFormat === 'min', () => setGoalFormat('min'))}
               {pill('Times', goalFormat === 'times', () => setGoalFormat('times'))}
+              {pill('Minutes', goalFormat === 'min', () => setGoalFormat('min'))}
               {pill('$', goalFormat === '$', () => setGoalFormat('$'), <DollarSign size={12} />)}
             </div>
           </div>
