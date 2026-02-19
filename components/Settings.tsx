@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Category, Habit } from '../types';
-import { Trash2, Plus, Palette, Edit2, Sparkles, Globe, ChevronDown } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Trash2, Plus, Palette, Edit2, Sparkles, Globe, ChevronDown, GripVertical } from 'lucide-react';
+import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { getTimezoneLabel, getTimezoneOffset, getTimeInTimezone } from '../utils/dateUtils';
 import { useEffect } from 'react';
 
@@ -88,10 +88,18 @@ const Settings: React.FC<Props> = ({ categories, setCategories, habits, onDelete
             </button>
           </div>
 
-          <div className="space-y-3">
+          <Reorder.Group axis="y" values={categories} onReorder={setCategories} className="space-y-3">
             {categories.map(cat => (
-              <div key={cat.id} className="rounded-block bg-indigo-50/30 border-2 border-indigo-50/50 overflow-hidden transition-all duration-300">
-                <div className="p-3 flex items-center gap-3">
+              <Reorder.Item
+                key={cat.id}
+                value={cat}
+                className="rounded-block bg-indigo-50/30 border-2 border-indigo-50/50 overflow-hidden transition-all duration-300"
+              >
+                <div className="p-3 flex items-center gap-2">
+                  <div className="cursor-grab active:cursor-grabbing p-1 text-slate-300 hover:text-cozy-indigo transition-colors shrink-0">
+                    <GripVertical size={20} strokeWidth={3} />
+                  </div>
+
                   <button
                     onClick={() => setEditingColorId(editingColorId === cat.id ? null : cat.id)}
                     className="relative w-10 h-10 rounded-block overflow-hidden shadow-md shrink-0 border-4 border-white transition-transform active:scale-90"
@@ -159,9 +167,9 @@ const Settings: React.FC<Props> = ({ categories, setCategories, habits, onDelete
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
+              </Reorder.Item>
             ))}
-          </div>
+          </Reorder.Group>
         </div>
       </div>
 

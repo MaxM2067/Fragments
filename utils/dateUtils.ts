@@ -116,11 +116,13 @@ export const getWeekDaysInTimezone = (weekOffset: number = 0, timezone?: string)
     const day = parseInt(parts.find(p => p.type === 'day')!.value);
 
     // Create a date object for "today" in local context
+    // This allows us to use standard d.setDate() safely for day arithmetic
     const today = new Date(year, month, day);
     const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
+    // We want Monday as start. If today is Sunday (0), offset to -6. If Monday (1), offset is 0.
     const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
     const monday = new Date(today);
-    monday.setDate(today.getDate() + mondayOffset + weekOffset * 7);
+    monday.setDate(today.getDate() + mondayOffset + (weekOffset * 7));
 
     const dates: string[] = [];
     for (let i = 0; i < 7; i++) {

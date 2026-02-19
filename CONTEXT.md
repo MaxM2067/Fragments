@@ -66,6 +66,7 @@
 - **UI State Persistence:** Sorting method (`sortBy`), active filter (`filterCategoryId`), and group expansion states (`collapsedGroups`) are persisted in `localStorage`. 
     - The "Done Today" group is **collapsed by default** when it first appears.
     - Habit Detail's **active tab** (`habitly_detail_tab`) and **stat view** (`habitly_show_full_month`) are persisted globally.
+    - **Category Order:** The order of categories is persisted and governs the sequence of filter buttons and habit groups (when sorted by category).
 - **Enhanced Statistics:**
     - **Dashboard-Style Summary:** Features a glassmorphic background with 6 metrics (This/Last Week, Month, Year).
     - **Goal Indicators:** Weekly charts include a dashed goal line and "Gem" icons inside bars that meet/exceed the target.

@@ -163,9 +163,17 @@ const HabitList: React.FC<Props> = ({
         categoryGroups[catName].push(h);
       });
 
-      Object.keys(categoryGroups).sort().forEach(catName => {
-        groups.push({ title: catName, habits: categoryGroups[catName] });
+      // Use the order of categories as they appear in the categories array
+      categories.forEach(cat => {
+        if (categoryGroups[cat.name]) {
+          groups.push({ title: cat.name, habits: categoryGroups[cat.name] });
+        }
       });
+
+      // Add Uncategorized if any
+      if (categoryGroups['Uncategorized']) {
+        groups.push({ title: 'Uncategorized', habits: categoryGroups['Uncategorized'] });
+      }
     }
 
     // Sort habits within each group: Main first, then completed last (only if NOT "Keep in list")
