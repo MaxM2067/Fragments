@@ -53,6 +53,39 @@ const App: React.FC = () => {
     localStorage.setItem('habitly_active_timers', JSON.stringify(timers));
   }, []);
 
+  // Helper to calculate progress updates for timer-based habits
+  const getProgressUpdateForTimer = useCallback((habitId: string, elapsed: number) => {
+    const habit = habits.find(h => h.id === habitId);
+    if (!habit || habit.goalFormat !== 'min') return { elapsedTime: elapsed };
+
+    const isMultiStep = habit.stepType === 'multiple';
+    if (isMultiStep) {
+      const stepSecs = (habit.stepValue || 1) * 60;
+      const stepsCount = habit.goal && habit.stepValue ? Math.floor(habit.goal / habit.stepValue) : 0;
+      const newSteps = Math.floor(elapsed / stepSecs);
+      const cyclesCompleted = stepsCount > 0 ? Math.floor(newSteps / stepsCount) : 0;
+      const reward = habit.rewardValue || 1;
+      return {
+        elapsedTime: elapsed,
+        stepsCompleted: newSteps,
+        completions: cyclesCompleted * reward,
+        completed: stepsCount > 0 && newSteps >= stepsCount
+      };
+    } else {
+      const goalMins = habit.goal || habit.oneTimeValue || 0;
+      const reward = habit.rewardValue || 1;
+      if (goalMins > 0) {
+        const comps = Math.floor(elapsed / (goalMins * 60)) * reward;
+        return {
+          elapsedTime: elapsed,
+          completions: comps,
+          completed: comps > 0
+        };
+      }
+    }
+    return { elapsedTime: elapsed };
+  }, [habits]);
+
   // Sync elapsed time from active timers into logs
   const syncTimersToLogs = useCallback((timers: Record<string, TimerEntry>) => {
     if (Object.keys(timers).length === 0) return;
@@ -64,12 +97,13 @@ const App: React.FC = () => {
       for (const [id, timer] of Object.entries(timers)) {
         const elapsed = computeElapsedTime(timer);
         const p = newProgress[id] || { habitId: id, completed: false, completions: 0, elapsedTime: 0, stepsCompleted: 0, moneyEarned: 0 };
-        newProgress[id] = { ...p, elapsedTime: elapsed };
+        const update = getProgressUpdateForTimer(id, elapsed);
+        newProgress[id] = { ...p, ...update };
       }
 
       return { ...prev, [todayStr]: { ...existingLog, progress: newProgress } };
     });
-  }, [computeElapsedTime]);
+  }, [computeElapsedTime, getProgressUpdateForTimer, userTimezone]);
 
   // Stop a timer and finalize its elapsed time in logs
   const stopTimer = useCallback((habitId: string) => {
@@ -82,11 +116,12 @@ const App: React.FC = () => {
         const todayStr = getTodayInTimezone(userTimezone);
         const existingLog = logsPrev[todayStr] || { date: todayStr, mood: 0, progress: {} };
         const p = existingLog.progress[habitId] || { habitId, completed: false, completions: 0, elapsedTime: 0, stepsCompleted: 0, moneyEarned: 0 };
+        const update = getProgressUpdateForTimer(habitId, elapsed);
         return {
           ...logsPrev,
           [todayStr]: {
             ...existingLog,
-            progress: { ...existingLog.progress, [habitId]: { ...p, elapsedTime: elapsed } }
+            progress: { ...existingLog.progress, [habitId]: { ...p, ...update } }
           }
         };
       });
@@ -203,11 +238,12 @@ const App: React.FC = () => {
         setLogs(logsPrev => {
           const existingLog = logsPrev[today] || { date: today, mood: 0, progress: {} };
           const p = existingLog.progress[habitId] || { habitId, completed: false, completions: 0, elapsedTime: 0, stepsCompleted: 0, moneyEarned: 0 };
+          const update = getProgressUpdateForTimer(habitId, elapsed);
           return {
             ...logsPrev,
             [today]: {
               ...existingLog,
-              progress: { ...existingLog.progress, [habitId]: { ...p, elapsedTime: elapsed } }
+              progress: { ...existingLog.progress, [habitId]: { ...p, ...update } }
             }
           };
         });
@@ -253,6 +289,15 @@ const App: React.FC = () => {
     const isMoneyGoal = habit.goalFormat === '$';
     const isMultiStep = habit.stepType === 'multiple';
     const existingProgress = currentLog.progress[habitId] || { habitId, completed: false, completions: 0, elapsedTime: 0, stepsCompleted: 0, moneyEarned: 0 };
+
+    if (habit.goalFormat === 'min') {
+      const stepSecs = isMultiStep
+        ? (habit.stepValue || 1) * 60
+        : (habit.goal || habit.oneTimeValue || 0) * 60;
+      const newElapsed = (existingProgress.elapsedTime || 0) + stepSecs;
+      updateHabitProgress(habitId, getProgressUpdateForTimer(habitId, newElapsed));
+      return;
+    }
 
     if (isMultiStep) {
       const stepsCount = habit.goal && habit.stepValue ? Math.floor(habit.goal / habit.stepValue) : 0;
@@ -301,6 +346,15 @@ const App: React.FC = () => {
     const isMultiStep = habit.stepType === 'multiple';
     const existingProgress = currentLog.progress[habitId];
     if (!existingProgress) return;
+
+    if (habit.goalFormat === 'min') {
+      const stepSecs = isMultiStep
+        ? (habit.stepValue || 1) * 60
+        : (habit.goal || habit.oneTimeValue || 0) * 60;
+      const newElapsed = Math.max(0, (existingProgress.elapsedTime || 0) - stepSecs);
+      updateHabitProgress(habitId, getProgressUpdateForTimer(habitId, newElapsed));
+      return;
+    }
 
     if (isMultiStep) {
       if ((existingProgress.stepsCompleted || 0) <= 0) return;
