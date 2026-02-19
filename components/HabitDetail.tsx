@@ -107,8 +107,23 @@ const HabitDetail: React.FC<Props> = ({
         return { year: now.getFullYear(), month: now.getMonth() + 1 };
     });
 
+    const [keyboardHeight, setKeyboardHeight] = useState(0);
     const [isFocused, setIsFocused] = useState(false);
     const focusTimeoutRef = useRef<number | null>(null);
+
+    useEffect(() => {
+        if (!window.visualViewport) return;
+
+        const handleResize = () => {
+            const viewport = window.visualViewport!;
+            const offset = window.innerHeight - viewport.height;
+            // Only apply if the offset is significant (to ignore small browser UI changes)
+            setKeyboardHeight(offset > 100 ? offset : 0);
+        };
+
+        window.visualViewport.addEventListener('resize', handleResize);
+        return () => window.visualViewport?.removeEventListener('resize', handleResize);
+    }, []);
 
     const handleFocus = () => {
         if (focusTimeoutRef.current) clearTimeout(focusTimeoutRef.current);
@@ -418,10 +433,16 @@ const HabitDetail: React.FC<Props> = ({
                                 {isFocused && (
                                     <motion.div
                                         initial={{ y: 80, opacity: 0 }}
-                                        animate={{ y: 0, opacity: 1 }}
+                                        animate={{
+                                            y: -keyboardHeight,
+                                            opacity: 1
+                                        }}
                                         exit={{ y: 80, opacity: 0 }}
+                                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
                                         className="fixed bottom-0 left-0 right-0 z-[100] p-4 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"
-                                        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}
+                                        style={{
+                                            paddingBottom: 'calc(env(safe-area-inset-bottom) + 1rem)',
+                                        }}
                                     >
                                         <div className="max-w-md mx-auto pointer-events-auto">
                                             <div className="flex items-center gap-1 p-1.5 bg-white/95 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl overflow-x-auto justify-center">
