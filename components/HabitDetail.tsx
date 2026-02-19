@@ -114,15 +114,24 @@ const HabitDetail: React.FC<Props> = ({
     useEffect(() => {
         if (!window.visualViewport) return;
 
-        const handleResize = () => {
+        const updateOffset = () => {
             const viewport = window.visualViewport!;
-            const offset = window.innerHeight - viewport.height;
-            // Only apply if the offset is significant (to ignore small browser UI changes)
-            setKeyboardHeight(offset > 100 ? offset : 0);
+            // Calculate how much the bottom of the visual viewport is offset from the bottom of the layout viewport
+            // This accounts for both the keyboard height and the scroll position of the viewport
+            const offset = window.innerHeight - (viewport.height + viewport.offsetTop);
+
+            // Only apply if the offset is significant or positive
+            setKeyboardHeight(offset > 50 ? offset : 0);
         };
 
-        window.visualViewport.addEventListener('resize', handleResize);
-        return () => window.visualViewport?.removeEventListener('resize', handleResize);
+        window.visualViewport.addEventListener('resize', updateOffset);
+        window.visualViewport.addEventListener('scroll', updateOffset);
+        updateOffset();
+
+        return () => {
+            window.visualViewport?.removeEventListener('resize', updateOffset);
+            window.visualViewport?.removeEventListener('scroll', updateOffset);
+        };
     }, []);
 
     const handleFocus = () => {
@@ -438,7 +447,7 @@ const HabitDetail: React.FC<Props> = ({
                                             opacity: 1
                                         }}
                                         exit={{ y: 80, opacity: 0 }}
-                                        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+                                        transition={{ type: 'spring', damping: 30, stiffness: 300, mass: 0.5 }}
                                         className="fixed bottom-0 left-0 right-0 z-[100] p-4 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"
                                         style={{
                                             paddingBottom: 'calc(env(safe-area-inset-bottom) + 1rem)',
