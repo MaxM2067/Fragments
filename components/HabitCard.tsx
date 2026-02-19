@@ -38,8 +38,7 @@ const CircularProgress: React.FC<{
   filledSegments?: number;
   color?: string;
   id: string;
-}> = ({ percent, size, stroke: strokeProp, segments, filledSegments, color = '#34D399', id }) => {
-  const stroke = strokeProp ?? (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--progress-stroke')) || 3.5);
+}> = ({ percent, size, stroke = 4, segments, filledSegments, color = '#34D399', id }) => {
   const r = (size - stroke) / 2;
   const circ = 2 * Math.PI * r;
   const gradId = `habit-grad-${id}`;
@@ -206,27 +205,20 @@ const HabitCard: React.FC<Props> = ({
 
   return (
     <div className="relative group rounded-block">
-      {/* Background Action: Skip today */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isSwiped ? 1 : 0 }}
-        transition={{ duration: 0.2 }}
-        className="absolute inset-0 z-10 flex items-center justify-end bg-slate-900 pr-6 rounded-block"
-      >
+      {/* Background Action: Skip today (Simplified without dark podlozka) */}
+      <div className="absolute inset-0 flex items-center justify-end pr-8">
         <button
           onClick={(e) => { e.stopPropagation(); onSkip(habit.id); }}
-          className="text-white font-black text-[10px] uppercase tracking-[0.2em] flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
+          className="text-white/90 font-black text-[10px] uppercase tracking-[0.2em] flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
         >
-          <span className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
-            <Minus size={18} strokeWidth={4} />
+          <span className="w-11 h-11 rounded-full bg-white/20 flex items-center justify-center border border-white/30 backdrop-blur-sm shadow-lg">
+            <Minus size={20} strokeWidth={4} />
           </span>
           Skip Today
         </button>
-      </motion.div>
+      </div>
 
       <motion.div
-        layout
-        layoutId={`habit-${habit.id}`}
         drag="x"
         dragDirectionLock={true}
         dragConstraints={{ left: -110, right: 0 }}
@@ -246,7 +238,6 @@ const HabitCard: React.FC<Props> = ({
           scale: 1
         }}
         transition={{
-          layout: { type: 'spring', stiffness: 120, damping: 25, mass: 1 },
           default: { type: 'spring', stiffness: 350, damping: 40, mass: 1 }
         }}
         className={`relative z-20 w-full bg-white/95 backdrop-blur-sm rounded-block border 
@@ -264,6 +255,7 @@ const HabitCard: React.FC<Props> = ({
           paddingBottom: 'var(--spacing-card-py)',
           paddingLeft: 'var(--spacing-card-px)',
           paddingRight: 'var(--spacing-card-px)',
+          willChange: 'transform'
         }}
         initial={{ scale: 0.97, opacity: 0 }}
         onClick={() => onViewDetail(habit.id)}

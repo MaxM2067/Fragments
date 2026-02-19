@@ -120,7 +120,7 @@ const HeaderDashboard: React.FC<Props> = ({
                                 onDragEnd={(_, info) => {
                                     if (info.offset.y < -30) setIsCollapsed(true);
                                 }}
-                                className="bg-white/10 backdrop-blur-xl px-4 pt-5 pb-4 rounded-[1.8rem] text-white border border-white/20 space-y-2 relative cursor-grab active:cursor-grabbing shadow-[0_2px_5px_rgba(0,0,0,0.15)]"
+                                className="bg-white/10 backdrop-blur-md px-4 pt-5 pb-4 rounded-[1.8rem] text-white border border-white/20 space-y-2 relative cursor-grab active:cursor-grabbing shadow-[0_2px_5px_rgba(0,0,0,0.15)]"
                             >
                                 {/* Stats Row */}
                                 <div className="grid grid-cols-4 gap-2">
@@ -189,7 +189,7 @@ const HeaderDashboard: React.FC<Props> = ({
                                 if (info.offset.y > 30) setIsCollapsed(false);
                             }}
                             onClick={() => setIsCollapsed(false)}
-                            className="bg-white/30 backdrop-blur-xl px-5 pt-2 pb-2.5 rounded-b-[1.2rem] border-x border-b border-white/30 flex items-center gap-3 cursor-pointer active:scale-95 transition-transform"
+                            className="bg-white/30 backdrop-blur-md px-5 pt-2 pb-2.5 rounded-b-[1.2rem] border-x border-b border-white/30 flex items-center gap-3 cursor-pointer active:scale-95 transition-transform"
                         >
                             <div className="flex items-center gap-2">
                                 <span className="text-[10px] font-black uppercase tracking-widest text-white/50">Today</span>
