@@ -37,7 +37,7 @@
 - **Done Today Group:** Completed habits move to a separate "Done Today" group at the bottom unless they are marked to stay in place.
 - **Keep in List:** Users can toggle "Keep in list when done" for any habit. This keeps the habit in its original group/position even after completion, allowing for over-completion without moving the card.
 - **Habit Detail Screen:** Clicking a habit card opens a dedicated detail view with two persistent tabs:
-    - **Notes:** A rich-text editor for habit journals, auto-saved per-habit.
+    - **Notes:** A rich-text editor for habit journals, auto-saved per-habit. **Habits with active notes are marked with a Pencil icon in the main list and detail header.**
     - **Stats:** Comprehensive activity tracking including a swipeable weekly bar chart and a full-month calendar grid.
 
 ## Project Structure
