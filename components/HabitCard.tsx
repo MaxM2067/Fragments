@@ -138,7 +138,21 @@ const HabitCard: React.FC<Props> = ({
   const hasNotes = useMemo(() => {
     const saved = localStorage.getItem(`habitly_notes_${habit.id}`);
     if (!saved) return false;
-    // Check if there is any text content after stripping HTML tags
+
+    // Check if it's a JSON object (the new format) or a plain string (old format)
+    try {
+      const parsed = JSON.parse(saved);
+      if (typeof parsed === 'object' && parsed !== null) {
+        // New format: Record<string, string>
+        return Object.values(parsed as Record<string, string>).some(content =>
+          content.replace(/<[^>]*>/g, '').trim().length > 0
+        );
+      }
+    } catch (e) {
+      // Not a JSON, treat as plain string (legacy format)
+    }
+
+    // Legacy format or fallback
     return saved.replace(/<[^>]*>/g, '').trim().length > 0;
   }, [habit.id]);
 

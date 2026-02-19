@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     getWeekDaysInTimezone,
     getMonthCalendarInTimezone,
-    formatDateInTimezone
+    formatDateInTimezone,
+    getTodayInTimezone
 } from '../utils/dateUtils';
 import {
     BarChart,
@@ -29,14 +30,52 @@ interface Props {
     onEdit: (id: string) => void;
 }
 
-// Helper to set initial content once without React reconciliation
-const InitNotes: React.FC<{ notes: string, notesRef: React.RefObject<HTMLDivElement | null> }> = ({ notes, notesRef }) => {
+// Helper component for a single note block
+const NoteBlock: React.FC<{
+    date: string;
+    content: string;
+    label: string;
+    onChange: (date: string, newContent: string) => void;
+    onFocus: () => void;
+    onBlur: () => void;
+    placeholder?: string;
+}> = ({ date, content, label, onChange, onFocus, onBlur, placeholder = "Write your thoughts here..." }) => {
+    const blockRef = useRef<HTMLDivElement>(null);
+
+    // Initialize content once
     useEffect(() => {
-        if (notesRef.current && !notesRef.current.innerHTML) {
-            notesRef.current.innerHTML = notes;
+        if (blockRef.current && blockRef.current.innerHTML !== content) {
+            blockRef.current.innerHTML = content;
         }
-    }, []); // Only on mount
-    return null;
+    }, []);
+
+    return (
+        <div className="mb-6 space-y-2">
+            <div className="flex items-center justify-between px-1">
+                <div className="text-[10px] font-black text-white/60 uppercase tracking-widest">
+                    {label}
+                </div>
+                <div className="text-[9px] font-bold text-white/40 tabular-nums">
+                    {date !== 'legacy' ? date : ''}
+                </div>
+            </div>
+            <div
+                ref={blockRef}
+                contentEditable
+                suppressContentEditableWarning
+                onInput={(e) => {
+                    onChange(date, e.currentTarget.innerHTML);
+                }}
+                onBlur={(e) => {
+                    onChange(date, e.currentTarget.innerHTML);
+                    onBlur();
+                }}
+                onFocus={onFocus}
+                className="w-full min-h-[100px] bg-white rounded-2xl px-3 py-2 text-slate-700 leading-relaxed outline-none border border-slate-100 shadow-sm font-medium focus:border-indigo-100 transition-colors"
+                placeholder={placeholder}
+            />
+        </div>
+    );
 };
 
 const HabitDetail: React.FC<Props> = ({
@@ -68,12 +107,37 @@ const HabitDetail: React.FC<Props> = ({
         return { year: now.getFullYear(), month: now.getMonth() + 1 };
     });
 
+    const [isFocused, setIsFocused] = useState(false);
+    const focusTimeoutRef = useRef<number | null>(null);
+
+    const handleFocus = () => {
+        if (focusTimeoutRef.current) clearTimeout(focusTimeoutRef.current);
+        setIsFocused(true);
+    };
+
+    const handleBlur = () => {
+        // Delay blur to allow toolbar interaction
+        focusTimeoutRef.current = window.setTimeout(() => {
+            setIsFocused(false);
+        }, 100);
+    };
+
     // --- Notes Logic ---
-    const [notes, setNotes] = useState<string>(() => {
+    const [allNotes, setAllNotes] = useState<Record<string, string>>(() => {
         const saved = localStorage.getItem(`habitly_notes_${habit.id}`);
-        return saved || '';
+        if (!saved) return {};
+        try {
+            const parsed = JSON.parse(saved);
+            if (typeof parsed === 'object' && parsed !== null) return parsed;
+            return { legacy: saved };
+        } catch (e) {
+            return { legacy: saved };
+        }
     });
-    const notesRef = useRef<HTMLDivElement>(null);
+
+    const today = useMemo(() => {
+        return getTodayInTimezone(userTimezone);
+    }, [userTimezone]);
 
     // Scroll to top on mount
     useEffect(() => {
@@ -82,17 +146,30 @@ const HabitDetail: React.FC<Props> = ({
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            localStorage.setItem(`habitly_notes_${habit.id}`, notes);
+            localStorage.setItem(`habitly_notes_${habit.id}`, JSON.stringify(allNotes));
         }, 1000);
         return () => clearTimeout(timer);
-    }, [notes, habit.id]);
+    }, [allNotes, habit.id]);
 
     const handleNoteCommand = (command: string, value?: string) => {
         document.execCommand(command, false, value);
-        if (notesRef.current) {
-            setNotes(notesRef.current.innerHTML);
-        }
+        // No need to manually update state here as onInput will catch it
+        // but we might want to force a refresh if necessary.
+        // For simple B/I commands, the browser handles it in the focused element.
     };
+
+    const handleNoteChange = (date: string, newContent: string) => {
+        setAllNotes(prev => ({
+            ...prev,
+            [date]: newContent
+        }));
+    };
+
+    const hasAnyNotes = useMemo(() => {
+        return Object.values(allNotes).some((content: string) =>
+            content && content.replace(/<[^>]*>/g, '').trim().length > 0
+        );
+    }, [allNotes]);
 
     // --- Stats Logic ---
     const [weekOffset, setWeekOffset] = useState(0);
@@ -244,11 +321,7 @@ const HabitDetail: React.FC<Props> = ({
                             {React.cloneElement(getIconById(habit.icon) as React.ReactElement, { size: 20 })}
                         </div>
                         <h1 className="font-black text-lg text-cozy-text tracking-tight truncate max-w-[180px] flex items-center gap-1.5">
-                            {(() => {
-                                const saved = localStorage.getItem(`habitly_notes_${habit.id}`);
-                                const hasNotes = saved && saved.replace(/<[^>]*>/g, '').trim().length > 0;
-                                return hasNotes ? <Pencil size={14} className="text-slate-400 shrink-0" strokeWidth={3} /> : null;
-                            })()}
+                            {hasAnyNotes ? <Pencil size={14} className="text-slate-400 shrink-0" strokeWidth={3} /> : null}
                             {habit.name}
                         </h1>
                     </div>
@@ -296,32 +369,91 @@ const HabitDetail: React.FC<Props> = ({
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -10 }}
                         >
-                            <div className="p-4">
-                                {/* Toolbar */}
-                                <div className="flex items-center gap-1 mb-4 p-1 bg-white rounded-xl border border-slate-100 shadow-sm overflow-x-auto">
-                                    <button onClick={() => handleNoteCommand('bold')} className="p-2 hover:bg-slate-50 rounded-lg text-slate-600"><Bold size={18} /></button>
-                                    <button onClick={() => handleNoteCommand('italic')} className="p-2 hover:bg-slate-50 rounded-lg text-slate-600"><Italic size={18} /></button>
-                                    <button onClick={() => handleNoteCommand('insertUnorderedList')} className="p-2 hover:bg-slate-50 rounded-lg text-slate-600"><ListIcon size={18} /></button>
-                                    <button onClick={() => handleNoteCommand('insertOrderedList')} className="p-2 hover:bg-slate-50 rounded-lg text-slate-600"><ListOrdered size={18} /></button>
-                                </div>
+                            <div className="px-0.5 pt-4">
+                                <div className="space-y-2">
+                                    {/* Today's Block */}
+                                    <NoteBlock
+                                        date={today}
+                                        label="Today's Notes"
+                                        content={allNotes[today] || ''}
+                                        onChange={handleNoteChange}
+                                        onFocus={handleFocus}
+                                        onBlur={handleBlur}
+                                        placeholder="Add a fragment of your day..."
+                                    />
 
-                                <div
-                                    ref={notesRef}
-                                    contentEditable
-                                    suppressContentEditableWarning
-                                    onInput={(e) => {
-                                        // Update state for persistence but DON'T re-sync to innerHTML
-                                        setNotes(e.currentTarget.innerHTML);
-                                    }}
-                                    onBlur={(e) => {
-                                        setNotes(e.currentTarget.innerHTML);
-                                    }}
-                                    className="w-full min-h-[400px] bg-white rounded-2xl p-6 text-slate-700 leading-relaxed outline-none border border-slate-100 shadow-sm font-medium"
-                                    placeholder="Write your thoughts here..."
-                                />
-                                {/* Initialize once on mount or habit change */}
-                                <InitNotes notes={notes} notesRef={notesRef} />
+                                    {/* Historical Blocks */}
+                                    {Object.keys(allNotes)
+                                        .filter(date => date !== today && date !== 'legacy')
+                                        .sort((a, b) => b.localeCompare(a)) // Latest first
+                                        .map(date => (
+                                            <NoteBlock
+                                                key={date}
+                                                date={date}
+                                                label={new Date(date).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
+                                                content={allNotes[date]}
+                                                onChange={handleNoteChange}
+                                                onFocus={handleFocus}
+                                                onBlur={handleBlur}
+                                            />
+                                        ))
+                                    }
+
+                                    {/* Legacy Block */}
+                                    {allNotes.legacy && allNotes.legacy.replace(/<[^>]*>/g, '').trim().length > 0 && (
+                                        <NoteBlock
+                                            date="legacy"
+                                            label="Older Notes"
+                                            content={allNotes.legacy}
+                                            onChange={handleNoteChange}
+                                            onFocus={handleFocus}
+                                            onBlur={handleBlur}
+                                        />
+                                    )}
+                                </div>
                             </div>
+
+                            {/* Sticky Toolbar */}
+                            <AnimatePresence>
+                                {isFocused && (
+                                    <motion.div
+                                        initial={{ y: 80, opacity: 0 }}
+                                        animate={{ y: 0, opacity: 1 }}
+                                        exit={{ y: 80, opacity: 0 }}
+                                        className="fixed bottom-0 left-0 right-0 z-[100] p-4 bg-gradient-to-t from-black/10 to-transparent pointer-events-none"
+                                        style={{ paddingBottom: 'calc(env(safe-area-inset-bottom) + 1rem)' }}
+                                    >
+                                        <div className="max-w-md mx-auto pointer-events-auto">
+                                            <div className="flex items-center gap-1 p-1.5 bg-white/95 backdrop-blur-md rounded-2xl border border-white/20 shadow-2xl overflow-x-auto justify-center">
+                                                <button
+                                                    onMouseDown={(e) => { e.preventDefault(); handleNoteCommand('bold'); }}
+                                                    className="p-3 hover:bg-slate-50 rounded-xl text-slate-700 active:scale-90 transition-transform"
+                                                >
+                                                    <Bold size={22} strokeWidth={3} />
+                                                </button>
+                                                <button
+                                                    onMouseDown={(e) => { e.preventDefault(); handleNoteCommand('italic'); }}
+                                                    className="p-3 hover:bg-slate-50 rounded-xl text-slate-700 active:scale-90 transition-transform"
+                                                >
+                                                    <Italic size={22} strokeWidth={3} />
+                                                </button>
+                                                <button
+                                                    onMouseDown={(e) => { e.preventDefault(); handleNoteCommand('insertUnorderedList'); }}
+                                                    className="p-3 hover:bg-slate-50 rounded-xl text-slate-700 active:scale-90 transition-transform"
+                                                >
+                                                    <ListIcon size={22} strokeWidth={3} />
+                                                </button>
+                                                <button
+                                                    onMouseDown={(e) => { e.preventDefault(); handleNoteCommand('insertOrderedList'); }}
+                                                    className="p-3 hover:bg-slate-50 rounded-xl text-slate-700 active:scale-90 transition-transform"
+                                                >
+                                                    <ListOrdered size={22} strokeWidth={3} />
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </motion.div>
                     ) : (
                         <motion.div
