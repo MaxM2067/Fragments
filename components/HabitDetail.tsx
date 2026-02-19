@@ -243,7 +243,12 @@ const HabitDetail: React.FC<Props> = ({
                         >
                             {React.cloneElement(getIconById(habit.icon) as React.ReactElement, { size: 20 })}
                         </div>
-                        <h1 className="font-black text-lg text-cozy-text tracking-tight truncate max-w-[180px]">
+                        <h1 className="font-black text-lg text-cozy-text tracking-tight truncate max-w-[180px] flex items-center gap-1.5">
+                            {(() => {
+                                const saved = localStorage.getItem(`habitly_notes_${habit.id}`);
+                                const hasNotes = saved && saved.replace(/<[^>]*>/g, '').trim().length > 0;
+                                return hasNotes ? <Pencil size={14} className="text-slate-400 shrink-0" strokeWidth={3} /> : null;
+                            })()}
                             {habit.name}
                         </h1>
                     </div>

@@ -16,6 +16,9 @@
 
 ## Design Philosophy: "Tactile Fragments"
 - **Background:** High-contrast linear gradient (`#1CA2DC` to `#5AAA62`) that flows diagonally.
+- **Core Principle: Speed & Lightweight UI.** Performance and responsiveness are the top priorities. The app must feel "snappy" even on mid-range mobile devices.
+- **Animations:** Use `motion` and `AnimatePresence` sparingly. Avoid the `layout` prop on list items as it causes heavy recalculations. Prefer simple transforms over complex layouts.
+- **Graphics:** Use static assets for decorative elements (like crystals). Avoid infinite loops of filters (`drop-shadow`) or heavy `backdrop-blur` (limit to `md` or `sm` intensity) in the main interaction path.
 - **Color Language:**
   - **Orange (`--color-accent` / Amber):** Used for "Doing" progress — circular rings, step counters, timers, and the default "Play" button.
   - **Blue (`--color-fragment`):** Used for "Rewards" — fragment gems, celebration particles, and statistics.

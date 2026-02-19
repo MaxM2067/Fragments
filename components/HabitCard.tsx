@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Habit, Category, DailyProgress } from '../types';
 import { getIconById } from '../constants';
-import { Play, Pause, Check, Minus, Star, Gem, Diamond } from 'lucide-react';
+import { Play, Pause, Check, Minus, Star, Gem, Diamond, Pencil } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
@@ -134,6 +134,13 @@ const HabitCard: React.FC<Props> = ({
   const completions = progress?.completions || 0;
   const stepsCompleted = progress?.stepsCompleted || 0;
   const isMultiStep = habit.stepType === 'multiple';
+
+  const hasNotes = useMemo(() => {
+    const saved = localStorage.getItem(`habitly_notes_${habit.id}`);
+    if (!saved) return false;
+    // Check if there is any text content after stripping HTML tags
+    return saved.replace(/<[^>]*>/g, '').trim().length > 0;
+  }, [habit.id]);
 
   // 7-second auto-return timer
   React.useEffect(() => {
@@ -305,12 +312,13 @@ const HabitCard: React.FC<Props> = ({
           {/* Info + Timer inline */}
           <div className="min-w-0 flex flex-col justify-center">
             <div
-              className={`font-bold leading-tight line-clamp-2 ${isActuallyCompleted ? '' : 'text-cozy-text'}`}
+              className={`font-bold leading-tight line-clamp-2 flex items-center gap-1.5 ${isActuallyCompleted ? '' : 'text-cozy-text'}`}
               style={{
                 fontSize: 'var(--font-size-habit-name, 1.1rem)',
                 color: isActuallyCompleted ? 'var(--color-text-completed)' : undefined
               }}
             >
+              {hasNotes && <Pencil size={14} className="text-slate-400 shrink-0" strokeWidth={3} />}
               {habit.name}
             </div>
             <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
