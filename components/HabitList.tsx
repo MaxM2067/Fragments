@@ -176,21 +176,10 @@ const HabitList: React.FC<Props> = ({
       }
     }
 
-    // Sort habits within each group: Main first, then completed last (only if NOT "Keep in list")
+    // Sort habits within each group: Main first, preserve rest
     groups.forEach(group => {
       group.habits.sort((a, b) => {
         if (a.isMain !== b.isMain) return a.isMain ? -1 : 1;
-
-        const isDoneA = getIsDone(a);
-        const isDoneB = getIsDone(b);
-        const isJustDoneA = isDoneA && !getWasDone(a);
-        const isJustDoneB = isDoneB && !getWasDone(b);
-
-        // If keeping in list or recently done, don't move to bottom
-        const effectivelyDoneA = isDoneA && !a.keepInListWhenDone && !recentlyCompleted.has(a.id) && !isJustDoneA;
-        const effectivelyDoneB = isDoneB && !b.keepInListWhenDone && !recentlyCompleted.has(b.id) && !isJustDoneB;
-
-        if (effectivelyDoneA !== effectivelyDoneB) return effectivelyDoneA ? 1 : -1;
         return 0;
       });
     });
