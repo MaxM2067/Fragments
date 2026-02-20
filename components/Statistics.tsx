@@ -11,16 +11,17 @@ interface Props {
   logs: Record<string, DailyLog>;
   categories: Category[];
   userTimezone: string;
+  userWeekStart: 'monday' | 'sunday';
 }
 
-const Statistics: React.FC<Props> = ({ habits, logs, categories, userTimezone }) => {
+const Statistics: React.FC<Props> = ({ habits, logs, categories, userTimezone, userWeekStart }) => {
   const [weekOffset, setWeekOffset] = useState(0);
   const moneyHabitIds = useMemo(() => new Set(habits.filter(h => h.goalFormat === '$').map(h => h.id)), [habits]);
   const dailyMinHabitIds = useMemo(() => new Set(habits.filter(h => h.dailyMinimum).map(h => h.id)), [habits]);
   const hasMoneyHabits = moneyHabitIds.size > 0;
 
   const chartData = useMemo(() => {
-    const weekDays = getWeekDaysInTimezone(weekOffset, userTimezone);
+    const weekDays = getWeekDaysInTimezone(weekOffset, userTimezone, userWeekStart);
 
     return weekDays.map(date => {
       const log = logs[date];
@@ -75,7 +76,7 @@ const Statistics: React.FC<Props> = ({ habits, logs, categories, userTimezone })
         ...categoryFragments
       };
     });
-  }, [logs, moneyHabitIds, dailyMinHabitIds, habits, categories, userTimezone, weekOffset]);
+  }, [logs, moneyHabitIds, dailyMinHabitIds, habits, categories, userTimezone, weekOffset, userWeekStart]);
 
   const stats = useMemo(() => {
     const allLogs = Object.values(logs) as DailyLog[];
@@ -113,7 +114,7 @@ const Statistics: React.FC<Props> = ({ habits, logs, categories, userTimezone })
         !moneyHabitIds.has(id) ? ps : ps + ((p as DailyProgress).moneyEarned || 0), 0), 0);
 
     // Current Week Range calculation for chart title
-    const thisWeek = getWeekDaysInTimezone(weekOffset, userTimezone);
+    const thisWeek = getWeekDaysInTimezone(weekOffset, userTimezone, userWeekStart);
     const firstDay = new Date(thisWeek[0]);
     const lastDay = new Date(thisWeek[6]);
     const weekRange = firstDay.getMonth() === lastDay.getMonth()
@@ -123,7 +124,7 @@ const Statistics: React.FC<Props> = ({ habits, logs, categories, userTimezone })
     const weekFragmentsTotal = chartData.reduce((sum, day) => sum + day.totalFragments, 0);
 
     // Summary (Relative to 0 offset)
-    const last7Days = getWeekDaysInTimezone(0, userTimezone);
+    const last7Days = getWeekDaysInTimezone(0, userTimezone, userWeekStart);
     const weekLogs = allLogs.filter(log => last7Days.includes(log.date));
 
     const weekFragments = weekLogs.reduce((sum, log) =>
@@ -139,7 +140,7 @@ const Statistics: React.FC<Props> = ({ habits, logs, categories, userTimezone })
       : '0';
 
     return { totalFragments, totalMoney, monthFragments, monthMoney, weekFragments, weekMoney, moodAvg, weekRange, weekFragmentsTotal };
-  }, [logs, moneyHabitIds, userTimezone, weekOffset, chartData]);
+  }, [logs, moneyHabitIds, userTimezone, weekOffset, userWeekStart, chartData]);
 
   return (
     <div className="space-y-6 pb-24">

@@ -13,6 +13,8 @@ interface Props {
   onEditHabit: (id: string) => void;
   userTimezone: string;
   setUserTimezone: (tz: string) => void;
+  userWeekStart: 'monday' | 'sunday';
+  setUserWeekStart: (start: 'monday' | 'sunday') => void;
 }
 
 const COZY_PALETTE = [
@@ -27,7 +29,7 @@ const COZY_PALETTE = [
   '#2DD4BF', // teal
 ];
 
-const Settings: React.FC<Props> = ({ categories, setCategories, habits, onDeleteHabit, onEditHabit, userTimezone, setUserTimezone }) => {
+const Settings: React.FC<Props> = ({ categories, setCategories, habits, onDeleteHabit, onEditHabit, userTimezone, setUserTimezone, userWeekStart, setUserWeekStart }) => {
   const [newCatName, setNewCatName] = useState('');
   const [editingColorId, setEditingColorId] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(() => getTimeInTimezone(userTimezone));
@@ -259,6 +261,33 @@ const Settings: React.FC<Props> = ({ categories, setCategories, habits, onDelete
                 <ChevronDown size={18} strokeWidth={3} />
               </div>
             </div>
+
+            <div className="border-t-2 border-indigo-50/50 my-2"></div>
+
+            <div className="flex flex-col">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Start of Week</p>
+              <div className="bg-slate-100 p-1 rounded-block flex items-center">
+                <button
+                  onClick={() => setUserWeekStart('monday')}
+                  className={`flex-1 py-2.5 px-4 rounded-[calc(var(--radius-block)-4px)] font-bold transition-all text-sm ${userWeekStart === 'monday'
+                    ? 'bg-white text-slate-800 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                >
+                  Monday
+                </button>
+                <button
+                  onClick={() => setUserWeekStart('sunday')}
+                  className={`flex-1 py-2.5 px-4 rounded-[calc(var(--radius-block)-4px)] font-bold transition-all text-sm ${userWeekStart === 'sunday'
+                    ? 'bg-white text-slate-800 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                >
+                  Sunday
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>

@@ -26,6 +26,7 @@ interface Props {
     category?: Category;
     logs: Record<string, DailyLog>;
     userTimezone: string;
+    userWeekStart: 'monday' | 'sunday';
     onBack: () => void;
     onEdit: (id: string) => void;
 }
@@ -83,6 +84,7 @@ const HabitDetail: React.FC<Props> = ({
     category,
     logs,
     userTimezone,
+    userWeekStart,
     onBack,
     onEdit
 }) => {
@@ -211,7 +213,7 @@ const HabitDetail: React.FC<Props> = ({
 
     // --- Stats Logic ---
     const [weekOffset, setWeekOffset] = useState(0);
-    const weekDays = useMemo(() => getWeekDaysInTimezone(weekOffset, userTimezone), [weekOffset, userTimezone]);
+    const weekDays = useMemo(() => getWeekDaysInTimezone(weekOffset, userTimezone, userWeekStart), [weekOffset, userTimezone, userWeekStart]);
 
     const getDayValue = (date: string) => {
         const progress = logs[date]?.progress?.[habit.id];
@@ -245,8 +247,8 @@ const HabitDetail: React.FC<Props> = ({
     }, [weekDays, logs, habit]);
 
     const calendarDays = useMemo(() =>
-        getMonthCalendarInTimezone(calendarDate.year, calendarDate.month),
-        [calendarDate]
+        getMonthCalendarInTimezone(calendarDate.year, calendarDate.month, userWeekStart),
+        [calendarDate, userWeekStart]
     );
 
     const stats = useMemo(() => {
@@ -255,7 +257,7 @@ const HabitDetail: React.FC<Props> = ({
         };
 
         const now = new Date();
-        const thisWeek = getWeekDaysInTimezone(weekOffset, userTimezone);
+        const thisWeek = getWeekDaysInTimezone(weekOffset, userTimezone, userWeekStart);
         const thisWeekTotal = calculateTotal(thisWeek);
 
         // Date range for week switcher
@@ -289,8 +291,8 @@ const HabitDetail: React.FC<Props> = ({
             return formatDateInTimezone(d, userTimezone);
         }).filter(Boolean) as string[];
 
-        const curWeek = getWeekDaysInTimezone(0, userTimezone);
-        const prevWeek = getWeekDaysInTimezone(-1, userTimezone);
+        const curWeek = getWeekDaysInTimezone(0, userTimezone, userWeekStart);
+        const prevWeek = getWeekDaysInTimezone(-1, userTimezone, userWeekStart);
 
         const curMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
         const curMonthDays = Array.from({ length: 31 }, (_, i) => {
@@ -319,7 +321,7 @@ const HabitDetail: React.FC<Props> = ({
                 lastYear: calculateTotal(lastYearDays)
             }
         };
-    }, [logs, habit, userTimezone, weekOffset, calendarDate]);
+    }, [logs, habit, userTimezone, userWeekStart, weekOffset, calendarDate]);
 
     const formatValue = (val: number, isTotal?: boolean) => {
         if (habit.goalFormat === 'min') {
@@ -662,7 +664,7 @@ const HabitDetail: React.FC<Props> = ({
                                         </div>
 
                                         <div className="grid grid-cols-7 gap-1">
-                                            {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
+                                            {(userWeekStart === 'sunday' ? ['S', 'M', 'T', 'W', 'T', 'F', 'S'] : ['M', 'T', 'W', 'T', 'F', 'S', 'S']).map((d, i) => (
                                                 <div key={i} className="text-center text-[10px] font-black text-slate-300 pb-2">{d}</div>
                                             ))}
                                             {calendarDays.map((day, i) => {

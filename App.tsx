@@ -25,6 +25,9 @@ const App: React.FC = () => {
   const [userTimezone, setUserTimezone] = useState<string>(() => {
     return localStorage.getItem('habitly_timezone') || Intl.DateTimeFormat().resolvedOptions().timeZone;
   });
+  const [userWeekStart, setUserWeekStart] = useState<'monday' | 'sunday'>(() => {
+    return (localStorage.getItem('habitly_week_start') as 'monday' | 'sunday') || 'monday';
+  });
   const [logs, setLogs] = useState<Record<string, DailyLog>>(() => {
     try { const s = localStorage.getItem('habitly_logs'); return s ? JSON.parse(s) : {}; } catch { return {}; }
   });
@@ -216,7 +219,8 @@ const App: React.FC = () => {
     localStorage.setItem('habitly_categories', JSON.stringify(categories));
     localStorage.setItem('habitly_logs', JSON.stringify(logs));
     localStorage.setItem('habitly_timezone', userTimezone);
-  }, [habits, categories, logs, userTimezone]);
+    localStorage.setItem('habitly_week_start', userWeekStart);
+  }, [habits, categories, logs, userTimezone, userWeekStart]);
 
   const currentLog = useMemo(() => {
     return logs[today] || { date: today, mood: 0, progress: {} };
@@ -468,7 +472,7 @@ const App: React.FC = () => {
           </div>
         );
       case 'statistics':
-        return <Statistics habits={habits} logs={logs} categories={categories} userTimezone={userTimezone} />;
+        return <Statistics habits={habits} logs={logs} categories={categories} userTimezone={userTimezone} userWeekStart={userWeekStart} />;
       case 'settings':
         return (
           <Settings
@@ -479,6 +483,8 @@ const App: React.FC = () => {
             onEditHabit={startEditing}
             userTimezone={userTimezone}
             setUserTimezone={setUserTimezone}
+            userWeekStart={userWeekStart}
+            setUserWeekStart={setUserWeekStart}
           />
         );
       case 'add-habit':
@@ -503,6 +509,7 @@ const App: React.FC = () => {
             category={categories.find(c => c.id === habit.categoryId)}
             logs={logs}
             userTimezone={userTimezone}
+            userWeekStart={userWeekStart}
             onBack={() => setView('habits')}
             onEdit={(id) => {
               setEditingHabitId(id);

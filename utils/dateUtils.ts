@@ -99,7 +99,7 @@ export const getTimeInTimezone = (timezone: string): string => {
  * weekOffset = 0 means current week, -1 = previous week, etc.
  * Week starts on Monday.
  */
-export const getWeekDaysInTimezone = (weekOffset: number = 0, timezone?: string): string[] => {
+export const getWeekDaysInTimezone = (weekOffset: number = 0, timezone?: string, weekStart: 'monday' | 'sunday' = 'monday'): string[] => {
     const tz = timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
     const now = new Date();
 
@@ -119,15 +119,21 @@ export const getWeekDaysInTimezone = (weekOffset: number = 0, timezone?: string)
     // This allows us to use standard d.setDate() safely for day arithmetic
     const today = new Date(year, month, day);
     const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon, ..., 6=Sat
-    // We want Monday as start. If today is Sunday (0), offset to -6. If Monday (1), offset is 0.
-    const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-    const monday = new Date(today);
-    monday.setDate(today.getDate() + mondayOffset + (weekOffset * 7));
+
+    let startDayOffset = 0;
+    if (weekStart === 'monday') {
+        startDayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+    } else {
+        startDayOffset = -dayOfWeek;
+    }
+
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() + startDayOffset + (weekOffset * 7));
 
     const dates: string[] = [];
     for (let i = 0; i < 7; i++) {
-        const d = new Date(monday);
-        d.setDate(monday.getDate() + i);
+        const d = new Date(startOfWeek);
+        d.setDate(startOfWeek.getDate() + i);
         const yy = d.getFullYear();
         const mm = String(d.getMonth() + 1).padStart(2, '0');
         const dd = String(d.getDate()).padStart(2, '0');
@@ -146,15 +152,16 @@ export interface CalendarDay {
  * Returns a full calendar grid (6-row max) for the given year/month.
  * Each row has 7 days (Mon–Sun). Pads with prev/next month days.
  */
-export const getMonthCalendarInTimezone = (year: number, month: number): CalendarDay[] => {
+export const getMonthCalendarInTimezone = (year: number, month: number, weekStart: 'monday' | 'sunday' = 'monday'): CalendarDay[] => {
     // month is 1-based (1=Jan, 12=Dec)
     const firstOfMonth = new Date(year, month - 1, 1);
     const lastOfMonth = new Date(year, month, 0);
     const daysInMonth = lastOfMonth.getDate();
 
-    // Day of week: 0=Sun, we want Mon=0
     let startDow = firstOfMonth.getDay(); // 0=Sun
-    startDow = startDow === 0 ? 6 : startDow - 1; // Convert to Mon=0
+    if (weekStart === 'monday') {
+        startDow = startDow === 0 ? 6 : startDow - 1; // Convert to Mon=0
+    }
 
     const days: CalendarDay[] = [];
 

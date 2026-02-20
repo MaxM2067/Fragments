@@ -46,7 +46,7 @@ The app heavily emphasizes subjective tracking alongside hard habits.
 
 #### Notes & Journaling
 Users can leave a note (`contentEditable` div) for any given day on any habit.
--   **Notes Template**: Users can define a rich-text template in the habit settings (e.g., specific reflection questions). This template automatically populates the note field for new days if a custom note hasn't been written yet.
+-   **Notes Template**: Users can define a rich-text template (supporting bold, italic, and lists) in the habit settings (e.g., specific reflection questions). This template automatically populates the note field for new days if a custom note hasn't been written yet.
 -   The "Notes" tab acts like a specialized micro-journal filtered by that habit.
 -   If a user has written notes for a habit, a small **Pencil** icon appears next to the habit's name on the card and detail page to indicate the presence of journal entries.
 -   Currently, notes are per-habit, per-day (`localStorage` key: `habitly_notes_[habitId]`).
