@@ -149,14 +149,28 @@ const HabitDetail: React.FC<Props> = ({
     // --- Notes Logic ---
     const [allNotes, setAllNotes] = useState<Record<string, string>>(() => {
         const saved = localStorage.getItem(`habitly_notes_${habit.id}`);
-        if (!saved) return {};
-        try {
-            const parsed = JSON.parse(saved);
-            if (typeof parsed === 'object' && parsed !== null) return parsed;
-            return { legacy: saved };
-        } catch (e) {
-            return { legacy: saved };
+        const todayStr = getTodayInTimezone(userTimezone);
+        let parsedNotes: Record<string, string> = {};
+
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if (typeof parsed === 'object' && parsed !== null) {
+                    parsedNotes = parsed;
+                } else {
+                    parsedNotes = { legacy: saved };
+                }
+            } catch (e) {
+                parsedNotes = { legacy: saved };
+            }
         }
+
+        // Initialize today's note with template if empty and template exists
+        if (!parsedNotes[todayStr] && habit.notesTemplate) {
+            parsedNotes[todayStr] = habit.notesTemplate;
+        }
+
+        return parsedNotes;
     });
 
     const today = useMemo(() => {

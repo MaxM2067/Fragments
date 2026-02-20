@@ -27,6 +27,7 @@ export interface Habit {
   isMain?: boolean;
   dailyMinimum?: boolean;
   keepInListWhenDone?: boolean;
+  notesTemplate?: string;
   createdAt: number;
 }
 

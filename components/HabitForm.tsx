@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { Habit, Category, TimeOfDay, GoalFormat, StepType } from '../types';
 import { ICONS, getIconById } from '../constants';
-import { ChevronLeft, Check, Save, Star, Layers, Zap, DollarSign, ChevronDown, Gem, Minus } from 'lucide-react';
+import { ChevronLeft, Check, Save, Star, Layers, Zap, DollarSign, ChevronDown, Gem, Minus, FileText, Bold, Italic, List as ListIcon, ListOrdered } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface Props {
@@ -39,6 +39,22 @@ const HabitForm: React.FC<Props> = ({
   const [isMain, setIsMain] = useState<boolean>(initialHabit?.isMain || false);
   const [dailyMinimum, setDailyMinimum] = useState<boolean>(initialHabit?.dailyMinimum || false);
   const [keepInListWhenDone, setKeepInListWhenDone] = useState<boolean>(initialHabit?.keepInListWhenDone || false);
+  const [showNotesTemplate, setShowNotesTemplate] = useState<boolean>(!!initialHabit?.notesTemplate);
+  const [notesTemplate, setNotesTemplate] = useState<string>(initialHabit?.notesTemplate || '');
+
+  const templateRef = React.useRef<HTMLDivElement>(null);
+  const [isTemplateFocused, setIsTemplateFocused] = useState(false);
+
+  // Initialize template content once
+  React.useEffect(() => {
+    if (templateRef.current && templateRef.current.innerHTML !== notesTemplate) {
+      templateRef.current.innerHTML = notesTemplate;
+    }
+  }, [showNotesTemplate]);
+
+  const handleTemplateCommand = (command: string, value?: string) => {
+    document.execCommand(command, false, value);
+  };
 
   const mainHabitsCount = habits.filter(h => h.isMain && h.id !== initialHabit?.id).length;
   const isMainDisabled = mainHabitsCount >= 2;
@@ -67,6 +83,7 @@ const HabitForm: React.FC<Props> = ({
       isMain,
       dailyMinimum,
       keepInListWhenDone,
+      notesTemplate: showNotesTemplate ? notesTemplate : undefined,
       createdAt: initialHabit?.createdAt || Date.now(),
     };
     onSave(habitData);
@@ -249,6 +266,81 @@ const HabitForm: React.FC<Props> = ({
                 className={`absolute top-0.5 w-4 h-4 rounded-full ${keepInListWhenDone ? 'bg-white' : 'bg-slate-300'}`} />
             </div>
           </button>
+
+          {/* Notes Template Toggle */}
+          <button type="button" onClick={() => setShowNotesTemplate(!showNotesTemplate)}
+            className={`w-full px-4 py-2.5 rounded-block border-2 transition-all flex items-center justify-between font-black text-sm ${showNotesTemplate
+              ? 'bg-rose-500 text-white border-rose-600 shadow-sm'
+              : 'bg-white text-slate-400 border-slate-100'}`}
+          >
+            <div className="flex items-center gap-2">
+              <FileText size={16} />
+              <span>Add notes template</span>
+            </div>
+            <div className={`w-8 h-5 rounded-full relative transition-colors ${showNotesTemplate ? 'bg-white/30' : 'bg-slate-100'}`}>
+              <motion.div animate={{ x: showNotesTemplate ? 14 : 2 }}
+                className={`absolute top-0.5 w-4 h-4 rounded-full ${showNotesTemplate ? 'bg-white' : 'bg-slate-300'}`} />
+            </div>
+          </button>
+
+          <AnimatePresence>
+            {showNotesTemplate && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="pt-2 space-y-2 relative">
+                  <div
+                    ref={templateRef}
+                    contentEditable
+                    suppressContentEditableWarning
+                    onInput={(e) => setNotesTemplate(e.currentTarget.innerHTML)}
+                    onFocus={() => setIsTemplateFocused(true)}
+                    onBlur={() => setTimeout(() => setIsTemplateFocused(false), 200)}
+                    className="w-full min-h-[120px] bg-white rounded-2xl px-4 py-3 text-slate-700 leading-relaxed outline-none border-2 border-slate-100 shadow-inner font-medium focus:border-indigo-300 transition-colors"
+                    placeholder="Write your template here... (e.g. Daily reflection: <br>1. <br>2.)"
+                  />
+                  <AnimatePresence>
+                    {isTemplateFocused && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 10 }}
+                        className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 p-1 bg-slate-800/90 backdrop-blur-md rounded-xl shadow-lg"
+                      >
+                        <button
+                          onMouseDown={(e) => { e.preventDefault(); handleTemplateCommand('bold'); }}
+                          className="p-2 hover:bg-slate-700 rounded-lg text-white transition-colors"
+                        >
+                          <Bold size={16} strokeWidth={3} />
+                        </button>
+                        <button
+                          onMouseDown={(e) => { e.preventDefault(); handleTemplateCommand('italic'); }}
+                          className="p-2 hover:bg-slate-700 rounded-lg text-white transition-colors"
+                        >
+                          <Italic size={16} strokeWidth={3} />
+                        </button>
+                        <button
+                          onMouseDown={(e) => { e.preventDefault(); handleTemplateCommand('insertUnorderedList'); }}
+                          className="p-2 hover:bg-slate-700 rounded-lg text-white transition-colors"
+                        >
+                          <ListIcon size={16} strokeWidth={3} />
+                        </button>
+                        <button
+                          onMouseDown={(e) => { e.preventDefault(); handleTemplateCommand('insertOrderedList'); }}
+                          className="p-2 hover:bg-slate-700 rounded-lg text-white transition-colors"
+                        >
+                          <ListOrdered size={16} strokeWidth={3} />
+                        </button>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* ═══ BLOCK 2: Goal Details ═══ */}

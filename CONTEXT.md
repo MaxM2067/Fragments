@@ -40,10 +40,26 @@
     - **Notes:** A rich-text editor for habit journals, auto-saved per-habit. **Habits with active notes are marked with a Pencil icon in the main list and detail header.**
     - **Stats:** Comprehensive activity tracking including a swipeable weekly bar chart and a full-month calendar grid.
 
+### 3. Analytics & Reflections
+
+The app heavily emphasizes subjective tracking alongside hard habits.
+
+#### Notes & Journaling
+Users can leave a note (`contentEditable` div) for any given day on any habit.
+-   **Notes Template**: Users can define a rich-text template in the habit settings (e.g., specific reflection questions). This template automatically populates the note field for new days if a custom note hasn't been written yet.
+-   The "Notes" tab acts like a specialized micro-journal filtered by that habit.
+-   If a user has written notes for a habit, a small **Pencil** icon appears next to the habit's name on the card and detail page to indicate the presence of journal entries.
+-   Currently, notes are per-habit, per-day (`localStorage` key: `habitly_notes_[habitId]`).
+
 ## Project Structure
 - `theme.css`: **The source of truth for styling.** Defines colors, shadows, and default progress ring stroke thickness.
 - `App.tsx`: Central state management, persistence, and routing. Handles cycle-based fragment logic.
 - `types.ts`: Interface definitions for `Habit`, `Category`, `DailyLog`, and `DailyProgress`.
+    -   `isMain`: boolean | Optional boolean marking a habit as a primary goal (max 2 per user).
+    -   `dailyMinimum`: boolean | Optional boolean marking a habit as essential for a successful day.
+    -   `keepInListWhenDone`: boolean | Optional boolean keeping the habit visible in the active list even after completion.
+    -   `createdAt`: number | Timestamp of creation (unix epoch).
+    -   `notesTemplate`: string | Optional HTML string representing a default template for daily notes, customizable per habit.
 - `utils/`:
   - `dateUtils.ts`: Centralized logic for timezone-aware date formatting (`YYYY-MM-DD`) and current time calculations.
 - `components/`:
