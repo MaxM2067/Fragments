@@ -311,24 +311,28 @@ const HabitForm: React.FC<Props> = ({
                         className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 p-1 bg-slate-800/90 backdrop-blur-md rounded-xl shadow-lg"
                       >
                         <button
+                          type="button"
                           onMouseDown={(e) => { e.preventDefault(); handleTemplateCommand('bold'); }}
                           className="p-2 hover:bg-slate-700 rounded-lg text-white transition-colors"
                         >
                           <Bold size={16} strokeWidth={3} />
                         </button>
                         <button
+                          type="button"
                           onMouseDown={(e) => { e.preventDefault(); handleTemplateCommand('italic'); }}
                           className="p-2 hover:bg-slate-700 rounded-lg text-white transition-colors"
                         >
                           <Italic size={16} strokeWidth={3} />
                         </button>
                         <button
+                          type="button"
                           onMouseDown={(e) => { e.preventDefault(); handleTemplateCommand('insertUnorderedList'); }}
                           className="p-2 hover:bg-slate-700 rounded-lg text-white transition-colors"
                         >
                           <ListIcon size={16} strokeWidth={3} />
                         </button>
                         <button
+                          type="button"
                           onMouseDown={(e) => { e.preventDefault(); handleTemplateCommand('insertOrderedList'); }}
                           className="p-2 hover:bg-slate-700 rounded-lg text-white transition-colors"
                         >
