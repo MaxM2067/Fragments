@@ -4,7 +4,7 @@ import { Habit, DailyLog, Category, DailyProgress } from '../types';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid, YAxis, LabelList } from 'recharts';
 import { TrendingUp, Award, Calendar, Zap, DollarSign, Gem, ChevronLeft, ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { getWeekDaysInTimezone, formatDateInTimezone } from '../utils/dateUtils';
+import { getWeekDaysInTimezone, formatDateInTimezone, formatDateStringForDisplay, parseDateString } from '../utils/dateUtils';
 
 interface Props {
   habits: Habit[];
@@ -19,13 +19,15 @@ const Statistics: React.FC<Props> = ({ habits, logs, categories, userTimezone, u
   const moneyHabitIds = useMemo(() => new Set(habits.filter(h => h.goalFormat === '$').map(h => h.id)), [habits]);
   const dailyMinHabitIds = useMemo(() => new Set(habits.filter(h => h.dailyMinimum).map(h => h.id)), [habits]);
   const hasMoneyHabits = moneyHabitIds.size > 0;
+  const weekDays = useMemo(() => getWeekDaysInTimezone(weekOffset, userTimezone, userWeekStart), [weekOffset, userTimezone, userWeekStart]);
 
   const chartData = useMemo(() => {
-    const weekDays = getWeekDaysInTimezone(weekOffset, userTimezone, userWeekStart);
-
     return weekDays.map(date => {
+      const dayName = formatDateStringForDisplay(date, 'en-US', { weekday: 'short' });
+      const dayInitial = dayName.charAt(0);
+      const dateLabel = formatDateStringForDisplay(date, 'en-US', { day: 'numeric', month: 'short' });
       const log = logs[date];
-      if (!log) return { name: date, totalFragments: 0, money: 0, mood: 0, date };
+      if (!log) return { name: dayName, dayInitial, dateLabel, totalFragments: 0, money: 0, mood: 0, date };
 
       let totalFragments = 0;
       let money = 0;
@@ -67,7 +69,9 @@ const Statistics: React.FC<Props> = ({ habits, logs, categories, userTimezone, u
       const dailyMinMet = dailyMinHabitsForDate.length > 0 && dailyMinCompletedCount === dailyMinHabitsForDate.length;
 
       return {
-        name: date,
+        name: dayName,
+        dayInitial,
+        dateLabel,
         totalFragments,
         money,
         mood: log.mood,
@@ -76,7 +80,7 @@ const Statistics: React.FC<Props> = ({ habits, logs, categories, userTimezone, u
         ...categoryFragments
       };
     });
-  }, [logs, moneyHabitIds, dailyMinHabitIds, habits, categories, userTimezone, weekOffset, userWeekStart]);
+  }, [logs, moneyHabitIds, dailyMinHabitIds, habits, categories, weekDays]);
 
   const stats = useMemo(() => {
     const allLogs = Object.values(logs) as DailyLog[];
@@ -114,12 +118,15 @@ const Statistics: React.FC<Props> = ({ habits, logs, categories, userTimezone, u
         !moneyHabitIds.has(id) ? ps : ps + ((p as DailyProgress).moneyEarned || 0), 0), 0);
 
     // Current Week Range calculation for chart title
-    const thisWeek = getWeekDaysInTimezone(weekOffset, userTimezone, userWeekStart);
-    const firstDay = new Date(thisWeek[0]);
-    const lastDay = new Date(thisWeek[6]);
-    const weekRange = firstDay.getMonth() === lastDay.getMonth()
-      ? `${firstDay.toLocaleDateString('en-US', { month: 'short' })} ${firstDay.getDate()}-${lastDay.getDate()}`
-      : `${firstDay.toLocaleDateString('en-US', { month: 'short' })} ${firstDay.getDate()} - ${lastDay.toLocaleDateString('en-US', { month: 'short' })} ${lastDay.getDate()}`;
+    const firstWeekDay = weekDays[0];
+    const lastWeekDay = weekDays[6];
+    const firstParts = parseDateString(firstWeekDay);
+    const lastParts = parseDateString(lastWeekDay);
+    const firstMonthShort = formatDateStringForDisplay(firstWeekDay, 'en-US', { month: 'short' });
+    const lastMonthShort = formatDateStringForDisplay(lastWeekDay, 'en-US', { month: 'short' });
+    const weekRange = firstParts.month === lastParts.month && firstParts.year === lastParts.year
+      ? `${firstMonthShort} ${firstParts.day}-${lastParts.day}`
+      : `${firstMonthShort} ${firstParts.day} - ${lastMonthShort} ${lastParts.day}`;
 
     const weekFragmentsTotal = chartData.reduce((sum, day) => sum + day.totalFragments, 0);
 
@@ -140,7 +147,7 @@ const Statistics: React.FC<Props> = ({ habits, logs, categories, userTimezone, u
       : '0';
 
     return { totalFragments, totalMoney, monthFragments, monthMoney, weekFragments, weekMoney, moodAvg, weekRange, weekFragmentsTotal };
-  }, [logs, moneyHabitIds, userTimezone, weekOffset, userWeekStart, chartData]);
+  }, [logs, moneyHabitIds, userTimezone, userWeekStart, chartData, weekDays]);
 
   return (
     <div className="space-y-6 pb-24">
@@ -233,12 +240,12 @@ const Statistics: React.FC<Props> = ({ habits, logs, categories, userTimezone, u
                 interval={0}
                 tick={(props: any) => {
                   const { x, y, payload } = props;
-                  const d = new Date(payload.value);
-                  const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
-                  const dateStr = d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+                  const dateValue = String(payload?.payload?.date || payload?.value || '');
+                  const dayInitial = formatDateStringForDisplay(dateValue, 'en-US', { weekday: 'short' }).charAt(0);
+                  const dateStr = formatDateStringForDisplay(dateValue, 'en-US', { day: 'numeric', month: 'short' });
                   return (
                     <g transform={`translate(${x},${y})`}>
-                      <text x={0} y={15} textAnchor="middle" fill="#1E293B" fontSize={16} fontWeight={900}>{dayName.charAt(0)}</text>
+                      <text x={0} y={15} textAnchor="middle" fill="#1E293B" fontSize={16} fontWeight={900}>{dayInitial}</text>
                       <text x={0} y={30} textAnchor="middle" fill="#94A3B8" fontSize={9} fontWeight={500}>{dateStr}</text>
                     </g>
                   );
@@ -321,7 +328,7 @@ const Statistics: React.FC<Props> = ({ habits, logs, categories, userTimezone, u
           <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData}>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fontWeight: 900, fill: '#CBD5E1' }} />
+                <XAxis dataKey="dateLabel" axisLine={false} tickLine={false} tick={{ fontSize: 11, fontWeight: 900, fill: '#CBD5E1' }} />
                 <Tooltip
                   cursor={{ fill: 'rgba(16, 185, 129, 0.1)', radius: 16 }}
                   contentStyle={{ borderRadius: '2rem', border: '4px solid #FBFCFE', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.05)', backgroundColor: '#fff', fontWeight: 900 }}
@@ -345,12 +352,11 @@ const Statistics: React.FC<Props> = ({ habits, logs, categories, userTimezone, u
             <LineChart data={chartData} margin={{ bottom: 20 }}>
               <CartesianGrid strokeDasharray="5 5" vertical={false} stroke="#FBFCFE" />
               <XAxis
-                dataKey="date"
+                dataKey="dateLabel"
                 axisLine={false}
                 tickLine={false}
                 interval={0}
                 tick={{ fontSize: 11, fontWeight: 900, fill: '#CBD5E1' }}
-                tickFormatter={(val) => new Date(val).toLocaleDateString('en-US', { day: 'numeric', month: 'short' })}
               />
               <YAxis hide domain={[-1, 4]} />
               <Tooltip

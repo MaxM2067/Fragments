@@ -133,7 +133,9 @@ const HabitCard: React.FC<Props> = ({
   const elapsedTime = progress?.elapsedTime || 0;
   const completions = progress?.completions || 0;
   const stepsCompleted = progress?.stepsCompleted || 0;
+  const moneyEarned = progress?.moneyEarned || 0;
   const isMultiStep = habit.stepType === 'multiple';
+  const isMoneyGoal = habit.goalFormat === '$';
 
   const hasNotes = useMemo(() => {
     const saved = localStorage.getItem(`habitly_notes_${habit.id}`);
@@ -179,9 +181,11 @@ const HabitCard: React.FC<Props> = ({
     return Math.floor(habit.goal / habit.stepValue);
   }, [isMultiStep, habit.goal, habit.stepValue]);
 
-  const isActuallyCompleted = isMultiStep
-    ? (stepsCount > 0 && stepsCompleted >= stepsCount)
-    : completions > 0;
+  const isActuallyCompleted = isMoneyGoal
+    ? !!progress?.completed || moneyEarned > 0
+    : isMultiStep
+      ? (stepsCount > 0 && stepsCompleted >= stepsCount)
+      : completions > 0;
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -217,7 +221,9 @@ const HabitCard: React.FC<Props> = ({
   const hasTimer = (isGoalHabit || habit.oneTimeValue) && !isMultiStep;
   const progressPercent = isGoalHabit ? Math.min(100, (elapsedTime / goalSeconds) * 100) : (isActuallyCompleted ? 100 : 0);
 
-  const displayCount = isMultiStep ? stepsCompleted : completions;
+  const displayCount = isMoneyGoal ? moneyEarned : (isMultiStep ? stepsCompleted : completions);
+  const shouldShowCountBadge = isMoneyGoal ? displayCount > 0 : ((isMultiStep && displayCount > 0) || (!isMultiStep && displayCount >= 2));
+  const formatMoney = (value: number) => (Number.isInteger(value) ? String(value) : value.toFixed(2).replace(/\.?0+$/, ''));
 
   // Circular progress config
   const iconWrapSize = 52;
@@ -389,7 +395,9 @@ const HabitCard: React.FC<Props> = ({
                   : 'bg-white text-emerald-500 border-emerald-100'
                   }`}
               >
-                {!isMultiStep && habit.rewardValue && habit.rewardValue > 1 ? (
+                {isMoneyGoal ? (
+                  <span className="text-[10px] font-black">+${formatMoney(habit.stepValue || 1)}</span>
+                ) : !isMultiStep && habit.rewardValue && habit.rewardValue > 1 ? (
                   <span className="text-base font-black">+{habit.rewardValue}</span>
                 ) : (
                   <Check size={24} strokeWidth={4} />
@@ -397,13 +405,13 @@ const HabitCard: React.FC<Props> = ({
               </button>
 
               <AnimatePresence>
-                {((isMultiStep && displayCount > 0) || (!isMultiStep && displayCount >= 2)) && (
+                {shouldShowCountBadge && (
                   <motion.span
                     initial={{ scale: 0, rotate: -20 }}
                     animate={{ scale: 1, rotate: 0 }}
-                    className="absolute -top-1 -right-1 bg-emerald-500 text-white text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-sm border-2 border-white z-20"
+                    className="absolute -top-1 -right-1 bg-emerald-500 text-white text-[10px] font-black min-w-[1.25rem] h-5 px-1 rounded-full flex items-center justify-center shadow-sm border-2 border-white z-20"
                   >
-                    {displayCount}
+                    {isMoneyGoal ? `$${formatMoney(displayCount)}` : displayCount}
                   </motion.span>
                 )}
               </AnimatePresence>

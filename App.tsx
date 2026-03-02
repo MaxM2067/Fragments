@@ -132,7 +132,7 @@ const App: React.FC = () => {
       saveActiveTimers(rest);
       return rest;
     });
-  }, [computeElapsedTime, saveActiveTimers]);
+  }, [computeElapsedTime, getProgressUpdateForTimer, saveActiveTimers, userTimezone]);
 
   // Restore active timers on mount
   useEffect(() => {
@@ -170,6 +170,14 @@ const App: React.FC = () => {
     }, 60000);
     return () => clearInterval(timer);
   }, [today, saveActiveTimers, syncTimersToLogs]);
+
+  // Recompute "today" immediately when user changes timezone.
+  useEffect(() => {
+    const current = getTodayInTimezone(userTimezone);
+    if (current === today) return;
+    syncTimersToLogs(activeTimersRef.current);
+    setToday(current);
+  }, [today, syncTimersToLogs, userTimezone]);
 
   // UI refresh interval — only for display, not for time accumulation
   useEffect(() => {
@@ -310,9 +318,10 @@ const App: React.FC = () => {
       const hasCompletedFirstCycle = stepsCount > 0 && newSteps >= stepsCount;
 
       if (isMoneyGoal) {
+        const moneyStep = habit.stepValue || 1;
         updateHabitProgress(habitId, {
           stepsCompleted: newSteps,
-          moneyEarned: (existingProgress.moneyEarned || 0) + (habit.stepValue || 0),
+          moneyEarned: (existingProgress.moneyEarned || 0) + moneyStep,
           completed: hasCompletedFirstCycle,
         });
       } else {
@@ -326,8 +335,9 @@ const App: React.FC = () => {
     } else {
       // Single step
       if (isMoneyGoal) {
+        const moneyStep = habit.stepValue || 1;
         updateHabitProgress(habitId, {
-          moneyEarned: (existingProgress.moneyEarned || 0) + (habit.stepValue || 0),
+          moneyEarned: (existingProgress.moneyEarned || 0) + moneyStep,
           completed: true,
         });
       } else {
@@ -367,9 +377,10 @@ const App: React.FC = () => {
       const cyclesCompleted = stepsCount > 0 ? Math.floor(newSteps / stepsCount) : 0;
 
       if (isMoneyGoal) {
+        const moneyStep = habit.stepValue || 1;
         updateHabitProgress(habitId, {
           stepsCompleted: newSteps,
-          moneyEarned: Math.max(0, (existingProgress.moneyEarned || 0) - (habit.stepValue || 0)),
+          moneyEarned: Math.max(0, (existingProgress.moneyEarned || 0) - moneyStep),
           completed: stepsCount > 0 && newSteps >= stepsCount,
         });
       } else {
@@ -383,9 +394,11 @@ const App: React.FC = () => {
     } else {
       // Single step
       if (isMoneyGoal) {
+        const moneyStep = habit.stepValue || 1;
+        const nextMoney = Math.max(0, (existingProgress.moneyEarned || 0) - moneyStep);
         updateHabitProgress(habitId, {
-          moneyEarned: Math.max(0, (existingProgress.moneyEarned || 0) - (habit.stepValue || 0)),
-          completed: (existingProgress.moneyEarned || 0) - (habit.stepValue || 0) > 0,
+          moneyEarned: nextMoney,
+          completed: nextMoney > 0,
         });
       } else {
         if ((existingProgress.completions || 0) <= 0) return;
@@ -449,6 +462,7 @@ const App: React.FC = () => {
             todayProgress={currentLog.progress}
             activeHabitIds={activeHabitIds}
             userTimezone={userTimezone}
+            userWeekStart={userWeekStart}
             onUpdateProgress={updateHabitProgress}
             onToggleTimer={toggleTimer}
             onIncrementCompletion={handleIncrementCompletion}

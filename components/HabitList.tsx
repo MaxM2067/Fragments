@@ -14,6 +14,7 @@ interface Props {
   activeHabitIds: Set<string>;
   categories: Category[];
   userTimezone: string;
+  userWeekStart: 'monday' | 'sunday';
   onUpdateProgress: (habitId: string, update: Partial<DailyProgress>) => void;
   onToggleTimer: (habitId: string) => void;
   onIncrementCompletion: (habitId: string) => void;
@@ -30,6 +31,7 @@ const HabitList: React.FC<Props> = ({
   activeHabitIds,
   categories,
   userTimezone,
+  userWeekStart,
   onUpdateProgress,
   onToggleTimer,
   onIncrementCompletion,
@@ -234,6 +236,7 @@ const HabitList: React.FC<Props> = ({
         logs={logs}
         todayProgress={todayProgress}
         userTimezone={userTimezone}
+        userWeekStart={userWeekStart}
       />
 
       {/* Filter & Sort Bar — transparent, no background plate */}
@@ -325,4 +328,3 @@ const HabitList: React.FC<Props> = ({
 };
 
 export default HabitList;
-

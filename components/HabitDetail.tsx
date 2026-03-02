@@ -7,8 +7,11 @@ import {
     getWeekDaysInTimezone,
     getMonthCalendarInTimezone,
     formatDateInTimezone,
-    getTodayInTimezone
+    getTodayInTimezone,
+    formatDateStringForDisplay,
+    parseDateString
 } from '../utils/dateUtils';
+import { applyRichTextCommand, RichTextCommand } from '../utils/richTextCommands';
 import {
     BarChart,
     Bar,
@@ -191,11 +194,8 @@ const HabitDetail: React.FC<Props> = ({
         return () => clearTimeout(timer);
     }, [allNotes, habit.id]);
 
-    const handleNoteCommand = (command: string, value?: string) => {
-        document.execCommand(command, false, value);
-        // No need to manually update state here as onInput will catch it
-        // but we might want to force a refresh if necessary.
-        // For simple B/I commands, the browser handles it in the focused element.
+    const handleNoteCommand = (command: RichTextCommand) => {
+        applyRichTextCommand(command);
     };
 
     const handleNoteChange = (date: string, newContent: string) => {
@@ -236,10 +236,11 @@ const HabitDetail: React.FC<Props> = ({
     const chartData = useMemo(() => {
         return weekDays.map(date => {
             const val = getDayValue(date);
-            const d = new Date(date);
-            const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+            const dayName = formatDateStringForDisplay(date, 'en-US', { weekday: 'short' });
             return {
                 name: dayName,
+                dayInitial: dayName.charAt(0),
+                dateLabel: formatDateStringForDisplay(date, 'en-US', { day: 'numeric', month: 'short' }),
                 value: val,
                 date: date
             };
@@ -261,11 +262,15 @@ const HabitDetail: React.FC<Props> = ({
         const thisWeekTotal = calculateTotal(thisWeek);
 
         // Date range for week switcher
-        const firstDay = new Date(thisWeek[0]);
-        const lastDay = new Date(thisWeek[6]);
-        const weekRange = firstDay.getMonth() === lastDay.getMonth()
-            ? `${firstDay.toLocaleDateString('en-US', { month: 'short' })} ${firstDay.getDate()}-${lastDay.getDate()}`
-            : `${firstDay.toLocaleDateString('en-US', { month: 'short' })} ${firstDay.getDate()} - ${lastDay.toLocaleDateString('en-US', { month: 'short' })} ${lastDay.getDate()}`;
+        const firstWeekDay = thisWeek[0];
+        const lastWeekDay = thisWeek[6];
+        const firstParts = parseDateString(firstWeekDay);
+        const lastParts = parseDateString(lastWeekDay);
+        const firstMonthShort = formatDateStringForDisplay(firstWeekDay, 'en-US', { month: 'short' });
+        const lastMonthShort = formatDateStringForDisplay(lastWeekDay, 'en-US', { month: 'short' });
+        const weekRange = firstParts.month === lastParts.month && firstParts.year === lastParts.year
+            ? `${firstMonthShort} ${firstParts.day}-${lastParts.day}`
+            : `${firstMonthShort} ${firstParts.day} - ${lastMonthShort} ${lastParts.day}`;
 
         // Monthly total
         const monthStart = new Date(calendarDate.year, calendarDate.month - 1, 1);
@@ -430,7 +435,11 @@ const HabitDetail: React.FC<Props> = ({
                                             <NoteBlock
                                                 key={date}
                                                 date={date}
-                                                label={new Date(date).toLocaleDateString(undefined, { weekday: 'long', month: 'short', day: 'numeric' })}
+                                                label={formatDateStringForDisplay(
+                                                    date,
+                                                    Intl.DateTimeFormat().resolvedOptions().locale || 'en-US',
+                                                    { weekday: 'long', month: 'short', day: 'numeric' }
+                                                )}
                                                 content={allNotes[date]}
                                                 onChange={handleNoteChange}
                                                 onFocus={handleFocus}
@@ -557,12 +566,12 @@ const HabitDetail: React.FC<Props> = ({
                                                         interval={0}
                                                         tick={(props: any) => {
                                                             const { x, y, payload } = props;
-                                                            const d = new Date(payload.value);
-                                                            const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
-                                                            const dateStr = d.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+                                                            const dateValue = String(payload?.payload?.date || payload?.value || '');
+                                                            const dayInitial = formatDateStringForDisplay(dateValue, 'en-US', { weekday: 'short' }).charAt(0);
+                                                            const dateStr = formatDateStringForDisplay(dateValue, 'en-US', { day: 'numeric', month: 'short' });
                                                             return (
                                                                 <g transform={`translate(${x},${y})`}>
-                                                                    <text x={0} y={15} textAnchor="middle" fill="#1E293B" fontSize={18} fontWeight={900}>{dayName.charAt(0)}</text>
+                                                                    <text x={0} y={15} textAnchor="middle" fill="#1E293B" fontSize={18} fontWeight={900}>{dayInitial}</text>
                                                                     <text x={0} y={32} textAnchor="middle" fill="#94A3B8" fontSize={10} fontWeight={500}>{dateStr}</text>
                                                                 </g>
                                                             );

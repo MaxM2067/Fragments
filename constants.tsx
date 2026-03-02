@@ -85,4 +85,4 @@ export const getIconById = (id: string) => {
 };
 
 /** Maximum timer duration in seconds (2 hours). Timer auto-stops after this. */
-export const TIMER_MAX_DURATION_SECONDS = 12 * 60 * 60; // 7200s
+export const TIMER_MAX_DURATION_SECONDS = 2 * 60 * 60; // 7200s

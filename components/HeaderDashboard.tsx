@@ -1,14 +1,15 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence, useDragControls } from 'framer-motion';
-import { Gem, ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Gem, ChevronDown } from 'lucide-react';
 import { Habit, DailyLog, DailyProgress } from '../types';
-import { getTodayInTimezone, formatDateInTimezone } from '../utils/dateUtils';
+import { getTodayInTimezone, formatDateInTimezone, getWeekDaysInTimezone } from '../utils/dateUtils';
 
 interface Props {
     habits: Habit[];
     logs: Record<string, DailyLog>;
     todayProgress: Record<string, DailyProgress>;
     userTimezone: string;
+    userWeekStart: 'monday' | 'sunday';
 }
 
 const HeaderDashboard: React.FC<Props> = ({
@@ -16,6 +17,7 @@ const HeaderDashboard: React.FC<Props> = ({
     logs,
     todayProgress,
     userTimezone,
+    userWeekStart,
 }) => {
     const [isCollapsed, setIsCollapsed] = useState(() => {
         return localStorage.getItem('habitly_header_collapsed') === 'true';
@@ -42,38 +44,24 @@ const HeaderDashboard: React.FC<Props> = ({
             if (moneyHabitIds.has(id)) return sum;
             return sum + (p.completions || 0);
         }, 0);
+        const [year, month, day] = today.split('-').map(Number);
 
-        const now = new Date();
-
-        // Yesterday
-        const yesterdayDate = new Date(now);
-        yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+        // Yesterday in the selected timezone
+        const todayDate = new Date(year, month - 1, day);
+        const yesterdayDate = new Date(todayDate);
+        yesterdayDate.setDate(todayDate.getDate() - 1);
         const yesterdayStr = formatDateInTimezone(yesterdayDate, userTimezone);
         const yesterdayFrags = getDayFragments(yesterdayStr);
 
-        // This Week (starting Monday)
-        const day = now.getDay(); // 0 (Sun) to 6 (Sat)
-        const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-        const monday = new Date(new Date(now).setDate(diff));
+        // This Week honoring user's selected week start
+        const weekDates = getWeekDaysInTimezone(0, userTimezone, userWeekStart).filter(dateStr => dateStr <= today);
+        const weekFrags = weekDates.reduce((sum, dateStr) => sum + getDayFragments(dateStr), 0);
 
-        let weekFrags = todayFrags;
-        for (let i = 0; i < 7; i++) {
-            const d = new Date(monday);
-            d.setDate(d.getDate() + i);
-            const dStr = formatDateInTimezone(d, userTimezone);
-            if (dStr === today) break;
-            weekFrags += getDayFragments(dStr);
-        }
-
-        // This Month
-        const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        let monthFrags = todayFrags;
-        for (let i = 0; i < 31; i++) {
-            const d = new Date(firstOfMonth);
-            d.setDate(d.getDate() + i);
-            const dStr = formatDateInTimezone(d, userTimezone);
-            if (dStr === today) break;
-            monthFrags += getDayFragments(dStr);
+        // This Month up to today (timezone-aware because `today` already is)
+        let monthFrags = 0;
+        for (let d = 1; d <= day; d++) {
+            const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            monthFrags += getDayFragments(dateStr);
         }
 
         return {
@@ -82,7 +70,7 @@ const HeaderDashboard: React.FC<Props> = ({
             week: weekFrags,
             month: monthFrags
         };
-    }, [todayProgress, today, userTimezone, moneyHabitIds, getDayFragments]);
+    }, [todayProgress, today, userTimezone, userWeekStart, moneyHabitIds, getDayFragments]);
 
     const dailyMinimumHabits = useMemo(() => habits.filter(h => h.dailyMinimum), [habits]);
     const dailyMinimumCompleted = useMemo(() => {

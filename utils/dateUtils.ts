@@ -149,6 +149,34 @@ export interface CalendarDay {
 }
 
 /**
+ * Parses a YYYY-MM-DD string into numeric parts.
+ */
+export const parseDateString = (date: string): { year: number; month: number; day: number } => {
+    const [year, month, day] = date.split('-').map(Number);
+    return { year, month, day };
+};
+
+/**
+ * Converts a YYYY-MM-DD string to a Date using local constructor semantics.
+ * This avoids UTC parsing shifts from `new Date("YYYY-MM-DD")`.
+ */
+export const dateFromDateString = (date: string): Date => {
+    const { year, month, day } = parseDateString(date);
+    return new Date(year, month - 1, day);
+};
+
+/**
+ * Formats a YYYY-MM-DD string for display without UTC parsing side effects.
+ */
+export const formatDateStringForDisplay = (
+    date: string,
+    locale: string,
+    options: Intl.DateTimeFormatOptions
+): string => {
+    return dateFromDateString(date).toLocaleDateString(locale, options);
+};
+
+/**
  * Returns a full calendar grid (6-row max) for the given year/month.
  * Each row has 7 days (Mon–Sun). Pads with prev/next month days.
  */

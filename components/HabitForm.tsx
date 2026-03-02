@@ -4,6 +4,7 @@ import { Habit, Category, TimeOfDay, GoalFormat, StepType } from '../types';
 import { ICONS, getIconById } from '../constants';
 import { ChevronLeft, Check, Save, Star, Layers, Zap, DollarSign, ChevronDown, Gem, Minus, FileText, Bold, Italic, List as ListIcon, ListOrdered } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { applyRichTextCommand, RichTextCommand } from '../utils/richTextCommands';
 
 interface Props {
   habits: Habit[];
@@ -52,8 +53,8 @@ const HabitForm: React.FC<Props> = ({
     }
   }, [showNotesTemplate]);
 
-  const handleTemplateCommand = (command: string, value?: string) => {
-    document.execCommand(command, false, value);
+  const handleTemplateCommand = (command: RichTextCommand) => {
+    applyRichTextCommand(command);
   };
 
   const mainHabitsCount = habits.filter(h => h.isMain && h.id !== initialHabit?.id).length;
@@ -63,6 +64,7 @@ const HabitForm: React.FC<Props> = ({
     if (stepType !== 'multiple' || !goal || !stepValue) return 0;
     return Math.floor(Number(goal) / Number(stepValue));
   }, [stepType, goal, stepValue]);
+  const showStepValueInput = stepType === 'multiple' || goalFormat === '$';
 
   const goalFormatLabel = (format: GoalFormat) => {
     switch (format) { case 'min': return 'min'; case 'times': return 'times'; case '$': return '$'; }
@@ -77,7 +79,7 @@ const HabitForm: React.FC<Props> = ({
       name, description, categoryId, icon,
       repetition: 'daily', timeOfDay, stepType, goalFormat,
       goal: goal === '' ? undefined : Number(goal),
-      stepValue: stepValue !== '' ? Number(stepValue) : undefined,
+      stepValue: stepValue !== '' ? Number(stepValue) : (isMoneyGoal ? 1 : undefined),
       oneTimeValue: oneTimeValue === '' ? undefined : Number(oneTimeValue),
       rewardValue: isMoneyGoal ? 0 : Number(rewardValue),
       isMain,
@@ -388,29 +390,41 @@ const HabitForm: React.FC<Props> = ({
               placeholder="Optional" className={inputClass} />
           </div>
 
-          {/* Step Value + Steps Count (only for multiple) */}
-          {stepType === 'multiple' && (
-            <div className="grid grid-cols-2 gap-3">
+          {/* Step Value (+ Steps Count for multi-step goals) */}
+          {showStepValueInput && (
+            <div className={stepType === 'multiple' ? 'grid grid-cols-2 gap-3' : ''}>
               <div>
-                <label className={labelClass}>Step Value ({goalFormatLabel(goalFormat)})</label>
-                <input type="number" value={stepValue}
+                <label className={labelClass}>
+                  {goalFormat === '$' && stepType === 'single'
+                    ? 'Amount Per Tap ($)'
+                    : `Step Value (${goalFormatLabel(goalFormat)})`}
+                </label>
+                <input
+                  type="number"
+                  value={stepValue}
                   onChange={e => setStepValue(e.target.value === '' ? '' : Number(e.target.value))}
-                  placeholder="Per step" className={inputClass} min="1" />
+                  placeholder={goalFormat === '$' ? 'e.g. 5' : 'Per step'}
+                  className={inputClass}
+                  min={goalFormat === '$' ? '0.01' : '1'}
+                  step={goalFormat === '$' ? '0.01' : '1'}
+                />
               </div>
-              <div>
-                <label className={labelClass}>Steps Count</label>
-                <div className="bg-indigo-50/50 px-4 py-3 rounded-block border-2 border-indigo-100/30 font-black text-cozy-text flex items-center justify-center gap-1.5">
-                  {stepsCount > 0 ? (
-                    <>
-                      <Layers size={14} className="text-indigo-400" />
-                      <span className="text-lg tabular-nums">{stepsCount}</span>
-                      <span className="text-[10px] text-cozy-text/40">steps</span>
-                    </>
-                  ) : (
-                    <span className="text-[11px] text-cozy-text/30">—</span>
-                  )}
+              {stepType === 'multiple' && (
+                <div>
+                  <label className={labelClass}>Steps Count</label>
+                  <div className="bg-indigo-50/50 px-4 py-3 rounded-block border-2 border-indigo-100/30 font-black text-cozy-text flex items-center justify-center gap-1.5">
+                    {stepsCount > 0 ? (
+                      <>
+                        <Layers size={14} className="text-indigo-400" />
+                        <span className="text-lg tabular-nums">{stepsCount}</span>
+                        <span className="text-[10px] text-cozy-text/40">steps</span>
+                      </>
+                    ) : (
+                      <span className="text-[11px] text-cozy-text/30">—</span>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           )}
         </div>
