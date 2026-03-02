@@ -6,6 +6,7 @@ import HabitGroup from './HabitGroup';
 import HeaderDashboard from './HeaderDashboard';
 import { LayoutGrid, Clock, Filter, Gem, DollarSign } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getStorageValue, setStorageValue, STORAGE_KEYS } from '../utils/storage';
 
 interface Props {
   habits: Habit[];
@@ -39,30 +40,56 @@ const HabitList: React.FC<Props> = ({
   onSkipHabit,
   onViewDetail
 }) => {
-  const [sortBy, setSortBy] = useState<'time' | 'category'>(() => {
-    return (localStorage.getItem('habitly_sort_by') as 'time' | 'category') || 'time';
-  });
-  const [filterCategoryId, setFilterCategoryId] = useState<string | 'all' | 'daily-minimum'>(() => {
-    return localStorage.getItem('habitly_filter_category') || 'all';
-  });
+  const [sortBy, setSortBy] = useState<'time' | 'category'>('time');
+  const [filterCategoryId, setFilterCategoryId] = useState<string | 'all' | 'daily-minimum'>('all');
   const [swipedHabitId, setSwipedHabitId] = useState<string | null>(null);
   const [recentlyCompleted, setRecentlyCompleted] = useState<Set<string>>(new Set());
-  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(() => {
-    const saved = localStorage.getItem('habitly_collapsed_groups');
-    if (saved) return new Set(JSON.parse(saved));
-    return new Set(['Done Today']); // Done Today collapsed by default
-  });
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set(['Done Today'])); // Done Today collapsed by default
+  const [prefsLoaded, setPrefsLoaded] = useState(false);
   const prevProgressRef = React.useRef(todayProgress);
+
+  React.useEffect(() => {
+    let isCancelled = false;
+    const loadPrefs = async () => {
+      const [savedSortBy, savedFilter, savedCollapsed] = await Promise.all([
+        getStorageValue<'time' | 'category'>(STORAGE_KEYS.sortBy),
+        getStorageValue<string>(STORAGE_KEYS.filterCategory),
+        getStorageValue<string[] | Set<string>>(STORAGE_KEYS.collapsedGroups),
+      ]);
+      if (isCancelled) return;
+
+      if (savedSortBy === 'time' || savedSortBy === 'category') {
+        setSortBy(savedSortBy);
+      }
+      if (savedFilter) {
+        setFilterCategoryId(savedFilter as string | 'all' | 'daily-minimum');
+      }
+      if (Array.isArray(savedCollapsed)) {
+        setCollapsedGroups(new Set(savedCollapsed));
+      } else if (savedCollapsed instanceof Set) {
+        setCollapsedGroups(savedCollapsed);
+      }
+      setPrefsLoaded(true);
+    };
+    void loadPrefs();
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   // Persist settings
   React.useEffect(() => {
-    localStorage.setItem('habitly_sort_by', sortBy);
-    localStorage.setItem('habitly_filter_category', filterCategoryId);
-  }, [sortBy, filterCategoryId]);
+    if (!prefsLoaded) return;
+    void Promise.all([
+      setStorageValue(STORAGE_KEYS.sortBy, sortBy),
+      setStorageValue(STORAGE_KEYS.filterCategory, filterCategoryId),
+    ]);
+  }, [filterCategoryId, prefsLoaded, sortBy]);
 
   React.useEffect(() => {
-    localStorage.setItem('habitly_collapsed_groups', JSON.stringify(Array.from(collapsedGroups)));
-  }, [collapsedGroups]);
+    if (!prefsLoaded) return;
+    void setStorageValue(STORAGE_KEYS.collapsedGroups, Array.from(collapsedGroups));
+  }, [collapsedGroups, prefsLoaded]);
 
   const toggleGroupCollapse = (title: string) => {
     setCollapsedGroups(prev => {

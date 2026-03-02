@@ -11,27 +11,19 @@ import BottomNav from './components/BottomNav';
 import MoodBar from './components/MoodBar';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getTodayInTimezone } from './utils/dateUtils';
+import { getStorageValue, migrateLocalStorageToIndexedDb, setStorageValue, STORAGE_KEYS } from './utils/storage';
 
 const App: React.FC = () => {
   const [view, setView] = useState<ViewState>('habits');
-  const [habits, setHabits] = useState<Habit[]>(() => {
-    try { const s = localStorage.getItem('habitly_habits'); return s ? JSON.parse(s) : []; } catch { return []; }
-  });
+  const [habits, setHabits] = useState<Habit[]>([]);
   const [editingHabitId, setEditingHabitId] = useState<string | null>(null);
   const [viewingHabitId, setViewingHabitId] = useState<string | null>(null);
-  const [categories, setCategories] = useState<Category[]>(() => {
-    try { const s = localStorage.getItem('habitly_categories'); return s ? JSON.parse(s) : DEFAULT_CATEGORIES; } catch { return DEFAULT_CATEGORIES; }
-  });
-  const [userTimezone, setUserTimezone] = useState<string>(() => {
-    return localStorage.getItem('habitly_timezone') || Intl.DateTimeFormat().resolvedOptions().timeZone;
-  });
-  const [userWeekStart, setUserWeekStart] = useState<'monday' | 'sunday'>(() => {
-    return (localStorage.getItem('habitly_week_start') as 'monday' | 'sunday') || 'monday';
-  });
-  const [logs, setLogs] = useState<Record<string, DailyLog>>(() => {
-    try { const s = localStorage.getItem('habitly_logs'); return s ? JSON.parse(s) : {}; } catch { return {}; }
-  });
-  const [today, setToday] = useState(() => getTodayInTimezone(localStorage.getItem('habitly_timezone') || undefined));
+  const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
+  const [userTimezone, setUserTimezone] = useState<string>(Intl.DateTimeFormat().resolvedOptions().timeZone);
+  const [userWeekStart, setUserWeekStart] = useState<'monday' | 'sunday'>('monday');
+  const [logs, setLogs] = useState<Record<string, DailyLog>>({});
+  const [today, setToday] = useState(() => getTodayInTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone));
+  const [isHydrated, setIsHydrated] = useState(false);
 
   // Timestamp-based active timers: { habitId: { startedAt: ms, accumulatedTime: seconds } }
   type TimerEntry = { startedAt: number; accumulatedTime: number };
@@ -51,9 +43,9 @@ const App: React.FC = () => {
     );
   }, []);
 
-  // Persist active timers to localStorage
+  // Persist active timers to IndexedDB
   const saveActiveTimers = useCallback((timers: Record<string, TimerEntry>) => {
-    localStorage.setItem('habitly_active_timers', JSON.stringify(timers));
+    void setStorageValue(STORAGE_KEYS.activeTimers, timers);
   }, []);
 
   // Helper to calculate progress updates for timer-based habits
@@ -134,27 +126,52 @@ const App: React.FC = () => {
     });
   }, [computeElapsedTime, getProgressUpdateForTimer, saveActiveTimers, userTimezone]);
 
-  // Restore active timers on mount
+  // Hydrate persisted app state and migrate legacy localStorage data on first load.
   useEffect(() => {
-    const savedTimers = localStorage.getItem('habitly_active_timers');
-    if (savedTimers) {
-      try {
-        const parsed: Record<string, TimerEntry> = JSON.parse(savedTimers);
-        // Auto-stop any that exceeded the limit while page was closed
-        const stillActive: Record<string, TimerEntry> = {};
-        for (const [id, timer] of Object.entries(parsed)) {
-          const elapsed = Math.floor(timer.accumulatedTime + (Date.now() - timer.startedAt) / 1000);
-          if (elapsed < TIMER_MAX_DURATION_SECONDS) {
-            stillActive[id] = timer;
-          }
-        }
-        setActiveTimers(stillActive);
-        saveActiveTimers(stillActive);
-        syncTimersToLogs(stillActive);
-      } catch { /* corrupted data, ignore */ }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    let isCancelled = false;
+    const hydrateState = async () => {
+      await migrateLocalStorageToIndexedDb();
+      const [savedHabits, savedCategories, savedLogs, savedTimezone, savedWeekStart, savedTimers] = await Promise.all([
+        getStorageValue<Habit[]>(STORAGE_KEYS.habits),
+        getStorageValue<Category[]>(STORAGE_KEYS.categories),
+        getStorageValue<Record<string, DailyLog>>(STORAGE_KEYS.logs),
+        getStorageValue<string>(STORAGE_KEYS.timezone),
+        getStorageValue<'monday' | 'sunday'>(STORAGE_KEYS.weekStart),
+        getStorageValue<Record<string, TimerEntry>>(STORAGE_KEYS.activeTimers),
+      ]);
+
+      if (isCancelled) return;
+
+      const resolvedTimezone = typeof savedTimezone === 'string'
+        ? savedTimezone
+        : Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const resolvedWeekStart = savedWeekStart === 'sunday' ? 'sunday' : 'monday';
+
+      setHabits(Array.isArray(savedHabits) ? savedHabits : []);
+      setCategories(Array.isArray(savedCategories) ? savedCategories : DEFAULT_CATEGORIES);
+      setLogs(savedLogs && typeof savedLogs === 'object' ? savedLogs : {});
+      setUserTimezone(resolvedTimezone);
+      setUserWeekStart(resolvedWeekStart);
+      setToday(getTodayInTimezone(resolvedTimezone));
+
+      const activeCandidates = savedTimers && typeof savedTimers === 'object' ? savedTimers : {};
+      const stillActive: Record<string, TimerEntry> = {};
+      for (const [id, timer] of Object.entries(activeCandidates)) {
+        if (!timer || typeof timer.startedAt !== 'number' || typeof timer.accumulatedTime !== 'number') continue;
+        const elapsed = Math.floor(timer.accumulatedTime + (Date.now() - timer.startedAt) / 1000);
+        if (elapsed < TIMER_MAX_DURATION_SECONDS) stillActive[id] = timer;
+      }
+
+      setActiveTimers(stillActive);
+      await setStorageValue(STORAGE_KEYS.activeTimers, stillActive);
+      setIsHydrated(true);
+    };
+
+    void hydrateState();
+    return () => {
+      isCancelled = true;
+    };
+  }, []);
 
   // Day rollover check
   useEffect(() => {
@@ -221,14 +238,17 @@ const App: React.FC = () => {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [computeElapsedTime, stopTimer, syncTimersToLogs]);
 
-  // Save data
+  // Save app data after initial hydration.
   useEffect(() => {
-    localStorage.setItem('habitly_habits', JSON.stringify(habits));
-    localStorage.setItem('habitly_categories', JSON.stringify(categories));
-    localStorage.setItem('habitly_logs', JSON.stringify(logs));
-    localStorage.setItem('habitly_timezone', userTimezone);
-    localStorage.setItem('habitly_week_start', userWeekStart);
-  }, [habits, categories, logs, userTimezone, userWeekStart]);
+    if (!isHydrated) return;
+    void Promise.all([
+      setStorageValue(STORAGE_KEYS.habits, habits),
+      setStorageValue(STORAGE_KEYS.categories, categories),
+      setStorageValue(STORAGE_KEYS.logs, logs),
+      setStorageValue(STORAGE_KEYS.timezone, userTimezone),
+      setStorageValue(STORAGE_KEYS.weekStart, userWeekStart),
+    ]);
+  }, [categories, habits, isHydrated, logs, userTimezone, userWeekStart]);
 
   const currentLog = useMemo(() => {
     return logs[today] || { date: today, mood: 0, progress: {} };

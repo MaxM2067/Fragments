@@ -23,6 +23,7 @@ import {
     Cell,
     ReferenceLine
 } from 'recharts';
+import { getStorageValue, NOTES_KEY_PREFIX, setStorageValue, STORAGE_KEYS } from '../utils/storage';
 
 interface Props {
     habit: Habit;
@@ -46,12 +47,12 @@ const NoteBlock: React.FC<{
 }> = ({ date, content, label, onChange, onFocus, onBlur, placeholder = "Write your thoughts here..." }) => {
     const blockRef = useRef<HTMLDivElement>(null);
 
-    // Initialize content once
+    // Keep contentEditable value in sync with state.
     useEffect(() => {
         if (blockRef.current && blockRef.current.innerHTML !== content) {
             blockRef.current.innerHTML = content;
         }
-    }, []);
+    }, [content]);
 
     return (
         <div className="mb-6 space-y-2">
@@ -91,21 +92,43 @@ const HabitDetail: React.FC<Props> = ({
     onBack,
     onEdit
 }) => {
-    const [activeTab, setActiveTab] = useState<'notes' | 'stats'>(() => {
-        const saved = localStorage.getItem('habitly_detail_tab');
-        return (saved as 'notes' | 'stats') || 'notes';
-    });
-    const [showFullMonth, setShowFullMonth] = useState(() => {
-        return localStorage.getItem('habitly_show_full_month') === 'true';
-    });
+    const [activeTab, setActiveTab] = useState<'notes' | 'stats'>('notes');
+    const [showFullMonth, setShowFullMonth] = useState(false);
+    const [prefsLoaded, setPrefsLoaded] = useState(false);
 
     useEffect(() => {
-        localStorage.setItem('habitly_detail_tab', activeTab);
-    }, [activeTab]);
+        let isCancelled = false;
+        const loadPrefs = async () => {
+            const [savedTab, savedFullMonth] = await Promise.all([
+                getStorageValue<'notes' | 'stats' | string>(STORAGE_KEYS.detailTab),
+                getStorageValue<boolean | string>(STORAGE_KEYS.showFullMonth),
+            ]);
+            if (isCancelled) return;
+            if (savedTab === 'notes' || savedTab === 'stats') {
+                setActiveTab(savedTab);
+            }
+            if (typeof savedFullMonth === 'boolean') {
+                setShowFullMonth(savedFullMonth);
+            } else if (savedFullMonth === 'true') {
+                setShowFullMonth(true);
+            }
+            setPrefsLoaded(true);
+        };
+        void loadPrefs();
+        return () => {
+            isCancelled = true;
+        };
+    }, []);
 
     useEffect(() => {
-        localStorage.setItem('habitly_show_full_month', String(showFullMonth));
-    }, [showFullMonth]);
+        if (!prefsLoaded) return;
+        void setStorageValue(STORAGE_KEYS.detailTab, activeTab);
+    }, [activeTab, prefsLoaded]);
+
+    useEffect(() => {
+        if (!prefsLoaded) return;
+        void setStorageValue(STORAGE_KEYS.showFullMonth, showFullMonth);
+    }, [prefsLoaded, showFullMonth]);
 
     const [calendarDate, setCalendarDate] = useState(() => {
         const now = new Date();
@@ -152,31 +175,8 @@ const HabitDetail: React.FC<Props> = ({
     };
 
     // --- Notes Logic ---
-    const [allNotes, setAllNotes] = useState<Record<string, string>>(() => {
-        const saved = localStorage.getItem(`habitly_notes_${habit.id}`);
-        const todayStr = getTodayInTimezone(userTimezone);
-        let parsedNotes: Record<string, string> = {};
-
-        if (saved) {
-            try {
-                const parsed = JSON.parse(saved);
-                if (typeof parsed === 'object' && parsed !== null) {
-                    parsedNotes = parsed;
-                } else {
-                    parsedNotes = { legacy: saved };
-                }
-            } catch (e) {
-                parsedNotes = { legacy: saved };
-            }
-        }
-
-        // Initialize today's note with template if empty and template exists
-        if (!parsedNotes[todayStr] && habit.notesTemplate) {
-            parsedNotes[todayStr] = habit.notesTemplate;
-        }
-
-        return parsedNotes;
-    });
+    const [allNotes, setAllNotes] = useState<Record<string, string>>({});
+    const [notesLoaded, setNotesLoaded] = useState(false);
 
     const today = useMemo(() => {
         return getTodayInTimezone(userTimezone);
@@ -188,11 +188,47 @@ const HabitDetail: React.FC<Props> = ({
     }, []);
 
     useEffect(() => {
+        let isCancelled = false;
+        const loadNotes = async () => {
+            const saved = await getStorageValue<unknown>(`${NOTES_KEY_PREFIX}${habit.id}`);
+            if (isCancelled) return;
+
+            let parsedNotes: Record<string, string> = {};
+            if (saved && typeof saved === 'object') {
+                parsedNotes = saved as Record<string, string>;
+            } else if (typeof saved === 'string') {
+                try {
+                    const parsed = JSON.parse(saved);
+                    parsedNotes = typeof parsed === 'object' && parsed !== null
+                        ? (parsed as Record<string, string>)
+                        : { legacy: saved };
+                } catch {
+                    parsedNotes = { legacy: saved };
+                }
+            }
+
+            if (!parsedNotes[today] && habit.notesTemplate) {
+                parsedNotes[today] = habit.notesTemplate;
+            }
+
+            setAllNotes(parsedNotes);
+            setNotesLoaded(true);
+        };
+        void loadNotes();
+
+        return () => {
+            isCancelled = true;
+            setNotesLoaded(false);
+        };
+    }, [habit.id, habit.notesTemplate, today]);
+
+    useEffect(() => {
+        if (!notesLoaded) return;
         const timer = setTimeout(() => {
-            localStorage.setItem(`habitly_notes_${habit.id}`, JSON.stringify(allNotes));
+            void setStorageValue(`${NOTES_KEY_PREFIX}${habit.id}`, allNotes);
         }, 1000);
         return () => clearTimeout(timer);
-    }, [allNotes, habit.id]);
+    }, [allNotes, habit.id, notesLoaded]);
 
     const handleNoteCommand = (command: RichTextCommand) => {
         applyRichTextCommand(command);

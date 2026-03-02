@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Category, Habit } from '../types';
-import { Trash2, Plus, Palette, Edit2, Sparkles, Globe, ChevronDown, GripVertical } from 'lucide-react';
+import { Trash2, Plus, Palette, Edit2, Globe, ChevronDown, GripVertical, Download, Upload } from 'lucide-react';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import { getTimezoneLabel, getTimezoneOffset, getTimeInTimezone } from '../utils/dateUtils';
-import { useEffect } from 'react';
+import { applyBackup, buildBackup, parseBackup } from '../utils/backup';
 
 interface Props {
   categories: Category[];
@@ -33,6 +33,10 @@ const Settings: React.FC<Props> = ({ categories, setCategories, habits, onDelete
   const [newCatName, setNewCatName] = useState('');
   const [editingColorId, setEditingColorId] = useState<string | null>(null);
   const [currentTime, setCurrentTime] = useState(() => getTimeInTimezone(userTimezone));
+  const [isExporting, setIsExporting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [backupStatus, setBackupStatus] = useState('');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -40,6 +44,58 @@ const Settings: React.FC<Props> = ({ categories, setCategories, habits, onDelete
     }, 10000); // Update every 10s to be reasonably accurate
     return () => clearInterval(timer);
   }, [userTimezone]);
+
+  const handleExportBackup = async () => {
+    try {
+      setIsExporting(true);
+      setBackupStatus('');
+      const backup = await buildBackup();
+      const timestamp = new Date().toISOString().replace(/[:]/g, '-');
+      const fileName = `fragments-backup-${timestamp}.json`;
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      setBackupStatus(`Backup exported (${fileName}).`);
+    } catch (error) {
+      setBackupStatus(error instanceof Error ? `Export failed: ${error.message}` : 'Export failed.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImportBackup: React.ChangeEventHandler<HTMLInputElement> = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsImporting(true);
+      setBackupStatus('');
+
+      const shouldImport = window.confirm('Importing a backup will overwrite current local data on this device. Continue?');
+      if (!shouldImport) return;
+
+      const backupText = await file.text();
+      const backup = parseBackup(backupText);
+      await applyBackup(backup);
+      setBackupStatus('Backup imported. Reloading...');
+      window.location.reload();
+    } catch (error) {
+      setBackupStatus(error instanceof Error ? `Import failed: ${error.message}` : 'Import failed.');
+    } finally {
+      setIsImporting(false);
+      event.target.value = '';
+    }
+  };
 
   const addCategory = () => {
     if (!newCatName) return;
@@ -289,6 +345,52 @@ const Settings: React.FC<Props> = ({ categories, setCategories, habits, onDelete
             </div>
 
           </div>
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <h3 className="text-[11px] font-black text-cozy-text/40 uppercase tracking-widest px-2">Backup</h3>
+        <div className="bg-white rounded-block p-5 shadow-block border-4 border-indigo-50/20 space-y-4">
+          <p className="text-xs text-cozy-text/60 font-bold">
+            Export and import your local habits, logs, notes, and preferences.
+          </p>
+
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={handleExportBackup}
+              disabled={isExporting || isImporting}
+              className="bg-white border-2 border-indigo-100 text-cozy-indigo px-4 py-3 rounded-block font-black text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Download size={16} strokeWidth={3} />
+              {isExporting ? 'Exporting...' : 'Export JSON'}
+            </button>
+            <button
+              onClick={handleImportClick}
+              disabled={isImporting || isExporting}
+              className="bg-white border-2 border-indigo-100 text-cozy-indigo px-4 py-3 rounded-block font-black text-sm flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Upload size={16} strokeWidth={3} />
+              {isImporting ? 'Importing...' : 'Import JSON'}
+            </button>
+          </div>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json,.json"
+            onChange={handleImportBackup}
+            className="hidden"
+          />
+
+          <p className="text-[11px] font-black text-cozy-text/40 uppercase tracking-widest">
+            Import replaces current local data on this device.
+          </p>
+
+          {backupStatus && (
+            <p className={`text-xs font-bold ${backupStatus.includes('failed') ? 'text-rose-500' : 'text-emerald-600'}`}>
+              {backupStatus}
+            </p>
+          )}
         </div>
       </div>
     </div>

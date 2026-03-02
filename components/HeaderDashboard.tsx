@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Gem, ChevronDown } from 'lucide-react';
 import { Habit, DailyLog, DailyProgress } from '../types';
 import { getTodayInTimezone, formatDateInTimezone, getWeekDaysInTimezone } from '../utils/dateUtils';
+import { getStorageValue, setStorageValue, STORAGE_KEYS } from '../utils/storage';
 
 interface Props {
     habits: Habit[];
@@ -19,13 +20,28 @@ const HeaderDashboard: React.FC<Props> = ({
     userTimezone,
     userWeekStart,
 }) => {
-    const [isCollapsed, setIsCollapsed] = useState(() => {
-        return localStorage.getItem('habitly_header_collapsed') === 'true';
-    });
+    const [isCollapsed, setIsCollapsed] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
-        localStorage.setItem('habitly_header_collapsed', String(isCollapsed));
-    }, [isCollapsed]);
+        let isCancelled = false;
+        const loadPreference = async () => {
+            const saved = await getStorageValue<boolean | string>(STORAGE_KEYS.headerCollapsed);
+            if (isCancelled) return;
+            const collapsed = typeof saved === 'boolean' ? saved : saved === 'true';
+            setIsCollapsed(collapsed);
+            setIsLoaded(true);
+        };
+        void loadPreference();
+        return () => {
+            isCancelled = true;
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!isLoaded) return;
+        void setStorageValue(STORAGE_KEYS.headerCollapsed, isCollapsed);
+    }, [isCollapsed, isLoaded]);
 
     const today = useMemo(() => getTodayInTimezone(userTimezone), [userTimezone]);
     const moneyHabitIds = useMemo(() => new Set(habits.filter(h => h.goalFormat === '$').map(h => h.id)), [habits]);

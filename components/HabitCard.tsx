@@ -4,6 +4,7 @@ import { Habit, Category, DailyProgress } from '../types';
 import { getIconById } from '../constants';
 import { Play, Pause, Check, Minus, Star, Gem, Diamond, Pencil } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { getStorageValue, NOTES_KEY_PREFIX } from '../utils/storage';
 
 interface Props {
   habit: Habit;
@@ -137,25 +138,35 @@ const HabitCard: React.FC<Props> = ({
   const isMultiStep = habit.stepType === 'multiple';
   const isMoneyGoal = habit.goalFormat === '$';
 
-  const hasNotes = useMemo(() => {
-    const saved = localStorage.getItem(`habitly_notes_${habit.id}`);
-    if (!saved) return false;
+  const [hasNotes, setHasNotes] = useState(false);
 
-    // Check if it's a JSON object (the new format) or a plain string (old format)
-    try {
-      const parsed = JSON.parse(saved);
-      if (typeof parsed === 'object' && parsed !== null) {
-        // New format: Record<string, string>
-        return Object.values(parsed as Record<string, string>).some(content =>
-          content.replace(/<[^>]*>/g, '').trim().length > 0
-        );
+  React.useEffect(() => {
+    let isCancelled = false;
+    const loadHasNotes = async () => {
+      const saved = await getStorageValue<unknown>(`${NOTES_KEY_PREFIX}${habit.id}`);
+      if (isCancelled) return;
+      if (!saved) {
+        setHasNotes(false);
+        return;
       }
-    } catch (e) {
-      // Not a JSON, treat as plain string (legacy format)
-    }
-
-    // Legacy format or fallback
-    return saved.replace(/<[^>]*>/g, '').trim().length > 0;
+      if (typeof saved === 'object' && saved !== null) {
+        setHasNotes(
+          Object.values(saved as Record<string, string>).some(content =>
+            typeof content === 'string' && content.replace(/<[^>]*>/g, '').trim().length > 0
+          )
+        );
+        return;
+      }
+      if (typeof saved === 'string') {
+        setHasNotes(saved.replace(/<[^>]*>/g, '').trim().length > 0);
+        return;
+      }
+      setHasNotes(false);
+    };
+    void loadHasNotes();
+    return () => {
+      isCancelled = true;
+    };
   }, [habit.id]);
 
   // 7-second auto-return timer
