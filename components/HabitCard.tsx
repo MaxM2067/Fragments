@@ -137,6 +137,15 @@ const HabitCard: React.FC<Props> = ({
   const moneyEarned = progress?.moneyEarned || 0;
   const isMultiStep = habit.stepType === 'multiple';
   const isMoneyGoal = habit.goalFormat === '$';
+  const isDayCounter = habit.habitType === 'day_counter';
+
+  const daysElapsed = useMemo(() => {
+    if (!isDayCounter) return 0;
+    const startMs = habit.dayCounterStartedAt ?? habit.createdAt;
+    return Math.floor((Date.now() - startMs) / 86400000);
+  }, [isDayCounter, habit.dayCounterStartedAt, habit.createdAt]);
+
+  const isDayCounterGoalReached = isDayCounter && !!habit.dayCounterGoalDays && daysElapsed >= habit.dayCounterGoalDays;
 
   const [hasNotes, setHasNotes] = useState(false);
 
@@ -192,11 +201,13 @@ const HabitCard: React.FC<Props> = ({
     return Math.floor(habit.goal / habit.stepValue);
   }, [isMultiStep, habit.goal, habit.stepValue]);
 
-  const isActuallyCompleted = isMoneyGoal
-    ? !!progress?.completed || moneyEarned > 0
-    : isMultiStep
-      ? (stepsCount > 0 && stepsCompleted >= stepsCount)
-      : completions > 0;
+  const isActuallyCompleted = isDayCounter
+    ? isDayCounterGoalReached
+    : isMoneyGoal
+      ? !!progress?.completed || moneyEarned > 0
+      : isMultiStep
+        ? (stepsCount > 0 && stepsCompleted >= stepsCount)
+        : completions > 0;
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -239,12 +250,20 @@ const HabitCard: React.FC<Props> = ({
   // Circular progress config
   const iconWrapSize = 52;
   const ringSize = iconWrapSize + 10;
-  const showRing = isMultiStep ? stepsCount > 0 : isGoalHabit;
+  const showRing = isDayCounter ? !!habit.dayCounterGoalDays : (isMultiStep ? stepsCount > 0 : isGoalHabit);
+  const ringSegments = isDayCounter ? (habit.dayCounterMilestoneSteps || 0) : (isMultiStep ? stepsCount : 0);
+  const ringFilledSegments = isDayCounter
+    ? (habit.dayCounterMilestoneSteps && habit.dayCounterGoalDays ? Math.min(Math.floor((daysElapsed / habit.dayCounterGoalDays) * habit.dayCounterMilestoneSteps), habit.dayCounterMilestoneSteps) : undefined)
+    : (isMultiStep ? Math.min(stepsCompleted, stepsCount) : undefined);
+  const ringPercent = isDayCounter && habit.dayCounterGoalDays ? Math.min(100, (daysElapsed / habit.dayCounterGoalDays) * 100) : (isMultiStep ? 0 : progressPercent);
 
   return (
-    <div className="relative group rounded-block">
-      {/* Background Action: Skip today (Simplified without dark podlozka) */}
-      <div className="absolute inset-0 flex items-center justify-end pr-8">
+    <div className="relative group rounded-block flex flex-col">
+      {/* Background Action: Skip today */}
+      <div
+        className="absolute inset-0 flex items-center justify-end pr-8"
+        style={{ opacity: isSwiped ? 1 : 0, transition: 'opacity 0.15s' }}
+      >
         <button
           onClick={(e) => { e.stopPropagation(); onSkip(habit.id); }}
           className="text-white/90 font-black text-[10px] uppercase tracking-[0.2em] flex flex-col items-center gap-1.5 active:scale-95 transition-transform"
@@ -317,17 +336,22 @@ const HabitCard: React.FC<Props> = ({
             <Star size={10} fill="currentColor" />
           </div>
         )}
+        {hasNotes && (
+          <div className="absolute top-1.5 right-12 z-30 pointer-events-none">
+            <Pencil size={11} className="text-slate-400" strokeWidth={2.5} />
+          </div>
+        )}
 
         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-3 w-full">
           {/* Icon with circular progress ring */}
           <div className="relative shrink-0 flex items-center justify-center" style={{ width: ringSize, height: ringSize }}>
             {showRing && (
               <CircularProgress
-                percent={isMultiStep ? 0 : progressPercent}
+                percent={ringPercent}
                 size={ringSize}
                 id={habit.id}
-                segments={isMultiStep ? stepsCount : undefined}
-                filledSegments={isMultiStep ? Math.min(stepsCompleted, stepsCount) : undefined}
+                segments={ringSegments > 0 ? ringSegments : undefined}
+                filledSegments={ringFilledSegments}
                 color="var(--color-accent, #F59E0B)"
               />
             )}
@@ -346,111 +370,127 @@ const HabitCard: React.FC<Props> = ({
           {/* Info + Timer inline */}
           <div className="min-w-0 flex flex-col justify-center">
             <div
-              className={`font-bold leading-tight line-clamp-2 flex items-center gap-1.5 ${isActuallyCompleted ? '' : 'text-cozy-text'}`}
+              className={`font-bold leading-tight line-clamp-2 ${isActuallyCompleted ? '' : 'text-cozy-text'}`}
               style={{
                 fontSize: 'var(--font-size-habit-name, 1.1rem)',
                 color: isActuallyCompleted ? 'var(--color-text-completed)' : undefined
               }}
             >
-              {hasNotes && <Pencil size={14} className="text-slate-400 shrink-0" strokeWidth={3} />}
               {habit.name}
             </div>
-            <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
-              {/* Inline timer */}
-              {hasTimer && (
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); onToggleTimer(habit.id); }}
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 border transition-all ${isRunning
-                      ? 'bg-amber-500 text-white shadow-sm border-amber-600/20'
-                      : 'bg-slate-50 text-amber-500 border-amber-200/50'}`}
-                  >
-                    {isRunning ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
-                  </button>
-                  <span className={`text-sm font-black tabular-nums truncate ${isRunning ? 'text-amber-500' : 'text-slate-400'}`}>
-                    {formatTime(elapsedTime)}
-                    {isGoalHabit && <span className="text-slate-300">/{habit.goal}m</span>}
+            {isDayCounter && habit.dayCounterGoalDays && !isDayCounterGoalReached ? (
+              <div className="flex items-center gap-2 mt-0.5 overflow-hidden text-[11px] font-black tabular-nums text-slate-400 shrink-0">
+                Goal: {habit.dayCounterGoalDays} days
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 mt-0.5 overflow-hidden">
+                {/* Inline timer */}
+                {hasTimer && (
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); onToggleTimer(habit.id); }}
+                      className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 border transition-all ${isRunning
+                        ? 'bg-amber-500 text-white shadow-sm border-amber-600/20'
+                        : 'bg-slate-50 text-amber-500 border-amber-200/50'}`}
+                    >
+                      {isRunning ? <Pause size={16} fill="currentColor" /> : <Play size={16} fill="currentColor" className="ml-0.5" />}
+                    </button>
+                    <span className={`text-sm font-black tabular-nums truncate ${isRunning ? 'text-amber-500' : 'text-slate-400'}`}>
+                      {formatTime(elapsedTime)}
+                      {isGoalHabit && <span className="text-slate-300">/{habit.goal}m</span>}
+                    </span>
+                  </div>
+                )}
+                {/* Inline multi-step counter */}
+                {isMultiStep && stepsCount > 0 && (
+                  <span className="text-[11px] font-black tabular-nums text-amber-500 shrink-0">
+                    {stepsCompleted}/{stepsCount}
                   </span>
-                </div>
-              )}
-              {/* Inline multi-step counter */}
-              {isMultiStep && stepsCount > 0 && (
-                <span className="text-[11px] font-black tabular-nums text-amber-500 shrink-0">
-                  {stepsCompleted}/{stepsCount}
-                </span>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Check / Decrement buttons */}
           <div className="flex items-center gap-1 shrink-0 justify-end" onClick={(e) => e.stopPropagation()}>
-            <AnimatePresence>
-              {showMinus && displayCount > 0 && (
-                <motion.button
-                  initial={{ opacity: 0, x: 5, scale: 0.8 }}
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: 5, scale: 0.8 }}
-                  onClick={(e) => { e.stopPropagation(); onDecrementCompletion(habit.id); setMinusTimerKey(prev => prev + 1); }}
-                  className="w-8 h-8 bg-slate-200/60 text-slate-500 rounded-block flex items-center justify-center active:scale-90 shrink-0 mr-1.5 shadow-inner border border-slate-300/30"
-                >
-                  <Minus size={16} strokeWidth={3} />
-                </motion.button>
-              )}
-            </AnimatePresence>
-
-            <div className="relative">
-              <button
-                onClick={handleIncrement}
-                className={`w-11 h-11 rounded-block flex items-center justify-center transition-all duration-500 active:scale-90 relative z-10 shadow-xl border-b-4 ${isActuallyCompleted
-                  ? 'bg-emerald-500 text-white border-emerald-600'
-                  : 'bg-white text-emerald-500 border-emerald-100'
-                  }`}
+            {isDayCounter ? (
+              <div
+                className={`w-14 h-14 rounded-full flex flex-col items-center justify-center transition-all duration-500 relative z-10 shadow-lg border-2 ${isDayCounterGoalReached ? 'bg-emerald-500 text-white border-emerald-600' : 'bg-white text-slate-700 border-slate-200'}`}
               >
-                {isMoneyGoal ? (
-                  <span className="text-[10px] font-black">+${formatMoney(habit.stepValue || 1)}</span>
-                ) : !isMultiStep && habit.rewardValue && habit.rewardValue > 1 ? (
-                  <span className="text-base font-black">+{habit.rewardValue}</span>
-                ) : (
-                  <Check size={24} strokeWidth={4} />
-                )}
-              </button>
+                <span className="text-[22px] font-black leading-none -mb-0.5">{daysElapsed}</span>
+                <span className={`text-[10px] font-bold ${isDayCounterGoalReached ? 'text-emerald-100' : 'text-slate-400'}`}>days</span>
+              </div>
+            ) : (
+              <>
+                <AnimatePresence>
+                  {showMinus && displayCount > 0 && (
+                    <motion.button
+                      initial={{ opacity: 0, x: 5, scale: 0.8 }}
+                      animate={{ opacity: 1, x: 0, scale: 1 }}
+                      exit={{ opacity: 0, x: 5, scale: 0.8 }}
+                      onClick={(e) => { e.stopPropagation(); onDecrementCompletion(habit.id); setMinusTimerKey(prev => prev + 1); }}
+                      className="w-8 h-8 bg-slate-200/60 text-slate-500 rounded-block flex items-center justify-center active:scale-90 shrink-0 mr-1.5 shadow-inner border border-slate-300/30"
+                    >
+                      <Minus size={16} strokeWidth={3} />
+                    </motion.button>
+                  )}
+                </AnimatePresence>
 
-              <AnimatePresence>
-                {shouldShowCountBadge && (
-                  <motion.span
-                    initial={{ scale: 0, rotate: -20 }}
-                    animate={{ scale: 1, rotate: 0 }}
-                    className="absolute -top-1 -right-1 bg-emerald-500 text-white text-[10px] font-black min-w-[1.25rem] h-5 px-1 rounded-full flex items-center justify-center shadow-sm border-2 border-white z-20"
+                <div className="relative">
+                  <button
+                    onClick={handleIncrement}
+                    className={`w-11 h-11 rounded-block flex items-center justify-center transition-all duration-500 active:scale-90 relative z-10 shadow-xl border-b-4 ${isActuallyCompleted
+                      ? 'bg-emerald-500 text-white border-emerald-600'
+                      : 'bg-white text-emerald-500 border-emerald-100'
+                      }`}
                   >
-                    {isMoneyGoal ? `$${formatMoney(displayCount)}` : displayCount}
-                  </motion.span>
-                )}
-              </AnimatePresence>
+                    {isMoneyGoal ? (
+                      <span className="text-[10px] font-black">+${formatMoney(habit.stepValue || 1)}</span>
+                    ) : !isMultiStep && habit.rewardValue && habit.rewardValue > 1 ? (
+                      <span className="text-base font-black">+{habit.rewardValue}</span>
+                    ) : (
+                      <Check size={24} strokeWidth={4} />
+                    )}
+                  </button>
 
-              {/* Crystal Particle Celebration */}
-              <AnimatePresence>
-                {particles.map(p => (
-                  <motion.div
-                    key={p.id}
-                    initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
-                    animate={{
-                      x: p.x * 2.5,
-                      y: -140 + p.y,
-                      scale: [0, 1.6, 0.8, 0],
-                      rotate: [0, 120 + Math.random() * 240, 360],
-                      opacity: [1, 1, 0.6, 0]
-                    }}
-                    transition={{ duration: 1.2, ease: "easeOut" }}
-                    className="absolute left-1/2 top-1/2 -ml-2 -mt-2 pointer-events-none z-50"
-                  >
-                    {p.shape === 'gem'
-                      ? <Gem size={p.size} fill={p.color} className="text-transparent drop-shadow-sm" />
-                      : <Diamond size={p.size} fill={p.color} className="text-transparent drop-shadow-sm" />
-                    }
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
+                  <AnimatePresence>
+                    {shouldShowCountBadge && (
+                      <motion.span
+                        initial={{ scale: 0, rotate: -20 }}
+                        animate={{ scale: 1, rotate: 0 }}
+                        className="absolute -top-1 -right-1 bg-emerald-500 text-white text-[10px] font-black min-w-[1.25rem] h-5 px-1 rounded-full flex items-center justify-center shadow-sm border-2 border-white z-20"
+                      >
+                        {isMoneyGoal ? `$${formatMoney(displayCount)}` : displayCount}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+
+                  {/* Crystal Particle Celebration */}
+                  <AnimatePresence>
+                    {particles.map(p => (
+                      <motion.div
+                        key={p.id}
+                        initial={{ x: 0, y: 0, scale: 0, opacity: 1 }}
+                        animate={{
+                          x: p.x * 2.5,
+                          y: -140 + p.y,
+                          scale: [0, 1.6, 0.8, 0],
+                          rotate: [0, 120 + Math.random() * 240, 360],
+                          opacity: [1, 1, 0.6, 0]
+                        }}
+                        transition={{ duration: 1.2, ease: "easeOut" }}
+                        className="absolute left-1/2 top-1/2 -ml-2 -mt-2 pointer-events-none z-50"
+                      >
+                        {p.shape === 'gem'
+                          ? <Gem size={p.size} fill={p.color} className="text-transparent drop-shadow-sm" />
+                          : <Diamond size={p.size} fill={p.color} className="text-transparent drop-shadow-sm" />
+                        }
+                      </motion.div>
+                    ))}
+                  </AnimatePresence>
+                </div>
+              </>
+            )}
           </div>
         </div>
 

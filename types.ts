@@ -9,6 +9,7 @@ export interface Category {
 
 export type GoalFormat = 'min' | 'times' | '$';
 export type StepType = 'single' | 'multiple';
+export type HabitType = 'standard' | 'day_counter';
 
 export interface Habit {
   id: string;
@@ -29,6 +30,13 @@ export interface Habit {
   keepInListWhenDone?: boolean;
   notesTemplate?: string;
   createdAt: number;
+  // Day Counter fields
+  habitType?: HabitType; // 'standard' (default) | 'day_counter'
+  dayCounterStartedAt?: number; // unix ms — start of current run
+  dayCounterGoalDays?: number; // optional day target
+  dayCounterMilestoneSteps?: number; // how many equal milestone segments
+  dayCounterFragValue?: number; // fragments awarded per reward period
+  dayCounterFragEveryDays?: number; // reward period in days
 }
 
 export interface DailyProgress {

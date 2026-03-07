@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo } from 'react';
-import { Habit, Category, TimeOfDay, GoalFormat, StepType } from '../types';
+import { Habit, Category, TimeOfDay, GoalFormat, StepType, HabitType } from '../types';
 import { ICONS, getIconById } from '../constants';
 import { ChevronLeft, Check, Save, Star, Layers, Zap, DollarSign, ChevronDown, Gem, Minus, FileText, Bold, Italic, List as ListIcon, ListOrdered } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,6 +28,7 @@ const HabitForm: React.FC<Props> = ({
   const [name, setName] = useState(initialHabit?.name || '');
   const [description, setDescription] = useState(initialHabit?.description || '');
   const [categoryId, setCategoryId] = useState(initialHabit?.categoryId || categories[0]?.id || '');
+  const [habitType, setHabitType] = useState<HabitType>(initialHabit?.habitType || 'standard');
   const [icon, setIcon] = useState(initialHabit?.icon || ICONS[0].id);
   const [showIcons, setShowIcons] = useState(false);
   const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(initialHabit?.timeOfDay || 'anytime');
@@ -42,6 +43,11 @@ const HabitForm: React.FC<Props> = ({
   const [keepInListWhenDone, setKeepInListWhenDone] = useState<boolean>(initialHabit?.keepInListWhenDone || false);
   const [showNotesTemplate, setShowNotesTemplate] = useState<boolean>(!!initialHabit?.notesTemplate);
   const [notesTemplate, setNotesTemplate] = useState<string>(initialHabit?.notesTemplate || '');
+
+  const [dayCounterGoalDays, setDayCounterGoalDays] = useState<number | ''>(initialHabit?.dayCounterGoalDays || '');
+  const [dayCounterMilestoneSteps, setDayCounterMilestoneSteps] = useState<number | ''>(initialHabit?.dayCounterMilestoneSteps || '');
+  const [dayCounterFragValue, setDayCounterFragValue] = useState<number>(initialHabit?.dayCounterFragValue || 1);
+  const [dayCounterFragEveryDays, setDayCounterFragEveryDays] = useState<number>(initialHabit?.dayCounterFragEveryDays || 1);
 
   const templateRef = React.useRef<HTMLDivElement>(null);
   const [isTemplateFocused, setIsTemplateFocused] = useState(false);
@@ -87,6 +93,12 @@ const HabitForm: React.FC<Props> = ({
       keepInListWhenDone,
       notesTemplate: showNotesTemplate ? notesTemplate : undefined,
       createdAt: initialHabit?.createdAt || Date.now(),
+      habitType,
+      dayCounterStartedAt: habitType === 'day_counter' ? (initialHabit?.dayCounterStartedAt || Date.now()) : undefined,
+      dayCounterGoalDays: dayCounterGoalDays === '' ? undefined : Number(dayCounterGoalDays),
+      dayCounterMilestoneSteps: dayCounterMilestoneSteps === '' ? undefined : Number(dayCounterMilestoneSteps),
+      dayCounterFragValue: Number(dayCounterFragValue),
+      dayCounterFragEveryDays: Number(dayCounterFragEveryDays),
     };
     onSave(habitData);
   };
@@ -356,76 +368,119 @@ const HabitForm: React.FC<Props> = ({
           {/* Goal Format */}
           <div>
             <label className={labelClass}>Goal Format</label>
-            <div className="flex gap-1.5 mt-1">
-              {pill('Times', goalFormat === 'times', () => setGoalFormat('times'))}
-              {pill('Minutes', goalFormat === 'min', () => setGoalFormat('min'))}
-              {pill('$', goalFormat === '$', () => setGoalFormat('$'), <DollarSign size={12} />)}
+            <div className="flex gap-1.5 mt-1 flex-wrap">
+              {pill('Times', habitType === 'standard' && goalFormat === 'times', () => { setHabitType('standard'); setGoalFormat('times'); })}
+              {pill('Minutes', habitType === 'standard' && goalFormat === 'min', () => { setHabitType('standard'); setGoalFormat('min'); })}
+              {pill('$', habitType === 'standard' && goalFormat === '$', () => { setHabitType('standard'); setGoalFormat('$'); }, <DollarSign size={12} />)}
+              {pill('Day Counter', habitType === 'day_counter', () => setHabitType('day_counter'))}
             </div>
           </div>
 
-          {/* Frag Value (only for non-$ goals) */}
-          {goalFormat !== '$' && (
-            <div>
-              <label className={labelClass}>Frag Value</label>
-              <input type="number" value={rewardValue === 0 ? '' : rewardValue}
-                onChange={e => setRewardValue(e.target.value === '' ? 0 : Math.max(1, Number(e.target.value)))}
-                placeholder="1" className={inputClass} min="1" />
-            </div>
-          )}
-
-          {/* Step Type */}
-          <div>
-            <label className={labelClass}>Steps</label>
-            <div className="flex gap-1.5 mt-1">
-              {pill('Single', stepType === 'single', () => setStepType('single'), <Zap size={12} />)}
-              {pill('Multiple', stepType === 'multiple', () => setStepType('multiple'), <Layers size={12} />)}
-            </div>
-          </div>
-
-          {/* Goal */}
-          <div>
-            <label className={labelClass}>Goal ({goalFormatLabel(goalFormat)})</label>
-            <input type="number" value={goal}
-              onChange={e => setGoal(e.target.value === '' ? '' : Number(e.target.value))}
-              placeholder="Optional" className={inputClass} />
-          </div>
-
-          {/* Step Value (+ Steps Count for multi-step goals) */}
-          {showStepValueInput && (
-            <div className={stepType === 'multiple' ? 'grid grid-cols-2 gap-3' : ''}>
-              <div>
-                <label className={labelClass}>
-                  {goalFormat === '$' && stepType === 'single'
-                    ? 'Amount Per Tap ($)'
-                    : `Step Value (${goalFormatLabel(goalFormat)})`}
-                </label>
-                <input
-                  type="number"
-                  value={stepValue}
-                  onChange={e => setStepValue(e.target.value === '' ? '' : Number(e.target.value))}
-                  placeholder={goalFormat === '$' ? 'e.g. 5' : 'Per step'}
-                  className={inputClass}
-                  min={goalFormat === '$' ? '0.01' : '1'}
-                  step={goalFormat === '$' ? '0.01' : '1'}
-                />
-              </div>
-              {stepType === 'multiple' && (
+          {/* --- Standard Habit Fields --- */}
+          {habitType === 'standard' && (
+            <>
+              {/* Frag Value (only for non-$ goals) */}
+              {goalFormat !== '$' && (
                 <div>
-                  <label className={labelClass}>Steps Count</label>
-                  <div className="bg-indigo-50/50 px-4 py-3 rounded-block border-2 border-indigo-100/30 font-black text-cozy-text flex items-center justify-center gap-1.5">
-                    {stepsCount > 0 ? (
-                      <>
-                        <Layers size={14} className="text-indigo-400" />
-                        <span className="text-lg tabular-nums">{stepsCount}</span>
-                        <span className="text-[10px] text-cozy-text/40">steps</span>
-                      </>
-                    ) : (
-                      <span className="text-[11px] text-cozy-text/30">—</span>
-                    )}
-                  </div>
+                  <label className={labelClass}>Frag Value</label>
+                  <input type="number" value={rewardValue === 0 ? '' : rewardValue}
+                    onChange={e => setRewardValue(e.target.value === '' ? 0 : Math.max(1, Number(e.target.value)))}
+                    placeholder="1" className={inputClass} min="1" />
                 </div>
               )}
-            </div>
+
+              {/* Step Type */}
+              <div>
+                <label className={labelClass}>Steps</label>
+                <div className="flex gap-1.5 mt-1">
+                  {pill('Single', stepType === 'single', () => setStepType('single'), <Zap size={12} />)}
+                  {pill('Multiple', stepType === 'multiple', () => setStepType('multiple'), <Layers size={12} />)}
+                </div>
+              </div>
+
+              {/* Goal */}
+              <div>
+                <label className={labelClass}>Goal ({goalFormatLabel(goalFormat)})</label>
+                <input type="number" value={goal}
+                  onChange={e => setGoal(e.target.value === '' ? '' : Number(e.target.value))}
+                  placeholder="Optional" className={inputClass} />
+              </div>
+
+              {/* Step Value (+ Steps Count for multi-step goals) */}
+              {showStepValueInput && (
+                <div className={stepType === 'multiple' ? 'grid grid-cols-2 gap-3' : ''}>
+                  <div>
+                    <label className={labelClass}>
+                      {goalFormat === '$' && stepType === 'single'
+                        ? 'Amount Per Tap ($)'
+                        : `Step Value (${goalFormatLabel(goalFormat)})`}
+                    </label>
+                    <input
+                      type="number"
+                      value={stepValue}
+                      onChange={e => setStepValue(e.target.value === '' ? '' : Number(e.target.value))}
+                      placeholder={goalFormat === '$' ? 'e.g. 5' : 'Per step'}
+                      className={inputClass}
+                      min={goalFormat === '$' ? '0.01' : '1'}
+                      step={goalFormat === '$' ? '0.01' : '1'}
+                    />
+                  </div>
+                  {stepType === 'multiple' && (
+                    <div>
+                      <label className={labelClass}>Steps Count</label>
+                      <div className="bg-indigo-50/50 px-4 py-3 rounded-block border-2 border-indigo-100/30 font-black text-cozy-text flex items-center justify-center gap-1.5">
+                        {stepsCount > 0 ? (
+                          <>
+                            <Layers size={14} className="text-indigo-400" />
+                            <span className="text-lg tabular-nums">{stepsCount}</span>
+                            <span className="text-[10px] text-cozy-text/40">steps</span>
+                          </>
+                        ) : (
+                          <span className="text-[11px] text-cozy-text/30">—</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* --- Day Counter Fields --- */}
+          {habitType === 'day_counter' && (
+            <>
+              {/* Goal Days */}
+              <div>
+                <label className={labelClass}>Goal (Days)</label>
+                <input type="number" value={dayCounterGoalDays}
+                  onChange={e => setDayCounterGoalDays(e.target.value === '' ? '' : Number(e.target.value))}
+                  placeholder="Optional e.g. 21" className={inputClass} min="1" />
+              </div>
+
+              {/* Milestones */}
+              <div>
+                <label className={labelClass}>Divide goal in N steps (Milestones)</label>
+                <input type="number" value={dayCounterMilestoneSteps}
+                  onChange={e => setDayCounterMilestoneSteps(e.target.value === '' ? '' : Number(e.target.value))}
+                  placeholder="Optional e.g. 3" className={inputClass} min="1" />
+              </div>
+
+              {/* Fragment Rewards */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className={labelClass}>Frag Value</label>
+                  <input type="number" value={dayCounterFragValue === 0 ? '' : dayCounterFragValue}
+                    onChange={e => setDayCounterFragValue(e.target.value === '' ? 0 : Math.max(0, Number(e.target.value)))}
+                    placeholder="1" className={inputClass} min="0" />
+                </div>
+                <div>
+                  <label className={labelClass}>For (Days)</label>
+                  <input type="number" value={dayCounterFragEveryDays === 0 ? '' : dayCounterFragEveryDays}
+                    onChange={e => setDayCounterFragEveryDays(e.target.value === '' ? 1 : Math.max(1, Number(e.target.value)))}
+                    placeholder="1" className={inputClass} min="1" />
+                </div>
+              </div>
+            </>
           )}
         </div>
       </form>

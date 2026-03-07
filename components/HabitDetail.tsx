@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Habit, Category, DailyLog, DailyProgress } from '../types';
 import { getIconById } from '../constants';
-import { ArrowLeft, Pencil, List, BarChart2, ChevronLeft, ChevronRight, Bold, Italic, List as ListIcon, ListOrdered, Calendar, Gem } from 'lucide-react';
+import { ArrowLeft, Pencil, List, BarChart2, ChevronLeft, ChevronRight, Bold, Italic, List as ListIcon, ListOrdered, Calendar, Gem, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     getWeekDaysInTimezone,
@@ -33,6 +33,7 @@ interface Props {
     userWeekStart: 'monday' | 'sunday';
     onBack: () => void;
     onEdit: (id: string) => void;
+    onResetDayCounter?: (id: string) => void;
 }
 
 // Helper component for a single note block
@@ -90,7 +91,8 @@ const HabitDetail: React.FC<Props> = ({
     userTimezone,
     userWeekStart,
     onBack,
-    onEdit
+    onEdit,
+    onResetDayCounter
 }) => {
     const [activeTab, setActiveTab] = useState<'notes' | 'stats'>('notes');
     const [showFullMonth, setShowFullMonth] = useState(false);
@@ -407,12 +409,23 @@ const HabitDetail: React.FC<Props> = ({
                         </h1>
                     </div>
                 </div>
-                <button
-                    onClick={() => onEdit(habit.id)}
-                    className="p-2.5 bg-indigo-50 text-indigo-600 rounded-block hover:bg-indigo-100 transition-colors active:scale-95 border-b-2 border-indigo-100"
-                >
-                    <Pencil size={20} strokeWidth={2.5} />
-                </button>
+                <div className="flex items-center gap-2">
+                    {habit.habitType === 'day_counter' && onResetDayCounter && (
+                        <button
+                            onClick={() => onResetDayCounter(habit.id)}
+                            className="p-2.5 bg-rose-50 text-rose-600 rounded-block hover:bg-rose-100 transition-colors active:scale-95 border-b-2 border-rose-100"
+                            title="Reset Counter"
+                        >
+                            <RotateCcw size={20} strokeWidth={2.5} />
+                        </button>
+                    )}
+                    <button
+                        onClick={() => onEdit(habit.id)}
+                        className="p-2.5 bg-indigo-50 text-indigo-600 rounded-block hover:bg-indigo-100 transition-colors active:scale-95 border-b-2 border-indigo-100"
+                    >
+                        <Pencil size={20} strokeWidth={2.5} />
+                    </button>
+                </div>
             </div>
 
             {/* Tabs */}
@@ -555,7 +568,30 @@ const HabitDetail: React.FC<Props> = ({
                             className="pt-6 space-y-3"
                         >
                             <AnimatePresence mode="wait">
-                                {!showFullMonth ? (
+                                {habit.habitType === 'day_counter' ? (
+                                    <motion.div
+                                        key="day-counter-stats"
+                                        initial={{ opacity: 0, x: -20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        exit={{ opacity: 0, x: 20 }}
+                                        className="bg-white p-6 shadow-sm border border-slate-100 rounded-block mx-3"
+                                    >
+                                        <div className="flex flex-col items-center justify-center py-10">
+                                            <div className="text-[72px] font-black leading-none text-slate-800">
+                                                {(() => {
+                                                    const startMs = habit.dayCounterStartedAt ?? habit.createdAt;
+                                                    return Math.floor((Date.now() - startMs) / 86400000);
+                                                })()}
+                                            </div>
+                                            <div className="text-sm font-bold text-slate-400 uppercase tracking-widest mt-2">Days Elapsed</div>
+                                            {habit.dayCounterGoalDays && (
+                                                <div className="mt-6 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100 text-sm font-black text-slate-500">
+                                                    Goal: {habit.dayCounterGoalDays} days
+                                                </div>
+                                            )}
+                                        </div>
+                                    </motion.div>
+                                ) : !showFullMonth ? (
                                     <motion.div
                                         key="weekly-chart"
                                         initial={{ opacity: 0, x: -20 }}
@@ -739,39 +775,41 @@ const HabitDetail: React.FC<Props> = ({
                                 )}
                             </AnimatePresence>
 
-                            <div className="px-4 space-y-6">
-                                {/* Calendar Toggle Button */}
-                                <button
-                                    onClick={() => setShowFullMonth(!showFullMonth)}
-                                    className="w-full py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl flex items-center justify-center gap-3 active:scale-[0.98] transition-all border border-slate-200/50"
-                                >
-                                    {showFullMonth ? <BarChart2 size={18} /> : <Calendar size={18} />}
-                                    {showFullMonth ? 'Back to Weekly Chart' : 'See Full Month View'}
-                                </button>
+                            {habit.habitType !== 'day_counter' && (
+                                <div className="px-4 space-y-6">
+                                    {/* Calendar Toggle Button */}
+                                    <button
+                                        onClick={() => setShowFullMonth(!showFullMonth)}
+                                        className="w-full py-4 bg-slate-100 text-slate-600 font-bold rounded-2xl flex items-center justify-center gap-3 active:scale-[0.98] transition-all border border-slate-200/50"
+                                    >
+                                        {showFullMonth ? <BarChart2 size={18} /> : <Calendar size={18} />}
+                                        {showFullMonth ? 'Back to Weekly Chart' : 'See Full Month View'}
+                                    </button>
 
-                                {/* Dashboard-style Summary Statistics */}
-                                <div className="bg-white/10 backdrop-blur-xl p-6 rounded-[2rem] border border-white/20 shadow-[0_4px_10px_rgba(0,0,0,0.15)] mx-3">
-                                    <div className="grid grid-cols-3 gap-y-6 gap-x-2">
-                                        {[
-                                            { label: 'THIS WEEK', value: stats.summary.thisWeek },
-                                            { label: 'LAST WEEK', value: stats.summary.lastWeek },
-                                            { label: 'THIS MONTH', value: stats.summary.thisMonth },
-                                            { label: 'LAST MONTH', value: stats.summary.lastMonth },
-                                            { label: 'THIS YEAR', value: stats.summary.thisYear },
-                                            { label: 'LAST YEAR', value: stats.summary.lastYear },
-                                        ].map((item, i) => (
-                                            <div key={i} className="flex flex-col items-center">
-                                                <span className="text-white/40 text-[9px] font-black uppercase tracking-widest mb-1 leading-none text-center">
-                                                    {item.label}
-                                                </span>
-                                                <span className={`font-black tabular-nums transition-all leading-none ${item.value > 0 ? 'text-white text-2xl' : 'text-white/20 text-xl'}`}>
-                                                    {formatValue(item.value, true) || '0'}
-                                                </span>
-                                            </div>
-                                        ))}
+                                    {/* Dashboard-style Summary Statistics */}
+                                    <div className="bg-white/10 backdrop-blur-xl p-6 rounded-[2rem] border border-white/20 shadow-[0_4px_10px_rgba(0,0,0,0.15)] mx-3">
+                                        <div className="grid grid-cols-3 gap-y-6 gap-x-2">
+                                            {[
+                                                { label: 'THIS WEEK', value: stats.summary.thisWeek },
+                                                { label: 'LAST WEEK', value: stats.summary.lastWeek },
+                                                { label: 'THIS MONTH', value: stats.summary.thisMonth },
+                                                { label: 'LAST MONTH', value: stats.summary.lastMonth },
+                                                { label: 'THIS YEAR', value: stats.summary.thisYear },
+                                                { label: 'LAST YEAR', value: stats.summary.lastYear },
+                                            ].map((item, i) => (
+                                                <div key={i} className="flex flex-col items-center">
+                                                    <span className="text-white/40 text-[9px] font-black uppercase tracking-widest mb-1 leading-none text-center">
+                                                        {item.label}
+                                                    </span>
+                                                    <span className={`font-black tabular-nums transition-all leading-none ${item.value > 0 ? 'text-white text-2xl' : 'text-white/20 text-xl'}`}>
+                                                        {formatValue(item.value, true) || '0'}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </motion.div>
                     )}
                 </AnimatePresence>

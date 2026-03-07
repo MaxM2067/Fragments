@@ -31,6 +31,10 @@
 - **Multi-Step Logic:** For habits with sub-steps (e.g., 25 pushups), fragments are awarded only upon completing a full "cycle" (defined by `goal` / `stepValue`).
 - **Main Habits:** Users can pin up to 2 habits. They are highlighted with an amber Star badge and stay at the top of the list.
 - **Daily Minimum:** Mandatory habits marked with gold crystals. Completion contributes to a dedicated "Daily Min" progress bar in the `HeaderDashboard`. Once met, the header's primary crystal icon transition to a gold fill state.
+- **Day Counter Habits:** A special passive habit type (`habitType: 'day_counter'`) that tracks consecutive days since a start date. Instead of daily check-ins, it runs automatically.
+  - **Visuals:** Displays a prominent circular badge with the number of days elapsed instead of a check button. The badge turns green when the `dayCounterGoalDays` is reached.
+  - **Fragment Rewards:** Fragments are accrued automatically based on a configured frequency (`dayCounterFragEveryDays`) and value (`dayCounterFragValue`). `App.tsx` handles this calculation and distribution upon app load/day rollover.
+  - **Reset Mechanism:** Can be manually reset via the Habit Detail screen, which updates `dayCounterStartedAt` while preserving the historical fragment logs.
 - **Micro-Progress:** Every habit icon is wrapped in a SVG circular ring that fills in real-time (for timers) or by segments (for steps).
 - **Habit Grouping:** Habits are grouped by Time of Day or Category. Groups are collapsible (spoilers) if they contain more than one habit.
 - **Header Statistics:** A collapsible/expandable dashboard (`HeaderDashboard`) providing Today, Yesterday, Week, and Month fragment counts.
@@ -78,7 +82,7 @@ Users can leave a note (`contentEditable` div) for any given day on any habit.
 - **Standardized Rounding:** Almost all containers use `rounded-block` which reads from the CSS variable `--radius-block` in `theme.css`.
 - **Intelligent Grouping:** Groups with only **one** item automatically hide their collapse toggle and "stacked" visual to maintain a clean UI.
 - **Descending Stacking:** Habit groups use a descending `z-index` so that shadows from previous cards always fall correctly over subsequent group headers.
-- **Completion Delay:** When a habit is completed (and "Keep in list" is OFF), it remains in its original position for **3 seconds** before animating smoothly to the "Done Today" group. This gives the user time to celebrate or continue interacting before reorganization.
+- **Completion Delay & Animations:** When a habit is completed (and "Keep in list" is OFF), it remains strictly in its original position for **3 seconds** (no intra-group sorting jumps). After the delay, it uses Framer Motion `layoutId` to animate smoothly across the screen into the "Done Today" group. This prevents disorienting layout shifts and gives time to undo or celebrate.
 - **UI State Persistence:** Sorting method (`sortBy`), active filter (`filterCategoryId`), and group expansion states (`collapsedGroups`) are persisted in `localStorage`. 
     - The "Done Today" group is **collapsed by default** when it first appears.
     - Habit Detail's **active tab** (`habitly_detail_tab`) and **stat view** (`habitly_show_full_month`) are persisted globally.

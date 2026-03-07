@@ -250,6 +250,62 @@ const App: React.FC = () => {
     ]);
   }, [categories, habits, isHydrated, logs, userTimezone, userWeekStart]);
 
+  const syncDayCounters = React.useCallback(() => {
+    setLogs(prev => {
+      let hasChanges = false;
+      const newLogs: Record<string, DailyLog> = { ...prev };
+
+      habits.forEach(habit => {
+        if (habit.habitType !== 'day_counter' || !habit.dayCounterFragValue || !habit.dayCounterFragEveryDays) return;
+
+        const startMs = habit.dayCounterStartedAt ?? habit.createdAt;
+        const daysElapsed = Math.floor((Date.now() - startMs) / 86400000);
+        if (daysElapsed <= 0) return;
+
+        const expectedRewards = Math.floor(daysElapsed / habit.dayCounterFragEveryDays);
+        const expectedFrags = expectedRewards * habit.dayCounterFragValue;
+
+        const startDayStr = new Intl.DateTimeFormat('en-CA', {
+          timeZone: userTimezone,
+          year: 'numeric', month: '2-digit', day: '2-digit'
+        }).format(new Date(startMs));
+
+        let givenFrags = 0;
+        Object.entries(newLogs).forEach(([dateStr, log]) => {
+          if (dateStr >= startDayStr && log.progress[habit.id]) {
+            givenFrags += log.progress[habit.id].completions || 0;
+          }
+        });
+
+        const fragsToAdd = expectedFrags - givenFrags;
+        if (fragsToAdd > 0) {
+          hasChanges = true;
+          const todayLog = newLogs[today] || { date: today, mood: 0, progress: {} };
+          const p = todayLog.progress[habit.id] || { habitId: habit.id, completed: true, completions: 0, elapsedTime: 0, stepsCompleted: 0, moneyEarned: 0 };
+          newLogs[today] = {
+            ...todayLog,
+            progress: {
+              ...todayLog.progress,
+              [habit.id]: {
+                ...p,
+                completions: (p.completions || 0) + fragsToAdd,
+                completed: true
+              }
+            }
+          };
+        }
+      });
+
+      return hasChanges ? newLogs : prev;
+    });
+  }, [habits, today, userTimezone]);
+
+  useEffect(() => {
+    if (isHydrated) {
+      syncDayCounters();
+    }
+  }, [isHydrated, today, syncDayCounters]);
+
   const currentLog = useMemo(() => {
     return logs[today] || { date: today, mood: 0, progress: {} };
   }, [logs, today]);
@@ -471,6 +527,15 @@ const App: React.FC = () => {
     });
   };
 
+  const handleResetDayCounter = (id: string) => {
+    if (window.confirm("Are you sure you want to reset this day counter?")) {
+      setHabits(prev => prev.map(h =>
+        h.id === id ? { ...h, dayCounterStartedAt: Date.now() } : h
+      ));
+      setView('habits');
+    }
+  };
+
   const renderContent = () => {
     switch (view) {
       case 'habits':
@@ -549,6 +614,7 @@ const App: React.FC = () => {
               setEditingHabitId(id);
               setView('add-habit');
             }}
+            onResetDayCounter={handleResetDayCounter}
           />
         );
       default:

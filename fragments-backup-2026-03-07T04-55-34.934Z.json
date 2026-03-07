@@ -1,0 +1,2537 @@
+{
+  "schemaVersion": 1,
+  "exportedAt": "2026-03-07T04:55:34.934Z",
+  "data": {
+    "habits": [
+      {
+        "id": "63z3qjgpx",
+        "name": "Лечь до 22:30",
+        "description": "",
+        "categoryId": "cat-health",
+        "icon": "bed",
+        "repetition": "daily",
+        "timeOfDay": "evening",
+        "stepType": "single",
+        "goalFormat": "times",
+        "rewardValue": 2,
+        "isMain": true,
+        "dailyMinimum": true,
+        "keepInListWhenDone": false,
+        "createdAt": 1770911137654
+      },
+      {
+        "id": "kb0gk9mdw",
+        "name": "Встать сразу с постели как проснулся ",
+        "description": "",
+        "categoryId": "cat-psyche",
+        "icon": "sun",
+        "repetition": "daily",
+        "timeOfDay": "morning",
+        "stepType": "single",
+        "goalFormat": "times",
+        "rewardValue": 2,
+        "isMain": false,
+        "dailyMinimum": true,
+        "keepInListWhenDone": false,
+        "createdAt": 1770911179299
+      },
+      {
+        "id": "5bl1r9dl3",
+        "name": "Чтение 15 мин",
+        "description": "",
+        "categoryId": "cat-interests",
+        "icon": "book",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "min",
+        "goal": 15,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": true,
+        "keepInListWhenDone": true,
+        "createdAt": 1770913172336
+      },
+      {
+        "id": "k12i3raf0",
+        "name": "Наслаждение 5 мин",
+        "description": "",
+        "categoryId": "cat-health",
+        "icon": "sparkles",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "min",
+        "goal": 5,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": true,
+        "keepInListWhenDone": false,
+        "createdAt": 1770913286776
+      },
+      {
+        "id": "dud17ypvx",
+        "name": "Ни о чем не думать, гулять, смотреть",
+        "description": "",
+        "categoryId": "cat-psyche",
+        "icon": "footprints",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "min",
+        "goal": 5,
+        "rewardValue": 1,
+        "isMain": false,
+        "createdAt": 1770947099196
+      },
+      {
+        "id": "5qebb6hrs",
+        "name": "10 мин вв",
+        "description": "",
+        "categoryId": "cat-psyche",
+        "icon": "leaf",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "min",
+        "goal": 10,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": true,
+        "createdAt": 1770949812916
+      },
+      {
+        "id": "0p0jjcahu",
+        "name": "ФА 10 мин",
+        "description": "",
+        "categoryId": "cat-sports",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "min",
+        "goal": 10,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": true,
+        "keepInListWhenDone": true,
+        "createdAt": 1770949959645
+      },
+      {
+        "id": "5oveotz8p",
+        "name": "Необжорство",
+        "description": "",
+        "categoryId": "cat-health",
+        "icon": "cherry",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "multiple",
+        "goalFormat": "times",
+        "goal": 3,
+        "stepValue": 1,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": true,
+        "createdAt": 1770951938936
+      },
+      {
+        "id": "gfhjgh45y",
+        "name": "120$ за день",
+        "description": "",
+        "categoryId": "cat-finance",
+        "icon": "wallet",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "multiple",
+        "goalFormat": "$",
+        "goal": 120,
+        "stepValue": 15,
+        "rewardValue": 0,
+        "isMain": false,
+        "dailyMinimum": false,
+        "createdAt": 1770975573259
+      },
+      {
+        "id": "19ado07tc",
+        "name": "Утро-солнце",
+        "description": "",
+        "categoryId": "cat-psyche",
+        "icon": "leaf",
+        "repetition": "daily",
+        "timeOfDay": "morning",
+        "stepType": "single",
+        "goalFormat": "times",
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": true,
+        "keepInListWhenDone": false,
+        "createdAt": 1771039221367
+      },
+      {
+        "id": "vy8hot1y6",
+        "name": "10 мин селекции, кроликов, книг Бо",
+        "description": "",
+        "categoryId": "cat-psyche",
+        "icon": "atom",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "min",
+        "goal": 10,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": true,
+        "keepInListWhenDone": true,
+        "createdAt": 1771055271537
+      },
+      {
+        "id": "okfa9pd4b",
+        "name": "Неподвижное лежание",
+        "description": "",
+        "categoryId": "cat-health",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "evening",
+        "stepType": "single",
+        "goalFormat": "min",
+        "goal": 15,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": false,
+        "createdAt": 1771119676429
+      },
+      {
+        "id": "8wvmcz6sy",
+        "name": "Подходы к людям, вяк",
+        "description": "",
+        "categoryId": "cat-interests",
+        "icon": "users",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "times",
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": true,
+        "createdAt": 1771122782687
+      },
+      {
+        "id": "s39bffidm",
+        "name": "Усиленное чтение, насл",
+        "description": "",
+        "categoryId": "cat-psyche",
+        "icon": "sparkles",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "min",
+        "goal": 10,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": false,
+        "createdAt": 1771124013536
+      },
+      {
+        "id": "1zuey6d4x",
+        "name": "Ежедневные списки заполнить",
+        "description": "",
+        "categoryId": "cat-1771566633726",
+        "icon": "book",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "times",
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": true,
+        "keepInListWhenDone": true,
+        "notesTemplate": "<div>Исследования, интересные сейчас:&nbsp;</div><div><ul><li><br></li></ul><div>Фрагменты сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div>Какие были сегодня открытия:</div><div><ul><li><br></li></ul><div>Радостные желания сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div><br></div><div>МЖ, проявившиес сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div><br></div><div>ОзВ, проявившиеся сегодня:</div><div><ul><li><br></li></ul></div><div><br></div><div>Проявившиеся сегодня физ.переживания:</div><div><br></div><div><br></div></div></div>",
+        "createdAt": 1771127038781
+      },
+      {
+        "id": "19ed68crd",
+        "name": "ЦВ ЖКС",
+        "description": "",
+        "categoryId": "cat-1771494746275",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "min",
+        "goal": 5,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": true,
+        "createdAt": 1771211094539
+      },
+      {
+        "id": "osqayeevj",
+        "name": "5 мин вв как встал",
+        "description": "",
+        "categoryId": "cat-psyche",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "morning",
+        "stepType": "single",
+        "goalFormat": "min",
+        "goal": 5,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": true,
+        "keepInListWhenDone": false,
+        "createdAt": 1771212546006
+      },
+      {
+        "id": "pfr39xbe8",
+        "name": "ДПО копить до 2х недель",
+        "description": "",
+        "categoryId": "cat-psyche",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "evening",
+        "stepType": "single",
+        "goalFormat": "times",
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": true,
+        "keepInListWhenDone": false,
+        "createdAt": 1771222010958
+      },
+      {
+        "id": "m6orjz9k5",
+        "name": "Попытки УНЭ",
+        "description": "",
+        "categoryId": "cat-1771494746275",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "multiple",
+        "goalFormat": "times",
+        "goal": 15,
+        "stepValue": 1,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": true,
+        "createdAt": 1771230147440
+      },
+      {
+        "id": "fqu11pl3c",
+        "name": "2х часовая фиксация ",
+        "description": "",
+        "categoryId": "cat-1771566633726",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "multiple",
+        "goalFormat": "times",
+        "goal": 4,
+        "stepValue": 1,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": true,
+        "notesTemplate": "6-8 апрель:<div><ul><li><br></li></ul></div><div>8-10 май:</div><div><ul><li><br></li></ul></div><div>10-12 июнь:</div><div><ul><li><br></li></ul></div><div>12-14 июль:</div><div><ul><li><br></li></ul></div><div>14-16 август:</div><div><ul><li><br></li></ul></div><div>16-18 сентябрь:</div><div><ul><li><br></li></ul></div><div>18-20 октябрь:</div><div><ul><li><br></li></ul></div><div>20-22 ноябрь:</div><div><ul><li><br></li></ul></div>",
+        "createdAt": 1771332846442
+      },
+      {
+        "id": "jn4w77j0z",
+        "name": "Выписать НФ",
+        "description": "",
+        "categoryId": "cat-1771566633726",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "times",
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": true,
+        "createdAt": 1771385228066
+      },
+      {
+        "id": "evqkcnjo7",
+        "name": "Ж жить, оно другое",
+        "description": "",
+        "categoryId": "cat-psyche",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "min",
+        "goal": 5,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": true,
+        "createdAt": 1771386535001
+      },
+      {
+        "id": "etfu5yg6y",
+        "name": "Устранять ЖКС по работе",
+        "description": "",
+        "categoryId": "cat-1771494746275",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "min",
+        "goal": 5,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": true,
+        "createdAt": 1771389202582
+      },
+      {
+        "id": "vptp6cbj2",
+        "name": "5 Отжиманий",
+        "description": "",
+        "categoryId": "cat-sports",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "multiple",
+        "goalFormat": "times",
+        "goal": 50,
+        "stepValue": 5,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": true,
+        "createdAt": 1771494133065
+      },
+      {
+        "id": "5i5lmxj3p",
+        "name": "Молодец, что заметил НЭ",
+        "description": "",
+        "categoryId": "cat-1771494746275",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "multiple",
+        "goalFormat": "times",
+        "goal": 15,
+        "stepValue": 1,
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": true,
+        "createdAt": 1771494674429
+      },
+      {
+        "id": "nya21chlb",
+        "name": "Покс за вчера",
+        "description": "",
+        "categoryId": "cat-psyche",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "morning",
+        "stepType": "single",
+        "goalFormat": "times",
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": false,
+        "notesTemplate": "Покс за вчера<div><ul><li><br></li></ul></div>",
+        "createdAt": 1771983973410
+      },
+      {
+        "id": "b7o57htsz",
+        "name": "Список Ж",
+        "description": "",
+        "categoryId": "cat-1771566633726",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "times",
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": true,
+        "notesTemplate": "<div>Какие РЖ различаю:</div><div><ul><li>&nbsp;</li></ul><br></div><div>Какие МЖ проявляются:</div><div><ul><li>&nbsp;</li></ul><br></div>Какие подавляемые Ж различил:<div><div><ul><li>&nbsp;</li></ul>Какие Ж буду реализовывать и что и что испытывыо в процессе</div></div><div><br></div>",
+        "createdAt": 1772165102745
+      },
+      {
+        "id": "3ysis8plb",
+        "name": "Смена итерпретаций",
+        "description": "",
+        "categoryId": "cat-1771566633726",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "times",
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": true,
+        "notesTemplate": "Новое сегодня:<div><ul><li><br></li></ul></div>",
+        "createdAt": 1772168239743
+      },
+      {
+        "id": "hs8m0kogz",
+        "name": "Само по себе не проходит",
+        "description": "",
+        "categoryId": "cat-1771566633726",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "times",
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": false,
+        "notesTemplate": "<ul><li><br></li></ul>",
+        "createdAt": 1772168381112
+      },
+      {
+        "id": "dwm20gnb3",
+        "name": "Какие проблемы сейчас? ",
+        "description": "",
+        "categoryId": "cat-1771566633726",
+        "icon": "dumbbell",
+        "repetition": "daily",
+        "timeOfDay": "anytime",
+        "stepType": "single",
+        "goalFormat": "times",
+        "rewardValue": 1,
+        "isMain": false,
+        "dailyMinimum": false,
+        "keepInListWhenDone": true,
+        "notesTemplate": "",
+        "createdAt": 1772630044695
+      }
+    ],
+    "categories": [
+      {
+        "id": "cat-1771566633726",
+        "name": "Списки",
+        "color": "#fad625"
+      },
+      {
+        "id": "cat-psyche",
+        "name": "Psyche",
+        "color": "#38BDF8"
+      },
+      {
+        "id": "cat-1771494746275",
+        "name": "УНЭ",
+        "color": "#e031dd"
+      },
+      {
+        "id": "cat-interests",
+        "name": "Interests",
+        "color": "#2DD4BF"
+      },
+      {
+        "id": "cat-sports",
+        "name": "ФА",
+        "color": "#FB923C"
+      },
+      {
+        "id": "cat-finance",
+        "name": "Finance",
+        "color": "#2DD4BF"
+      },
+      {
+        "id": "cat-health",
+        "name": "Health",
+        "color": "#A5B4FC"
+      }
+    ],
+    "logs": {
+      "2026-02-12": {
+        "date": "2026-02-12",
+        "mood": 0,
+        "progress": {
+          "63z3qjgpx": {
+            "habitId": "63z3qjgpx",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0
+          },
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0
+          }
+        }
+      },
+      "2026-02-13": {
+        "date": "2026-02-13",
+        "mood": 0,
+        "progress": {
+          "dud17ypvx": {
+            "habitId": "dud17ypvx",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 402
+          },
+          "5qebb6hrs": {
+            "habitId": "5qebb6hrs",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600
+          },
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 0
+          },
+          "0p0jjcahu": {
+            "habitId": "0p0jjcahu",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 757
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 1136
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": true,
+            "completions": 6,
+            "elapsedTime": 0
+          },
+          "5oveotz8p": {
+            "habitId": "5oveotz8p",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0
+          },
+          "63z3qjgpx": {
+            "habitId": "63z3qjgpx",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0
+          }
+        }
+      },
+      "2026-02-14": {
+        "date": "2026-02-14",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 0
+          },
+          "dud17ypvx": {
+            "habitId": "dud17ypvx",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 376
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0
+          },
+          "5qebb6hrs": {
+            "habitId": "5qebb6hrs",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 900
+          },
+          "vy8hot1y6": {
+            "habitId": "vy8hot1y6",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 785
+          },
+          "0p0jjcahu": {
+            "habitId": "0p0jjcahu",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 1148
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "k12i3raf0": {
+            "habitId": "k12i3raf0",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5oveotz8p": {
+            "habitId": "5oveotz8p",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-02-15": {
+        "date": "2026-02-15",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "dud17ypvx": {
+            "habitId": "dud17ypvx",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "0p0jjcahu": {
+            "habitId": "0p0jjcahu",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5qebb6hrs": {
+            "habitId": "5qebb6hrs",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "8wvmcz6sy": {
+            "habitId": "8wvmcz6sy",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "s39bffidm": {
+            "habitId": "s39bffidm",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 1131,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 900,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "k12i3raf0": {
+            "habitId": "k12i3raf0",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5oveotz8p": {
+            "habitId": "5oveotz8p",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 3,
+            "moneyEarned": 0
+          },
+          "1zuey6d4x": {
+            "habitId": "1zuey6d4x",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "okfa9pd4b": {
+            "habitId": "okfa9pd4b",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 1200,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "vy8hot1y6": {
+            "habitId": "vy8hot1y6",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "63z3qjgpx": {
+            "habitId": "63z3qjgpx",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          }
+        }
+      },
+      "2026-02-16": {
+        "date": "2026-02-16",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "8wvmcz6sy": {
+            "habitId": "8wvmcz6sy",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "19ed68crd": {
+            "habitId": "19ed68crd",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5qebb6hrs": {
+            "habitId": "5qebb6hrs",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "0p0jjcahu": {
+            "habitId": "0p0jjcahu",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "dud17ypvx": {
+            "habitId": "dud17ypvx",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 900,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "s39bffidm": {
+            "habitId": "s39bffidm",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5oveotz8p": {
+            "habitId": "5oveotz8p",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 2,
+            "moneyEarned": 0
+          },
+          "k12i3raf0": {
+            "habitId": "k12i3raf0",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "1zuey6d4x": {
+            "habitId": "1zuey6d4x",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "vy8hot1y6": {
+            "habitId": "vy8hot1y6",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 2022,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": true,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 8,
+            "moneyEarned": 120
+          },
+          "m6orjz9k5": {
+            "habitId": "m6orjz9k5",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 0,
+            "stepsCompleted": 30,
+            "moneyEarned": 0
+          },
+          "osqayeevj": {
+            "habitId": "osqayeevj",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "63z3qjgpx": {
+            "habitId": "63z3qjgpx",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-02-17": {
+        "date": "2026-02-17",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "osqayeevj": {
+            "habitId": "osqayeevj",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5qebb6hrs": {
+            "habitId": "5qebb6hrs",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "0p0jjcahu": {
+            "habitId": "0p0jjcahu",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 294,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "dud17ypvx": {
+            "habitId": "dud17ypvx",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "m6orjz9k5": {
+            "habitId": "m6orjz9k5",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 15,
+            "moneyEarned": 0
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 2028,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "s39bffidm": {
+            "habitId": "s39bffidm",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 66,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "k12i3raf0": {
+            "habitId": "k12i3raf0",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "1zuey6d4x": {
+            "habitId": "1zuey6d4x",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 4,
+            "moneyEarned": 60
+          },
+          "vy8hot1y6": {
+            "habitId": "vy8hot1y6",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 1200,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "pfr39xbe8": {
+            "habitId": "pfr39xbe8",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "fqu11pl3c": {
+            "habitId": "fqu11pl3c",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 5,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-02-18": {
+        "date": "2026-02-18",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "osqayeevj": {
+            "habitId": "osqayeevj",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 2486,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5oveotz8p": {
+            "habitId": "5oveotz8p",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 1,
+            "moneyEarned": 0
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "evqkcnjo7": {
+            "habitId": "evqkcnjo7",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 438,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "etfu5yg6y": {
+            "habitId": "etfu5yg6y",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": true,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 10,
+            "moneyEarned": 150
+          },
+          "5qebb6hrs": {
+            "habitId": "5qebb6hrs",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "m6orjz9k5": {
+            "habitId": "m6orjz9k5",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 15,
+            "moneyEarned": 0
+          },
+          "jn4w77j0z": {
+            "habitId": "jn4w77j0z",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "63z3qjgpx": {
+            "habitId": "63z3qjgpx",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "pfr39xbe8": {
+            "habitId": "pfr39xbe8",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-02-19": {
+        "date": "2026-02-19",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "osqayeevj": {
+            "habitId": "osqayeevj",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "0p0jjcahu": {
+            "habitId": "0p0jjcahu",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 1200,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5qebb6hrs": {
+            "habitId": "5qebb6hrs",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "1zuey6d4x": {
+            "habitId": "1zuey6d4x",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 3439,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "fqu11pl3c": {
+            "habitId": "fqu11pl3c",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 4,
+            "moneyEarned": 0
+          },
+          "5oveotz8p": {
+            "habitId": "5oveotz8p",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "vy8hot1y6": {
+            "habitId": "vy8hot1y6",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 1200,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "vptp6cbj2": {
+            "habitId": "vptp6cbj2",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 3000,
+            "stepsCompleted": 3,
+            "moneyEarned": 0
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "evqkcnjo7": {
+            "habitId": "evqkcnjo7",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5i5lmxj3p": {
+            "habitId": "5i5lmxj3p",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 11,
+            "moneyEarned": 0
+          },
+          "k12i3raf0": {
+            "habitId": "k12i3raf0",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "8wvmcz6sy": {
+            "habitId": "8wvmcz6sy",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "pfr39xbe8": {
+            "habitId": "pfr39xbe8",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "jn4w77j0z": {
+            "habitId": "jn4w77j0z",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "m6orjz9k5": {
+            "habitId": "m6orjz9k5",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 2,
+            "moneyEarned": 0
+          },
+          "63z3qjgpx": {
+            "habitId": "63z3qjgpx",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-02-20": {
+        "date": "2026-02-20",
+        "mood": 0,
+        "progress": {
+          "osqayeevj": {
+            "habitId": "osqayeevj",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "jn4w77j0z": {
+            "habitId": "jn4w77j0z",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "dud17ypvx": {
+            "habitId": "dud17ypvx",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 1896,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "vy8hot1y6": {
+            "habitId": "vy8hot1y6",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 794,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "1zuey6d4x": {
+            "habitId": "1zuey6d4x",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "fqu11pl3c": {
+            "habitId": "fqu11pl3c",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 4,
+            "moneyEarned": 0
+          },
+          "pfr39xbe8": {
+            "habitId": "pfr39xbe8",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "63z3qjgpx": {
+            "habitId": "63z3qjgpx",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5i5lmxj3p": {
+            "habitId": "5i5lmxj3p",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 2,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-02-21": {
+        "date": "2026-02-21",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5qebb6hrs": {
+            "habitId": "5qebb6hrs",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "0p0jjcahu": {
+            "habitId": "0p0jjcahu",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 921,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5oveotz8p": {
+            "habitId": "5oveotz8p",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 1,
+            "moneyEarned": 0
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "fqu11pl3c": {
+            "habitId": "fqu11pl3c",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 1,
+            "moneyEarned": 0
+          },
+          "dud17ypvx": {
+            "habitId": "dud17ypvx",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "pfr39xbe8": {
+            "habitId": "pfr39xbe8",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-02-22": {
+        "date": "2026-02-22",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "osqayeevj": {
+            "habitId": "osqayeevj",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 1214,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "1zuey6d4x": {
+            "habitId": "1zuey6d4x",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-02-23": {
+        "date": "2026-02-23",
+        "mood": 0,
+        "progress": {
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "osqayeevj": {
+            "habitId": "osqayeevj",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "fqu11pl3c": {
+            "habitId": "fqu11pl3c",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 2,
+            "moneyEarned": 0
+          },
+          "jn4w77j0z": {
+            "habitId": "jn4w77j0z",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 2096,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "1zuey6d4x": {
+            "habitId": "1zuey6d4x",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "pfr39xbe8": {
+            "habitId": "pfr39xbe8",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": true,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 8,
+            "moneyEarned": 120
+          }
+        }
+      },
+      "2026-02-24": {
+        "date": "2026-02-24",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "osqayeevj": {
+            "habitId": "osqayeevj",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 4,
+            "elapsedTime": 4288,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": true,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 8,
+            "moneyEarned": 120
+          },
+          "5oveotz8p": {
+            "habitId": "5oveotz8p",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "63z3qjgpx": {
+            "habitId": "63z3qjgpx",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "pfr39xbe8": {
+            "habitId": "pfr39xbe8",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-02-25": {
+        "date": "2026-02-25",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "nya21chlb": {
+            "habitId": "nya21chlb",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5qebb6hrs": {
+            "habitId": "5qebb6hrs",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "0p0jjcahu": {
+            "habitId": "0p0jjcahu",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 2323,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-02-26": {
+        "date": "2026-02-26",
+        "mood": 0,
+        "progress": {
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "osqayeevj": {
+            "habitId": "osqayeevj",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 6,
+            "elapsedTime": 5487,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "pfr39xbe8": {
+            "habitId": "pfr39xbe8",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 2,
+            "moneyEarned": 30
+          }
+        }
+      },
+      "2026-02-27": {
+        "date": "2026-02-27",
+        "mood": 0,
+        "progress": {
+          "osqayeevj": {
+            "habitId": "osqayeevj",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "nya21chlb": {
+            "habitId": "nya21chlb",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 4,
+            "elapsedTime": 4233,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "0p0jjcahu": {
+            "habitId": "0p0jjcahu",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "hs8m0kogz": {
+            "habitId": "hs8m0kogz",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "1zuey6d4x": {
+            "habitId": "1zuey6d4x",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "fqu11pl3c": {
+            "habitId": "fqu11pl3c",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 3,
+            "moneyEarned": 0
+          },
+          "b7o57htsz": {
+            "habitId": "b7o57htsz",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          }
+        }
+      },
+      "2026-02-28": {
+        "date": "2026-02-28",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "5oveotz8p": {
+            "habitId": "5oveotz8p",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 1,
+            "moneyEarned": 0
+          },
+          "8wvmcz6sy": {
+            "habitId": "8wvmcz6sy",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 900,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 1,
+            "moneyEarned": 15
+          }
+        }
+      },
+      "2026-03-01": {
+        "date": "2026-03-01",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "0p0jjcahu": {
+            "habitId": "0p0jjcahu",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "8wvmcz6sy": {
+            "habitId": "8wvmcz6sy",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5oveotz8p": {
+            "habitId": "5oveotz8p",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 1,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-03-02": {
+        "date": "2026-03-02",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "1zuey6d4x": {
+            "habitId": "1zuey6d4x",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "fqu11pl3c": {
+            "habitId": "fqu11pl3c",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 1,
+            "moneyEarned": 0
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "osqayeevj": {
+            "habitId": "osqayeevj",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 1555,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": true,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 8,
+            "moneyEarned": 120
+          },
+          "5qebb6hrs": {
+            "habitId": "5qebb6hrs",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "0p0jjcahu": {
+            "habitId": "0p0jjcahu",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 600,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "ohhm2dceb": {
+            "habitId": "ohhm2dceb",
+            "completed": true,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "bf16k7f8f": {
+            "habitId": "bf16k7f8f",
+            "completed": true,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "ear4r1ir3": {
+            "habitId": "ear4r1ir3",
+            "completed": true,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "4ws7gt4jn": {
+            "habitId": "4ws7gt4jn",
+            "completed": true,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-03-03": {
+        "date": "2026-03-03",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "osqayeevj": {
+            "habitId": "osqayeevj",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 2,
+            "moneyEarned": 30
+          },
+          "5oveotz8p": {
+            "habitId": "5oveotz8p",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 1,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-03-04": {
+        "date": "2026-03-04",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "osqayeevj": {
+            "habitId": "osqayeevj",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "nya21chlb": {
+            "habitId": "nya21chlb",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5oveotz8p": {
+            "habitId": "5oveotz8p",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 2,
+            "moneyEarned": 0
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 5,
+            "moneyEarned": 75
+          },
+          "vptp6cbj2": {
+            "habitId": "vptp6cbj2",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 5,
+            "moneyEarned": 0
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 900,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "pfr39xbe8": {
+            "habitId": "pfr39xbe8",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-03-05": {
+        "date": "2026-03-05",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "osqayeevj": {
+            "habitId": "osqayeevj",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 300,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "gfhjgh45y": {
+            "habitId": "gfhjgh45y",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 7,
+            "moneyEarned": 105
+          },
+          "1zuey6d4x": {
+            "habitId": "1zuey6d4x",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 900,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-03-06": {
+        "date": "2026-03-06",
+        "mood": 0,
+        "progress": {
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "pfr39xbe8": {
+            "habitId": "pfr39xbe8",
+            "completed": true,
+            "completions": 1,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          }
+        }
+      },
+      "2026-03-07": {
+        "date": "2026-03-07",
+        "mood": 0,
+        "progress": {
+          "kb0gk9mdw": {
+            "habitId": "kb0gk9mdw",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "19ado07tc": {
+            "habitId": "19ado07tc",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "osqayeevj": {
+            "habitId": "osqayeevj",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 0,
+            "moneyEarned": 0,
+            "skipped": true
+          },
+          "5bl1r9dl3": {
+            "habitId": "5bl1r9dl3",
+            "completed": true,
+            "completions": 2,
+            "elapsedTime": 1800,
+            "stepsCompleted": 0,
+            "moneyEarned": 0
+          },
+          "5oveotz8p": {
+            "habitId": "5oveotz8p",
+            "completed": false,
+            "completions": 0,
+            "elapsedTime": 0,
+            "stepsCompleted": 1,
+            "moneyEarned": 0
+          }
+        }
+      }
+    },
+    "settings": {
+      "timezone": "Asia/Hong_Kong",
+      "weekStart": "monday"
+    },
+    "notes": {
+      "habitly_notes_0p0jjcahu": {
+        "2026-02-27": "<div>Сегодня:</div>Присед на одной ноге: по 9 раз<div>Подъем одной ногой на ступени: по 12 раз</div><div>Подтягивания: 1, 6</div><div>Горизонтальные подтягивания: 6</div><div>Брусья отжим: 1, 9 (рекорд)</div><div>Трицепс присед: 5 раз тяжело..</div><div>Брусья подъем ног и развод в стороны: 5 раз</div><div><br></div><div>Заметки:</div><div><ul><li>Стало интересно повышать нагрузку понемногу и это кажется уже мое желание без примесей НЭ.</li><li>А около недели заметил что стало приятно делать медленно подтягивания, чувствовать силу и нагрузку. Просто ради этого ощущения, не ради рекордов.&nbsp;</li><li>2 Недели ФА по 10 мин дала о себе знать.</li><li><br></li></ul></div><div><br></div>"
+      },
+      "habitly_notes_19ado07tc": {},
+      "habitly_notes_19ed68crd": "",
+      "habitly_notes_1zuey6d4x": {
+        "2026-02-20": "Исследования, интересные сейчас:&nbsp;<div><ul><li><br></li></ul></div><div>Какие были сегодня открытия:<br><div><ul><li><br></li></ul></div><div>Радостные желания сегодня:&nbsp;</div><div><br></div><div>МЖ, проявившиес сегодня:&nbsp;</div><div><br></div><div>ОзВ, проявившиеся сегодня:</div><div><br></div><div>Проявившиеся сегодня физ.переживания:</div><div><br></div><div><br></div></div>",
+        "2026-02-22": "Исследования, интересные сейчас:&nbsp;<div><ul><li>Как бы не быть выжатым как лимон после встреч и трахов с телками. Что я такого делаю, что потом мне хуево. Ну во-первых перетрах, я пытаюсь выжать всё и даже перепотиск.&nbsp;</li><li>С другой стороны после траха вчера и потисков я как будто более спокойный и довольный, как будто гормоны типа акситоцина.</li><li>Как бы удвл от жизни получать? Хочется жить в удвл, без этих подавляющих НЭ.</li></ul><div>Какие были сегодня открытия:</div><div><ul><li>Зачем ебать неприятных женщин? Может хватит уже? Ну реально. Она может и в чем-то возб, но до ужаса тупая была и противная в повадках и зачем это? Вчерашняя кринг хотя бы более человек по разговору и хотя бы приятная. Надо начать фильтровать. Я не готов ебать всё что готово мне дать. Я тоже не резиновый. И я не хочу травиться. Не хочу на них тратить энергию.&nbsp;</li></ul><div>Радостные желания сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div><br></div><div>МЖ, проявившиес сегодня:&nbsp;</div><div><ul><li>Спать и не вставать с кровати</li><li>Пилить приложение и похуй что будет</li></ul></div><div><br></div><div>ОзВ, проявившиеся сегодня:</div><div><ul><li><br></li></ul></div><div><br></div><div>Проявившиеся сегодня физ.переживания:</div><div><br></div><div><br></div></div></div>",
+        "2026-02-23": "Исследования, интересные сейчас:&nbsp;<div><ul><li>УНЭ ндв на работе</li></ul><div>Какие были сегодня открытия:</div><div><ul><li><br></li></ul><div>Радостные желания сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div><br></div><div>МЖ, проявившиес сегодня:&nbsp;</div><div><ul><li>Забить на работу&nbsp;</li><li>Драчить утром без возб</li><li>Залипнуть на сз</li></ul></div><div><br></div><div>ОзВ, проявившиеся сегодня:</div><div><ul><li><br></li></ul></div><div><br></div><div>Проявившиеся сегодня физ.переживания:</div><div><br></div><div><br></div></div></div>",
+        "2026-02-25": "Исследования, интересные сейчас:&nbsp;<div><ul><li>Как бы выбраться из жопы, из которой не хочется выбираться. Первое думаю надо пресечь мысленную жвачку на тему что же могло послужить этому. Второе цлс просто делать фрагменты которые меня выпинывают и на которые энергия есть.&nbsp;</li><li>Имеет смысл использовать любые инструменты. Вот я давно хочу каких-то фрагментов себе сделать в течение дня, на которые можно было бы опереться. Так надо сделать просто, в этом же приложении. ⁷</li></ul><div>Фрагменты сегодня:&nbsp;</div><div><ul><li>Вышел в парк</li><li>Начал запись ежедневных списков</li><li>3 мин цв Эн-Вя - стало получше</li><li>3 мин цв энтуз-серость. Не получалось, но см попытками стало лучше&nbsp;</li><li>9 мин цв НЭ-\"само не проходит\" и стало уже на порядок лучше. Сос на ноль, минус 0.5. А был на минус 2-3</li></ul></div><div>Какие были сегодня открытия:</div><div><ul><li><br></li></ul><div>Радостные желания сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div><br></div><div>МЖ, проявившиес сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div><br></div><div>ОзВ, проявившиеся сегодня:</div><div><ul><li><br></li></ul></div><div><br></div><div>Проявившиеся сегодня физ.переживания:</div><div><br></div><div><br></div></div></div>",
+        "2026-02-26": "Исследования, интересные сейчас:&nbsp;<div><ul><li>Останавливать ВД, помечать психический мусор явно, проговаривая это про себя. И мне кажется это способствует тому что именно этот тип мусора начинает реже проявляться. Может даже цлс его письменно фиксировать.</li></ul><div>Какие были сегодня открытия:</div><div><ul><li>Когда пытаюсь убить комара то прям ннв испытываю, отвращение еще, брезгливость. В общем комок сильных ядовитых вв. Хотя можно и без них. Ну цлс убить и всё. Он хищник, ну а я не донор, мне мешает их звук и не нравятся точки на теле.</li></ul><div>Радостные желания сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div><br></div><div>МЖ, проявившиес сегодня:&nbsp;</div><div><ul><li>Драчить на сф или порно картинки долго когда возб уже почти нет</li><li>Залеживаться в кровати с утра</li><li>Отменить прогулку по парку</li></ul></div><div><br></div><div>ОзВ, проявившиеся сегодня:</div><div><ul><li>Пвк книжку читать дальше,Гайдзин</li></ul></div><div><br></div><div>Проявившиеся сегодня физ.переживания:</div><div><br></div><div><br></div></div></div>",
+        "2026-02-27": "<div>Исследования, интересные сейчас:&nbsp;</div><div><ul><li>Как выбираться с состояния с плотным НФ.&nbsp;</li><li>Ловить себя на НЭ и пробовать УНЭ</li><li>Интересно, в каком направлении изучения чего-то я бы хотел углубляться. Где бы я хотел реально учиться чему-то новому и сложному, постепенно вгрызыясь и усваивая всё новые и новые франменты. Вот именно я. Не просто потому что модно и хорошо с т.з. бо. Пока могу просматриваться к разным направлениям.&nbsp;</li><li>Интересно что бывает когда я реализую свои ж и в том числе МЖ или смешанные с МЖ в плане творчества. Вот я хотел себе сайт портфолио и я доволен. Я хотел себе это приложение и я тоже доволен. Но я много такого подавляю.</li><li>Хочется новый подход к делам взразивать. Если решил что-то делать, то делать с упорством лостаточное время чтобы получить результаты. Как Тави и бодх, они если начинают то делают активно и много, ебашат. Эрик ебашит тоже. И этот въеб он не на идее фикс и не на МЖ от снован, там нет ожидания быстрого результата просто так. Он скорее на расчете что просто так не бывает и поэтому нужно много работать и достаточно долго чтобы был результат. Таким образом это не неделя и не три дня, а может и месяцы работы.</li></ul><div>Франменты сегодня:&nbsp;</div><div><ul><li>Вышел в парк</li><li>Читал полчаса&nbsp;</li><li>Покс за вчера почитал и впрыгнул</li><li>Открыл эти записи</li></ul></div><div>Какие были сегодня открытия:</div><div><ul><li><br></li></ul><div>Радостные желания сегодня:&nbsp;</div><div><ul><li>Пвк читать книжку&nbsp;</li><li>Пвк приятное найти для себя чем заняться сегодня</li><li>РЖ? Читать ещё Тайпен клавела</li><li>РЖ? Почитать новый учебник по японскому который купил</li><li>РЖ? Писать в телеграм чат про секс опыт и мысли о нем. Причем есть фантазии что это будет популярный канал среди обычных людей - ха. И что для симпатов будет интересно. Для симпатов можно и в общий чат писать. Это мое ж быть знаменитым, ж славы и подпитки ЧСВ. С другой стороны описывать опыт само по себе интересно и развивающе, так что это можно было бы отделить. А вообще ж славы и признания и популряности очень сильное и я от него не хочу отказываться не попробовав удовлетворить. Есть вп, что я упущу что-то привлекательное, если не попробую.&nbsp;</li><li>Наблюдать куда уходит время и энергия - на МЖ, на противных старых теток, депрессию, на&nbsp;</li></ul></div><div><br></div><div>МЖ, проявившиес сегодня:&nbsp;</div><div><ul><li>Забить на работу</li></ul></div><div><br></div><div>ОзВ, проявившиеся сегодня:</div><div><ul><li>Држст порождал. Это очень приятно и получалось к тем к кому есть какая-то симпатия, потому что им хочется приятного и приятно представлять что им что-то нравится что они получают удвл. Это кстати необычно человек ведь другой и приятно ему, а это переживается как мое удвл.</li><li>И држств к себ4</li></ul></div><div><br></div><div>Проявившиеся сегодня физ.переживания:</div><div><ul><li>Приятно в мышцах после тренировки</li><li><br></li></ul></div><div><br></div></div></div>",
+        "2026-02-28": "<div>Исследования, интересные сейчас:&nbsp;</div><div><ul><li><br></li></ul><div>Фрагменты сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div>Какие были сегодня открытия:</div><div><ul><li><br></li></ul><div>Радостные желания сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div><br></div><div>МЖ, проявившиес сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div><br></div><div>ОзВ, проявившиеся сегодня:</div><div><ul><li><br></li></ul></div><div><br></div><div>Проявившиеся сегодня физ.переживания:</div><div><br></div><div><br></div></div></div>",
+        "2026-03-02": "<div>Исследования, интересные сейчас:&nbsp;</div><div><ul><li>Мысли паразиты отслеживать и нахуй слать</li><li>Внимание на НОКС направить. С ним невозможно бороться логически, надо просто выжигать жту заразу. Она не совместима с желанием жить.&nbsp;</li><li>Ж жить вспоминать&nbsp;</li></ul><div>Фрагменты сегодня:&nbsp;</div><div><ul><li>Цв нокс - ж жить 3 мин</li><li>ФА 7 мин</li><li>Цв вял-энер 3 мин</li><li><br></li></ul></div><div>Какие были сегодня открытия:</div><div><ul><li>Нокс не победить логически. Нужно просто устранять привычку.</li><li>На след. день после секса с одной двш секса с ней уже не хочется, но хочется секса с другой. Т.е. ж секса оно такое, нужно разнообразие, причем ежедневное. А может и чаще. А может и реже - в общем они живёт и меняется всегда.</li></ul><div>Радостные желания сегодня:&nbsp;</div><div><ul><li>Когда-то я смогу покупать своей двчке, своей обезьянке типа Джем кроссовки, юбочку, топики, чтобы она клево выглядела.</li></ul></div><div><br></div><div>МЖ, проявившиес сегодня:&nbsp;</div><div><ul><li>Купить кроссы для Джем. Вроде бы благородное ж, и хочется чтобы она не ходила в старых туфлях. Но если представляю, что не делаю этого, то возникает разочарование, спазмы. Так что это не РЖ. Но я могу выделить из этого РЖ и исп пвк.</li></ul></div><div><br></div><div>ОзВ, проявившиеся сегодня:</div><div><ul><li><br></li></ul></div><div><br></div><div>Проявившиеся сегодня физ.переживания:</div><div><br></div><div><br></div></div></div>",
+        "2026-03-03": "<div>Исследования, интересные сейчас:&nbsp;</div><div><ul><li>Попытки УНЭ на работе и отслеживание НЭ на работе</li></ul><div>Фрагменты сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div>Какие были сегодня открытия:</div><div><ul><li>Я айре безразличен. Именно поэтому ноль реакций. Как у кошки.</li></ul><div>Радостные желания сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div><br></div><div>МЖ, проявившиес сегодня:&nbsp;</div><div><ul><li>Болезненный ажиатаж на работе</li><li>МЖ ебаться до последнего, так как она под рукой есть</li><li>Засесть за статистику ключей, навязчивое ж и сервис допилить и ключт посмотреть.</li></ul></div><div><br></div><div>ОзВ, проявившиеся сегодня:</div><div><ul><li>Чкр в парке</li><li>Нжн, чкр когда айру тискал</li><li><br></li></ul></div><div><br></div><div>Проявившиеся сегодня физ.переживания:</div><div><br></div><div><br></div></div></div>",
+        "2026-03-04": "<div>Исследования, интересные сейчас:&nbsp;</div><div><ul><li>Трв бы сбить и паническое срстояние спешки, ажиотажа, что не успеваю чего-то.</li></ul><div>Фрагменты сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div>Какие были сегодня открытия:</div><div><ul><li>Олег поддерживает уродов и ублюдков и занимает ублюдочные позиции и активно на них стоит. В голове у него каша и теории заговора и&nbsp;</li></ul><div>Радостные желания сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div><br></div><div>МЖ, проявившиес сегодня:&nbsp;</div><div><ul><li>Подбирать нишу для хром приложения</li><li>Пилить фрагменты, кану, на сайт статью. Это всё не переживается как рж, потому что есть болезненность когда откладываю, вместо пвк.</li></ul></div><div><br></div><div>ОзВ, проявившиеся сегодня:</div><div><ul><li>Пвк книжку почитать</li></ul></div><div><br></div><div>Проявившиеся сегодня физ.переживания:</div><div><br></div><div><br></div></div></div>",
+        "2026-03-05": "<div>Исследования, интересные сейчас:&nbsp;</div><div><ul><li>Повторять \"испытываю ли я то, что хочу испытывать прямо сейчас?\" И смотреть что будет. Мне нравится задавать себе след вопрос - а что хочется сейчас исп?</li></ul><div>Фрагменты сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div>Какие были сегодня открытия:</div><div><ul><li><br></li></ul><div>Радостные желания сегодня:&nbsp;</div><div><ul><li>Читать книжку</li><li>Сериал посмотреть</li></ul></div><div><br></div><div>МЖ, проявившиес сегодня:&nbsp;</div><div><ul><li>Пилить, что угодно. Типа творчества хочется, при этом хочется уйти от мира</li></ul></div><div><br></div><div>ОзВ, проявившиеся сегодня:</div><div><ul><li><br></li></ul></div><div><br></div><div>Проявившиеся сегодня физ.переживания:</div><div><br></div><div><br></div></div></div>",
+        "2026-03-06": "<div>Исследования, интересные сейчас:&nbsp;</div><div><ul><li>Не обжираться бы и спать нормально. Просто уровень энергии держать приемоемый.</li></ul><div>Фрагменты сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div>Какие были сегодня открытия:</div><div><ul><li><br></li></ul><div>Радостные желания сегодня:&nbsp;</div><div><ul><li><br></li></ul></div><div><br></div><div>МЖ, проявившиес сегодня:&nbsp;</div><div><ul><li>Пилить все приложения</li><li>Исследовать хром приложения</li></ul></div><div><br></div><div>ОзВ, проявившиеся сегодня:</div><div><ul><li><br></li></ul></div><div><br></div><div>Проявившиеся сегодня физ.переживания:</div><div><br></div><div><br></div></div></div>"
+      },
+      "habitly_notes_3ysis8plb": {
+        "2026-02-27": "Новое сегодня:<div><ul><li>Нет \"надо работать и все тут\" -&gt; цлс следовать своему плану, зачем-то я его делал, зачем-то мне нужна какая-то сумма денег&nbsp;</li><li><br></li></ul></div>",
+        "2026-03-02": "Новое сегодня:<div><ul><li>Жаль телки не подходят сами -&gt; хочу и подхожу, с чего я должен ждать, я не существую для них пока сам не подойду.&nbsp;</li></ul></div>"
+      },
+      "habitly_notes_5bl1r9dl3": {},
+      "habitly_notes_5i5lmxj3p": "",
+      "habitly_notes_5oveotz8p": {},
+      "habitly_notes_5qebb6hrs": {},
+      "habitly_notes_63z3qjgpx": {
+        "legacy": "<br>",
+        "2026-02-26": "Вчера похерил. Было что-то важное что делал за компом, Но сегодня уже не помню что! Настолько важное, блин)<div><br></div><div>А, вспомнил. Интеграция в новый сервис проджект менеджмента. Щас вижу что МЖ чистой воды. За один вечер хотел чтобы она мне волшебным образом как-то сама всё кормила, сэкономив кучу часов и т.п.. Хотя скорее всего она сама по себе слржная и не даст ничего.&nbsp;</div><div>И нужно понимать проблему прежде чем оптимизировать)</div><div><br><div><br></div><div>Сфантазию хотел раскручивать и драчить, и наверное ещё час после полуночи на это выделил. Совсем не срочное дело.</div></div>"
+      },
+      "habitly_notes_8wvmcz6sy": {},
+      "habitly_notes_b7o57htsz": {
+        "2026-02-27": "Какие подавляемые Ж различил:<div><ul><li>На БИ записаться. Явно хочется такой нагрузки, но постоянно откладываю, типа вот новая страна, сложно найти. Покупать снаряжение опять. Хуйня какая-то.</li><li>Разнообрразить ФА через упражнения типа darebee. Просто откладываю типа.. Лень?..в прошлый раз забросил и тут тоже.. сложно как-то их смотреть с мобильного.. Чё я как дурак буду прыгать.. а вдруг это не сбалансированная какая-то тренировка и я буду делать хуже? Мне нужен кто-то кто скажет что делать..</li><li>Нанять инструктора по ФА. А как оно будет удалено, а вдруг мне не понравится..</li><li>Нанять Тави для работы с психикой&nbsp;</li><li>Вести свой твиттер, набирать популярность, билдить на публике. Тут куча скептиков.</li><li>Сделать отсчет дней в этом приложении. Типа очередное МЖ..и опять потрачу время на какие-то беспрлезные хотелки.. интересно..У меня вообще фоновое такое отношение ко всем микро улучшениям для своей жизни. Тя всегда выбираю какой-то путь серого спартанца, который обойдется.. Вот это обойдется, обойдусь, не надо, я скромный и без этого справлюсь это всё из детства. Но практика показывает что эффективнее использовать любые подручнык средства, приятнее жить с ними, и приятно жизнь для себя и вещи вокруг делать комфортнее. Так что это очень деструктивная хуйня. По каждой мелочи причем.</li></ul><div><br></div><ul><li>Сделать себе автоматизацию отправки мейлов. Я вроде и хочу и подавляю тоже. Подавляю так как не знаю сколько времени займет, получится ли что-то толковое и не уверен что мне это нужно, не верю что получится нормально и думаю всё равно придется руками писать..И враг это сплошное МЖ.</li><li>Купить себе спортивные штаны. С ними удобно, Но скептик что опять куплю себе серое и что я за симпат с одним серым и мне не нравится уже серое.. Но с ними удобнее просто.&nbsp;</li><li><br></li></ul><div>Что реализовал и наблюдения:</div></div><div><ul><li>Сделал себе сайт</li><li>Сделал себе это приложение</li></ul></div>",
+        "2026-03-02": "Какие подавляемые Ж различил:<div><ul><li><br></li></ul></div>",
+        "2026-03-05": "<div>Рж:</div><div><br></div><div>Мж:</div><div><ul><li>&nbsp;Пилить</li><li>Разобраться с планами на ближ недели. А то я мчусь..</li></ul><br></div><div><br></div><div><br></div>Какие подавляемые Ж различил:<div><ul><li>Написать в чат про сф с массажисткой</li><li><br></li></ul></div>"
+      },
+      "habitly_notes_dud17ypvx": "",
+      "habitly_notes_dwm20gnb3": {
+        "2026-03-04": "<ul><li>&nbsp;Не хватает времени ни на что. На что? Поработать норму. Сделать утро-солнце подольше. Почитать. Посмотреть сериал. Поисследовать нишу. Поиграться с проектами.</li><li>Но куда уходит время? Сегодня - на спор с Олегом. На трах утром с Айрой. На трах с трансиком. Потом спал. Как-то тупил на работе.&nbsp;</li><li>Итого:&nbsp;</li><li><ol><li>&nbsp;Цлс не устраивать трахи днём и утром после завтрака, пока работа важна. Свидания для траха цлс назначать на 7-8т вечера, чтобы к10 уже освободиться.&nbsp;</li><li>Приоритет утром и днём цлс отдавать деньгам. И млзг у меня лучше работает</li><li>Не цлс обжираться утром и днём иначе не могу работать.&nbsp;</li><li>Утро-солнце критически важно для нормального состояния. Не цлс его заменять на что-то другое. Ту же айру можно трахнуть после, никуда не денется.</li></ol><br></li></ul>"
+      },
+      "habitly_notes_etfu5yg6y": "<ul><li>Устранять ндв во время работы. Значит что я это могу уже помогает</li><li>Ж жить. Из него посмотреть на работу. Задачи.&nbsp;</li><li>Выписать в чем НЭ по конкретной задаче - сменя интерпретации.</li><li>Стах что нет задач. Ну так если их не станет, то я всегда могу переключиться на заработок другими путями - фриланс, поиск новой компании или пет проект.</li></ul>",
+      "habitly_notes_evqkcnjo7": {
+        "legacy": "<div><ul><li>Посмотреть на НЭ из позиции ж жить. НЭ несрвместимы и ж жить начинает их расщиплять, они уступают. Так и по поводу работы можно, и по поводу каждой задачи. Появляются мысли что клево свои 4 часа закончить быстрее и дальше что-то приятное делать, жить приятно дальше. Вот это что-то новое для меня. И очень приятное.&nbsp;</li><li>И то же к МЖ! Из позиции ж жить очень сомнительно кажется потратить вечер на приложение. Встаёт вопрос ведь можно же что-то более приятное найти? Ценность приятно провести время появляется.</li></ul></div>"
+      },
+      "habitly_notes_fqu11pl3c": {
+        "2026-02-20": "10-12. Дома, не работаю, смотрю твиттер, жру, страдаю что не работаю, жкс и Нокс.&nbsp;<div><br></div><div>12-14: пилю приложение. Но почитал ещё немного селекции. Работать не хочу. Хотя не против выполнить срочные задачи.&nbsp;</div><div>14-16: пилю приложение, немного поработал 20 мин, переписываюсь с арддержкой курса</div><div>18-20: написал 3м блоггерам. Это хорошо что начал.&nbsp;&nbsp;</div><div><br></div><div><br></div><div><br></div>",
+        "2026-02-21": "6-8 апрель:<div><br></div><div>8-10 май:</div><div><br></div><div>10-12 июнь:</div><div><br></div><div>12-14 июль:</div><div><br></div><div>14-16 август:</div><div><br></div><div>16-18 сентябрь:</div><div>Ебался. Опять как в последний раз. Дорвался до возб тела. Но хорошо, что вовремя остановился. Я не хотел кончать.</div><div><br></div><div>18-20 октябрь:</div><div><br></div><div>20-22 ноябрь:</div>",
+        "2026-02-22": "6-8 апрель:<div><br></div><div>8-10 май:</div><div><br></div><div>10-12 июнь:</div><div><br></div><div>12-14 июль:</div><div>Был дома и пытался трахнуть противную филиппинку</div><div><br></div><div>14-16 август:</div><div><br></div><div>16-18 сентябрь:</div><div>Погулял по парку и пожрал с кринг. Уже лучше. Мне с ней приятнее. Не хватает тискательных вп на улице, но хоть что-то получаю</div><div><br></div><div>18-20 октябрь:</div><div><br></div><div>20-22 ноябрь:</div>",
+        "2026-02-23": "6-8 апрель:<div><br></div><div>8-10 май:</div><div><ul><li>Драчил, ждал японский и повторил кое-что, вышел на прогулку.</li></ul></div><div>10-12 июнь:</div><div><ul><li>Жрал, читал полчаса. Не иду на работу, драчил. Вспоминал Кринг.</li></ul></div><div>12-14 июль:</div><div><br></div><div>14-16 август:</div><div><br></div><div>16-18 сентябрь:</div><div><br></div><div>18-20 октябрь:</div><div><br></div><div>20-22 ноябрь:</div>",
+        "2026-02-27": "6-8 апрель:<div><br></div><div>8-10 май:</div><div><br></div><div>10-12 июнь:</div><div><br></div><div>12-14 июль:</div><div><ul><li>ФА 15и мин, приятно, списки в приложении тут почитал и новые сделал, собирал чемодан, в парке сидел, обдумывал разное со списками.</li></ul></div><div><br></div><div>14-16 август:</div><div><ul><li>Ж жить 5 мин вспоминал и накладывал его на текущие НЭ, вкусно поел, читал - интересно на 7, држст 3 мин и к себе тоже</li></ul></div><div><br></div><div>16-18 сентябрь:</div><div><ul><li>В аэропорту, НЭ начал исп по работе. Хотя долго держался с помощью памятования о ж жить. Читал</li></ul></div><div>18-20 октябрь:</div><div><ul><li>Читал, жрал, ничего больше</li></ul></div><div><br></div><div>20-22 ноябрь:</div>",
+        "2026-02-28": "6-8 апрель:<div><ul><li><br></li></ul></div><div>8-10 май:</div><div><ul><li><br></li></ul></div><div>10-12 июнь:</div><div><ul><li><br></li></ul></div><div>12-14 июль:</div><div><ul><li><br></li></ul></div><div>14-16 август:</div><div><ul><li><br></li></ul></div><div>16-18 сентябрь:</div><div><ul><li>Смотрю видео..</li></ul></div><div>18-20 октябрь:</div><div><ul><li>Видео и вышел прогуляться. Почему-то голова болела с утра. Хз почему. Похоже на нокс что не работаю...</li></ul></div><div>20-22 ноябрь:</div><div><ul><li><br></li></ul></div>",
+        "2026-03-02": "6-8 апрель:<div><ul><li><br></li></ul></div><div>8-10 май:</div><div><ul><li>Драчил и досыпал до 8:30. Пошел на террасу, поработал с вв немного, 7 мин ФА, пошел жрать. Слежу за отравляющим вд</li></ul></div><div>10-12 июнь:</div><div><ul><li><br></li></ul></div><div>12-14 июль:</div><div><ul><li><br></li></ul></div><div>14-16 август:</div><div><ul><li><br></li></ul></div><div>16-18 сентябрь:</div><div><ul><li><br></li></ul></div><div>18-20 октябрь:</div><div><ul><li><br></li></ul></div><div>20-22 ноябрь:</div><div><ul><li><br></li></ul></div>",
+        "2026-03-05": "6-8 апрель:<div><ul><li><br></li></ul></div><div>8-10 май:</div><div><ul><li><br></li></ul></div><div>10-12 июнь:</div><div><ul><li><br></li></ul></div><div>12-14 июль:</div><div><ul><li><br></li></ul></div><div>14-16 август:</div><div><ul><li><br></li></ul></div><div>16-18 сентябрь:</div><div><ul><li><br></li></ul></div><div>18-20 октябрь:</div><div><ul><li>Поработал час</li></ul></div><div>20-22 ноябрь:</div><div><ul><li><br></li></ul></div>"
+      },
+      "habitly_notes_gfhjgh45y": {
+        "legacy": "Сегодня 2 часа всего.&nbsp;"
+      },
+      "habitly_notes_hs8m0kogz": {
+        "2026-02-27": "<ul><li>Мрачность&nbsp;</li><li>Жизнерадостность&nbsp;</li><li>Деньги просто так не дают</li><li>ЖКС&nbsp;</li><li>НОКС&nbsp;</li><li>ПОКС&nbsp;</li><li>МЖ&nbsp;</li><li>Напряжение&nbsp;</li><li>Тревожность</li><li>Важность</li><li>Энтузиазм&nbsp;</li><li>Спокойствие</li><li>ОзВ</li><li>ПВК</li><li>Энергичность</li><li>Мышцы сами не растут им нужна нагрузка</li><li>Телки сами не приходят и не вешаются на меня, я для них не существую пока не начну что-то делать&nbsp;</li><li><br></li></ul>"
+      },
+      "habitly_notes_jn4w77j0z": {
+        "legacy": "<ul><li>Мрачность что день какой-то не такой</li><li>Жкс что надо работать</li><li>Ндв, что сонный и жкс</li><li>МЖ пилить приложение</li><li>Ожидание НЭ от рабочих задач</li><li>Нокс что не хочу работать и что не работаю.&nbsp;</li><li>Нокс что много НЭ и сильный НФ</li><li>Урадничесвто, что НФ такой сильный несмотря на 2 дня усилий. Кстати может быть инерция.</li><li>Трв о деньгах, что не буду работать и не заработаю достаточно</li><li>Упадничество, что нет интересных задач для меня по работе, что не знаю за что браться.</li><li>Нокс что не хочу ФА и не выполняю фра тогогмент обязательный.</li></ul>",
+        "2026-02-19": "<ul><li>&nbsp;сегодняшняя заметка 19.02</li></ul>",
+        "2026-02-20": "<ul><li>Жкс что не было секса с индонезийкой вчера</li><li>Жкс 3 что секса мало</li><li>Ж3с 4 что работать надо</li><li>Жкс 3 что хилый и худой, Нокс 4</li><li>Нокс 6 что не работаю</li><li>Трв от деньгах</li><li>Трв о будущем, о бизнесе</li><li>Трв по вводу статьи для универа</li></ul>",
+        "2026-02-22": "<ul><li>Жкс 4 что хреново время провел с телкой&nbsp;</li><li>Противно как-то от себя и от телки</li><li>От себя что мямлил и что не остановился И что раздражался и что чувствовал себя уязвленным.</li><li>Уязвленным из-за того что она раза 3 повторила что рожа у меня красная. Но это так и я ничего ч этим поделать пока не могу. И это реально может отталкивать. И если с ней так, то я тоже ничего не могу поделать и могу просто принять.</li><li>Раздр и ндвл что она не могла решить хочет или не хочет. И что я потратил энергию уговаривая. Но может это была ее игра? Может ей хотелось что ее соблазнили. Но тогда зачем вставать и отталкивать? Тоже часть игры может. Ну и хуй с ней. Я не обязан вписываться во все игры. Ее игра мне не зашла. У других подобные игры мне нравились.</li><li>Жкс что время выходного заканчивается, а я потоатил не на себя а на телок</li><li>Жкс что и щас полдня на телку потрачу. Но может отменить тогда? Точно ли мне щас хочется так уж ебаться? 4баться почти не хочется. Может быть тискаться и обниматься.&nbsp;</li><li>А чего охота</li></ul>",
+        "2026-02-23": "<ul><li>Какая-то усталость и невыспанность. И сильный НФ. Хотя казалось бы вчера очень приятно вечером трахался. А утром неприятно..&nbsp;</li><li>Лень работать. Страх что нет задач или что они муторные.. Что буду страдать с ними. Но не буду. Лень начинать работу, как будто больше хочется ничего не делать. Но я не могу ничего не делать, я в выходные или забиваю скуку телками или бросаюсь МЖ реализовывать и пилю приложение, всегда что-то делаю и не отдыхаю. Лучшее мое состояние кстати не в выходные, а в рабочие дни когда я контролирую вв, когда делать фрагменты.&nbsp;</li></ul>",
+        "2026-02-27": "<ul><li>Жкс 3 заебался таскать рюкзак</li><li>Ндв 4 что ест вор и что непонятно как его поймать.</li></ul>"
+      },
+      "habitly_notes_k12i3raf0": {},
+      "habitly_notes_kb0gk9mdw": {},
+      "habitly_notes_m6orjz9k5": "",
+      "habitly_notes_nya21chlb": {
+        "2026-02-25": "Покс за вчера<div><ul><li>Утро-солнце в парке</li><li>Написал пост в x</li><li>4 часа отработал</li><li>В другой рест зашёл вечером</li><li>Час читал, интересно было</li><li>Японским утром занимался</li><li>Разминку делал утром</li></ul></div>",
+        "2026-02-26": "Покс за сегодня<div><ul><li>1 час поработал&nbsp;</li><li>Купил обратный билет причем нашел дешёвый вариант</li><li>Оформил форму для въезда</li><li>Догоырился с Элис на вечер</li><li>СФ нашел с коровкой, и описал ей и увидел ее реакцию. Ей не нужен секс, ей любовь.. Нужна</li></ul></div>",
+        "2026-02-27": "Покс за вчера<div><ul><li>Проанализировал опыт с Элис: неловкость ведёт к хуйне. И кстати довольно просто начать заниматься своими делами, а человек пусть если хочет занимается своими. Она мне не мешала в общем то. Было ещё так странно - я вообще ничего не чувствовал когда гладил её. Вообще ничего. Как будто первый раз такое. Полностью безразлично былр её тискать. Потому что вообще не было возб и не было эр. вв.</li></ul></div>",
+        "2026-03-04": "Покс за вчера<div><ul><li>Не стал платить за противную телку</li><li>Позвал айру, с которой приятнее&nbsp;</li><li>3.5 часа поработал</li><li>В планке постоял&nbsp;</li><li><br></li></ul></div>",
+        "2026-03-05": "Покс за вчера<div><ul><li>Сформулировал что мне не нравится позиция олега и ему сказал</li><li><br></li></ul></div>",
+        "2026-03-06": "Покс за вчера<div><ul><li>Сегодня молодец что трах остановил когда ещё не перетрахался. И был свежий прсле. Было приятно.&nbsp;</li><li>Но обожрался.</li></ul></div>"
+      },
+      "habitly_notes_ohhm2dceb": {},
+      "habitly_notes_osqayeevj": {},
+      "habitly_notes_pfr39xbe8": {
+        "2026-02-26": "Кончил. Причем так нелепо. Было сложно сразу распрощаться с телкой и поэтому я решил ещё один заход сделать на секс. И вроде как нашел что-то возбуждающее - тира полизать подмышки или поиграть в изнасилование с ней, Но это получается какой-то самолбман или что. Потому что тело всё равно сказало, что хватит. Было около 10 дпо мне кажется.&nbsp;<div><br></div><div><br></div>"
+      },
+      "habitly_notes_unsj9hjpg": {
+        "2026-02-27": "Баги:<div><ul><li>Тултип форматирования мешается в заметках.</li></ul></div><div>Идеи:</div><div><ul><li>Сделать цели счетчики по дням и часам</li><li>И счетчики типа маразмов? Без фрагметов за тапы</li></ul></div>"
+      },
+      "habitly_notes_vptp6cbj2": {
+        "2026-03-04": "25 за раз рекорд"
+      },
+      "habitly_notes_vy8hot1y6": ""
+    },
+    "preferences": {
+      "habitly_sort_by": "time",
+      "habitly_filter_category": "cat-finance",
+      "habitly_collapsed_groups": [],
+      "habitly_header_collapsed": true,
+      "habitly_detail_tab": "notes",
+      "habitly_show_full_month": false
+    }
+  }
+}
